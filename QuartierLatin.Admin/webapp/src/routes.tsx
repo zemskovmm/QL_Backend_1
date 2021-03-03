@@ -10,7 +10,14 @@ import {
 } from "src/routing/hooks";
 import { convertRoutes } from "src/routing/route";
 import { AnonNotFoundPage } from "src/pages/anon/AnonNotFoundPage";
-import { AccountConfirmPage, AdminLoginPage, EditProfilePage, LoginPage, RegisterPage } from "./routing/LazyRoutes";
+import {
+    AccountConfirmPage,
+    AdminDashboardPage,
+    AdminLoginPage,
+    EditProfilePage,
+    LoginPage,
+    RegisterPage,
+} from "./routing/LazyRoutes";
 
 export enum AnonRouteNames {
     notFound = "not-found",
@@ -44,6 +51,7 @@ export const UserViewMap = {
 
 export const AdminViewMap = {
     [AdminRouteNames.login]: <AdminLoginPage />,
+    [AdminRouteNames.mainPage]: <AdminDashboardPage />,
 };
 
 const AnonRoutes: Route[] = convertRoutes([

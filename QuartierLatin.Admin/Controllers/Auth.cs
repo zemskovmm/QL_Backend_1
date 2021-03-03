@@ -17,21 +17,21 @@ namespace QuartierLatin.Admin.Controllers
     
     [Route("[Controller]")]
     [AllowAnonymous]
-    public class Login : Controller
+    public class Auth : Controller
     {
 
         private readonly IUserAppService _user;
         private readonly IRolesAppService _roles;
 
-        public Login(IUserAppService user, IRolesAppService roles)
+        public Auth(IUserAppService user, IRolesAppService roles)
         {
             _user = user;
             _roles = roles;
         }
 
         // GET
-        [HttpPost]
-        public async Task<IActionResult> AdminLogin([FromBody]AdminLoginModel model)
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody]AdminLoginModel model)
         {
             UserProfileDto user;
             
@@ -75,6 +75,13 @@ namespace QuartierLatin.Admin.Controllers
                 authProperties);
             
             return Ok();
+        }
+
+        [HttpGet("Logout")]
+        public async Task<IActionResult> AdminLogout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Redirect("/");
         }
     }
 }

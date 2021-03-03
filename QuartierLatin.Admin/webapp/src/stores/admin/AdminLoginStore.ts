@@ -4,6 +4,7 @@ import { AdminRouteNames } from "src/routes";
 import { validate, IsNotEmpty } from "@keroosha/class-validator";
 import { reduceValidationErrorsToErrors } from "src/utilities";
 import { AuthErrorFields, AuthorizeStore, ResettableFieldsStore, StoreWithErrors } from "src/stores/interfaces";
+import { RouterState } from "mobx-state-router";
 
 export class AdminLoginStore implements AuthorizeStore, ResettableFieldsStore, StoreWithErrors<AuthErrorFields> {
     @observable root;
@@ -43,21 +44,22 @@ export class AdminLoginStore implements AuthorizeStore, ResettableFieldsStore, S
             return;
         }
 
-        // const res = await this.adminApi.userLogin.loginAdmin(this.login, this.password);
-        // if (res.success) {
-        //     runInAction(() => {
-        //         this.root.adminRpc.setUserToken(res.value);
-        //         this.JumpToDashboard();
-        //         this.resetFields();
-        //     });
-        //     return;
-        // }
+        const res = await fetch("/Auth/Login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username: this.login, password: this.password, rememberMe: false }),
+        });
 
-        // this.errors.apiError = [res.error.description];
+        if (res.ok) this.JumpToDashboard();
+        this.errors.apiError = ["Wrong password"];
     }
 
-    @action LogOut() {
-        // this.root.adminRpc.resetUserToken();
+    @action async LogOut() {
+        const res = await fetch("/Auth/Logout", {
+            method: "GET",
+        });
         window.location.reload();
     }
 }

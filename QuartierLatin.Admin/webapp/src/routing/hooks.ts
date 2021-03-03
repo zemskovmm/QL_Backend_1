@@ -22,11 +22,15 @@ export const UserAllowOnlyFilledProfilesHook: RouteTransitionHook = async (root)
     if (!profileFilled) throw new RouterState(UserRouteNames.profile);
 };
 
-export const AdminAuthorizedOnlyHook: RouteTransitionHook = (root) => {
+export const AdminAuthorizedOnlyHook: RouteTransitionHook = async (root) => {
+    const res = await fetch("/Heartbeat/pulseAdmin", { method: "GET" });
+    if (!res.ok) throw new RouterState(AdminRouteNames.login);
     // if (!root.adminRpc.isAuthorized) throw new RouterState(AdminRouteNames.login);
 };
 
-export const AdminRouteToRootIfAuthorizedHook: RouteTransitionHook = (root) => {
+export const AdminRouteToRootIfAuthorizedHook: RouteTransitionHook = async (root) => {
+    const res = await fetch("/Heartbeat/pulseAdmin", { method: "GET" });
+    if (res.ok) throw new RouterState(AdminRouteNames.mainPage);
     // if (root.adminRpc.isAuthorized) {
     //     root.routerStore.goTo(new RouterState(AdminRouteNames.mainPage));
     // }

@@ -151,6 +151,8 @@ namespace QuartierLatin.Admin
                 app.UseStaticFiles(); // for wwwroot
             }
             
+            StaticFiles();
+            
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

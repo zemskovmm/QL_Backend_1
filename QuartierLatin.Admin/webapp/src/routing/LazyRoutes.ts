@@ -11,3 +11,4 @@ export const AccountConfirmPage = lazy(() => import("../pages/user/AccountConfir
 
 // Admin pages.
 export const AdminLoginPage = lazy(() => import("../pages/admin/Login/AdminLoginPage"));
+export const AdminDashboardPage = lazy(() => import("../pages/admin/dashboard/dashboard-page"));
