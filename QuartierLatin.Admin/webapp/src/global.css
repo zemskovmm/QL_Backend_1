@@ -1,0 +1,27 @@
+html,
+body,
+div#app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+    font-family: "Open Sans", sans-serif;
+}
+
+button:focus {
+    outline: none;
+}
+
+label {
+    cursor: pointer;
+    margin: 0;
+}
+
+/* HACK: react datepicker doesn't have fullwidth mechanism by default */
+.react-datepicker-wrapper {
+    width: 100%;
+}
+
+.react-datepicker__input-container > input[type="text"] {
+    width: 100%;
+}

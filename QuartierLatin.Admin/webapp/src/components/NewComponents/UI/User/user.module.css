@@ -1,0 +1,45 @@
+.User__avatar {
+    width: 50px;
+    min-width: 42px;
+    height: 50px;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #90b2c9;
+    margin-left: 19px;
+    font-size: 24px;
+    color: #ffffff;
+    box-sizing: border-box;
+    border: 1px solid #90b2c9;
+}
+
+.User__title,
+.User__subtitle {
+    font-size: 14px;
+    text-align: right;
+}
+
+.User__title {
+    color: #ffffff;
+}
+
+.User__subtitle {
+    color: #90b2c9;
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    border: 0;
+    background: transparent;
+    padding: 0;
+}
+
+
+@media (max-width: 940px) {
+    .User__subtitle, .User__title{
+        display: none;
+    }
+    .User__avatar{
+        margin: 0;
+    }
+}

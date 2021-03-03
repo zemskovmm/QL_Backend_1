@@ -1,0 +1,27 @@
+.login-layout {
+    /* padding-left: 4rem; */
+    width: 100%;
+    max-width: 1071px;
+    box-sizing: content-box;
+    margin: 0 auto;
+    padding: 19px 28px;
+}
+
+@media (max-width: 1131px) {
+    .login-layout {
+        box-sizing: border-box;
+        padding: 19px 30px;
+        margin: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .login-layout {
+        width: auto;
+        padding: 19px 12px;
+    }
+}
+
+.login-layout form {
+    max-width: 694px;
+}

@@ -1,0 +1,13 @@
+.editProfile__maxWidth {
+    max-width: 1071px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 19px 30px 15px;
+    box-sizing: content-box;
+}
+@media (max-width: 767px){
+    .editProfile__maxWidth{
+        width: auto;
+        padding: 12px;
+    }
+}
