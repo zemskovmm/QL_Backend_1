@@ -26,33 +26,30 @@ const AdminNavigation: FC<{ onLogout: () => void }> = ({ onLogout }) => (
 
 export const AdminShell = () => {
     const {
-        rootStore: { routerStore, adminRpc, adminLoginStore },
+        rootStore: { routerStore },
     } = useRootStore();
-    return useObserver(() =>
-        adminRpc.isAuthorized ? (
-            <div className={style.fullHeight}>
-                <Fade className={style.fullHeight + " container ml-0"}>
-                    <div className={style.flexList + " row " + style.fullHeight}>
-                        <div className={"col-lg-3 " + style.darkBackground}>
-                            <div className={"sticky-top mt-4"}>
-                                <AdminNavigation onLogout={() => adminLoginStore.LogOut()} />
-                            </div>
-                        </div>
-                        <div className={"col-lg-9"}>
-                            <SuspensePlaceholder>
-                                <RouterView routerStore={routerStore} viewMap={AdminViewMap} />
-                            </SuspensePlaceholder>
-                        </div>
-                    </div>
-                </Fade>
-            </div>
-        ) : (
-            <>
-                {useIsAdminRoute() && <Header />}
-                <SuspensePlaceholder>
-                    <RouterView routerStore={routerStore} viewMap={AdminViewMap} />
-                </SuspensePlaceholder>
-            </>
-        )
-    );
+    return useObserver(() => (
+        // <div className={style.fullHeight}>
+        //     <Fade className={style.fullHeight + " container ml-0"}>
+        //         <div className={style.flexList + " row " + style.fullHeight}>
+        //             <div className={"col-lg-3 " + style.darkBackground}>
+        //                 <div className={"sticky-top mt-4"}>
+        //                     <AdminNavigation onLogout={() => adminLoginStore.LogOut()} />
+        //                 </div>
+        //             </div>
+        //             <div className={"col-lg-9"}>
+        //                 <SuspensePlaceholder>
+        //                     <RouterView routerStore={routerStore} viewMap={AdminViewMap} />
+        //                 </SuspensePlaceholder>
+        //             </div>
+        //         </div>
+        //     </Fade>
+        // </div>
+        <>
+            {useIsAdminRoute() && <Header />}
+            <SuspensePlaceholder>
+                <RouterView routerStore={routerStore} viewMap={AdminViewMap} />
+            </SuspensePlaceholder>
+        </>
+    ));
 };

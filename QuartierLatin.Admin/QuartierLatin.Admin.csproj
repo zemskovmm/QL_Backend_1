@@ -12,7 +12,6 @@
 
 
     <ItemGroup>
-        <PackageReference Include="CoreRPC.AspNetCore" Version="0.5.4" />
         <PackageReference Include="linq2db.PostgreSQL" Version="3.2.0" />
         <PackageReference Include="Nito.AsyncEx" Version="5.1.0" />
         <PackageReference Include="Serenity.FluentMigrator" Version="1.6.904" />

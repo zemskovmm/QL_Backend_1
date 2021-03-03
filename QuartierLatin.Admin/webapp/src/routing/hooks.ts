@@ -3,7 +3,7 @@ import { RouterState } from "mobx-state-router";
 import { AdminRouteNames, UserRouteNames } from "src/routes";
 
 export const UserAuthorizedOnlyHook: RouteTransitionHook = (root) => {
-    if (!root.userRpc.isAuthorized) throw new RouterState(UserRouteNames.login);
+    // if (!root.userRpc.isAuthorized) throw new RouterState(UserRouteNames.login);
 };
 
 export const EnsureProfileLoadedHook: RouteTransitionHook = async (root) => {
@@ -11,9 +11,9 @@ export const EnsureProfileLoadedHook: RouteTransitionHook = async (root) => {
 };
 
 export const UserRouteToRootIfAuthorizedHook: RouteTransitionHook = (root) => {
-    if (root.userRpc.isAuthorized) {
-        root.routerStore.goTo(new RouterState(UserRouteNames.mainPage));
-    }
+    // if (root.userRpc.isAuthorized) {
+    //     root.routerStore.goTo(new RouterState(UserRouteNames.mainPage));
+    // }
 };
 
 export const UserAllowOnlyFilledProfilesHook: RouteTransitionHook = async (root) => {
@@ -23,11 +23,11 @@ export const UserAllowOnlyFilledProfilesHook: RouteTransitionHook = async (root)
 };
 
 export const AdminAuthorizedOnlyHook: RouteTransitionHook = (root) => {
-    if (!root.adminRpc.isAuthorized) throw new RouterState(AdminRouteNames.login);
+    // if (!root.adminRpc.isAuthorized) throw new RouterState(AdminRouteNames.login);
 };
 
 export const AdminRouteToRootIfAuthorizedHook: RouteTransitionHook = (root) => {
-    if (root.adminRpc.isAuthorized) {
-        root.routerStore.goTo(new RouterState(AdminRouteNames.mainPage));
-    }
+    // if (root.adminRpc.isAuthorized) {
+    //     root.routerStore.goTo(new RouterState(AdminRouteNames.mainPage));
+    // }
 };

@@ -1,11 +1,9 @@
-using CoreRPC;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using QuartierLatin.Admin.Auth;
-using QuartierLatin.Admin.Auth.Requirements;
 using QuartierLatin.Admin.Config;
 using QuartierLatin.Admin.Database;
 using QuartierLatin.Admin.Managers;
@@ -109,17 +107,12 @@ namespace QuartierLatin.Admin
         {
             var roleRepository = app.ApplicationServices.GetRequiredService<IRoleRepository>();
             var userAuthManager = app.ApplicationServices.GetRequiredService<UserAuthManager>();
-            var interceptors = new List<IMethodCallInterceptor>
-            {
-                new RpcRoleInterceptor(roleRepository, userAuthManager)
-            };
 
             void StaticFiles()
             {
                 var devJsRoot = Path.Combine(Directory.GetCurrentDirectory(), "webapp");
                 if (Directory.Exists(devJsRoot))
                 {
-                    File.WriteAllText(Path.Combine(devJsRoot, "src", "api.ts"), TsInterop.GenerateTsRpc());
                     var dist = Path.GetFullPath(Path.Combine(devJsRoot, "build"));
                     Directory.CreateDirectory(dist);
                     app.UseStaticFiles(new StaticFileOptions
@@ -130,7 +123,6 @@ namespace QuartierLatin.Admin
             }
 
             StaticFiles();
-            TsInterop.Register(app, interceptors);
 
             app.UseRouting();
             app.UseAuthorization();

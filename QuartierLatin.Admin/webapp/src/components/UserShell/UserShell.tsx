@@ -15,13 +15,13 @@ export const UserRoutes = () => {
 
 export const UserShell = () => {
     const {
-        rootStore: { routerStore, userRpc },
+        rootStore: { routerStore },
     } = useRootStore();
-    const [routes, userWidget] = userRpc.isAuthorized ? [<UserRoutes />, <User />] : [];
+    // const [routes, userWidget] = userRpc.isAuthorized ? [<UserRoutes />, <User />] : [];
 
     return useObserver(() => (
         <>
-            {useIsUserRoute() && <Header HeaderNav={routes} UserWidget={userWidget} />}
+            {/*{useIsUserRoute() && <Header HeaderNav={routes} UserWidget={userWidget} />}*/}
             <SuspensePlaceholder>
                 <RouterView routerStore={routerStore} viewMap={UserViewMap} />
             </SuspensePlaceholder>

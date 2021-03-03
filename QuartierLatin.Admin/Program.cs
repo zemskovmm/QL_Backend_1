@@ -39,19 +39,7 @@ namespace QuartierLatin.Admin
                 Console.WriteLine(PasswordToolkit.EncodeSshaPassword(pass));
                 return;
             }
-
-            if (args.Contains("--GenerateTsApi"))
-            {
-                var devJsRoot = Path.Combine(Directory.GetCurrentDirectory(), "webapp");
-                if (Directory.Exists(devJsRoot))
-                {
-                    File.WriteAllText(Path.Combine(devJsRoot, "src", "api.ts"), TsInterop.GenerateTsRpc());
-                    Console.WriteLine("api.ts created!");
-                }
-
-                return;
-            }
-
+            
             var built = CreateHostBuilder(args).Build();
 
             if (args.Contains("--Services")) ServiceRunner.StartServices(built.Services);

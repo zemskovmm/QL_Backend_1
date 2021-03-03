@@ -1,6 +1,5 @@
 import { RootStore } from "src/stores/RootStore";
 import { action, computed, observable, runInAction } from "mobx";
-import { UserProfileDto } from "src/api";
 import { validate, IsNotEmpty } from "@keroosha/class-validator";
 import { reduceValidationErrorsToErrors } from "src/utilities";
 import { UserRouteNames } from "src/routes";
@@ -22,16 +21,16 @@ export class UpdateProfileAvatarStore {
 
     @action async uploadAvatar(file: File) {
         const buffer = await file.arrayBuffer();
-        const res = await this.root.userRpc.userProfile.uploadUserPhoto(Array.from(new Uint8Array(buffer)));
-        if (!res.success) return;
-        await this.userStore.loadProfile();
+        // const res = await this.root.userRpc.userProfile.uploadUserPhoto(Array.from(new Uint8Array(buffer)));
+        // if (!res.success) return;
+        // await this.userStore.loadProfile();
         this.uploadMode = false;
     }
 
     @action async removeAvatar() {
-        const res = await this.root.userRpc.userProfile.removeUserPhoto();
-        if (!res.success) return;
-        debugger;
+        // const res = await this.root.userRpc.userProfile.removeUserPhoto();
+        // if (!res.success) return;
+
         await this.userStore.loadProfile();
     }
 }
@@ -94,15 +93,15 @@ export class UpdateProfileStore {
         }
 
         const avatarImage = "boo";
-        const res = await this.root.userRpc.userProfile.updateProfile({
-            id,
-            email,
-            name: `${firstName} ${lastName}`,
-        } as UserProfileDto);
-        if (!res.success) {
-            runInAction(() => (this.error = res.error.description));
-            return;
-        }
+        // const res = await this.root.userRpc.userProfile.updateProfile({
+        //     id,
+        //     email,
+        //     name: `${firstName} ${lastName}`,
+        // } as UserProfileDto);
+        // if (!res.success) {
+        //     runInAction(() => (this.error = res.error.description));
+        //     return;
+        // }
 
         await userStore.loadProfile();
         await this.root.routerStore.goTo(UserRouteNames.mainPage);

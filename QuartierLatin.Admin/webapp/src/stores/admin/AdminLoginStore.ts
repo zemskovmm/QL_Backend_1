@@ -15,14 +15,12 @@ export class AdminLoginStore implements AuthorizeStore, ResettableFieldsStore, S
     @observable
     password;
 
-    @observable adminApi;
     @observable errors: AuthErrorFields;
 
     constructor(root: RootStore) {
         this.root = root;
         this.login = "";
         this.password = "";
-        this.adminApi = this.root.adminRpc;
         this.errors = {};
     }
 
@@ -37,7 +35,7 @@ export class AdminLoginStore implements AuthorizeStore, ResettableFieldsStore, S
     }
 
     @action async Login() {
-        if (this.root.adminRpc.isAuthorized) this.JumpToDashboard();
+        // if (this.root.adminRpc.isAuthorized) this.JumpToDashboard();
 
         const errors = await validate(this);
         if (errors.length !== 0) {
@@ -45,21 +43,21 @@ export class AdminLoginStore implements AuthorizeStore, ResettableFieldsStore, S
             return;
         }
 
-        const res = await this.adminApi.userLogin.loginAdmin(this.login, this.password);
-        if (res.success) {
-            runInAction(() => {
-                this.root.adminRpc.setUserToken(res.value);
-                this.JumpToDashboard();
-                this.resetFields();
-            });
-            return;
-        }
+        // const res = await this.adminApi.userLogin.loginAdmin(this.login, this.password);
+        // if (res.success) {
+        //     runInAction(() => {
+        //         this.root.adminRpc.setUserToken(res.value);
+        //         this.JumpToDashboard();
+        //         this.resetFields();
+        //     });
+        //     return;
+        // }
 
-        this.errors.apiError = [res.error.description];
+        // this.errors.apiError = [res.error.description];
     }
 
     @action LogOut() {
-        this.root.adminRpc.resetUserToken();
+        // this.root.adminRpc.resetUserToken();
         window.location.reload();
     }
 }

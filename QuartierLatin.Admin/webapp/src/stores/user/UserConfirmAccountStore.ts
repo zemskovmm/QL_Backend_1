@@ -27,11 +27,11 @@ export class UserConfirmAccountStore {
             return false;
         }
 
-        const { success, error } = await this.root.userRpc.userLogin.confirmAccount(code);
-        if (!success) {
-            this.setError(error.description);
-            return false;
-        }
+        // const { success, error } = await this.root.userRpc.userLogin.confirmAccount(code);
+        // if (!success) {
+        //     this.setError(error.description);
+        //     return false;
+        // }
         return true;
     }
 }
