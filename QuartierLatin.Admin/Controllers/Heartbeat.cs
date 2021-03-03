@@ -8,12 +8,6 @@ namespace QuartierLatin.Admin.Controllers
     [Authorize]
     public class Heartbeat : Controller
     {
-        [HttpGet("pulse")]
-        public Task Pulse()
-        {
-            return Task.CompletedTask;
-        }
-        
         [HttpGet("pulseAdmin")]
         [Authorize(Policy = "Admin")]
         public Task PulseAdmin()
