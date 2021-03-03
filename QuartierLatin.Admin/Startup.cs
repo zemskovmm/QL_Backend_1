@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using QuartierLatin.Admin.Auth;
 using QuartierLatin.Admin.Config;
 using QuartierLatin.Admin.Database;
@@ -11,8 +12,10 @@ using QuartierLatin.Admin.Models;
 using QuartierLatin.Admin.Models.Repositories;
 using QuartierLatin.Admin.Storages;
 using LinqToDB;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -67,6 +70,32 @@ namespace QuartierLatin.Admin
             services.AddSingleton<UserAuthManager>();
             services.AddSingleton<BlobManager>();
 
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.SameSite = SameSiteMode.Strict;
+                    options.Events.OnRedirectToAccessDenied = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return Task.CompletedTask;
+                    };
+                    options.Events.OnRedirectToLogin = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    };
+                });
+            
+            services.AddSwaggerGen();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole(Roles.Admin);
+                });
+            });
+
             var blobType = new BlobConfig();
             Configuration.GetSection("Blob").Bind(blobType);
             if (blobType.Type is BlobTypes.Azure) services.AddSingleton<IBlobFileStorage, AzureBlobStorage>();
@@ -90,9 +119,9 @@ namespace QuartierLatin.Admin
             services.AddSingleton<AppDbContextManager>();
 
             if (Configuration.GetSection("Email").Exists())
-                services.AddSingleton<IEmailConfirmationService, EmailConfirmationService>();
+                services.AddSingleton<IConfirmationService, EmailConfirmationService>();
             else
-                services.AddSingleton<IEmailConfirmationService, NoopEmailConfirmationService>();
+                services.AddSingleton<IConfirmationService, NoopEmailConfirmationService>();
 
             if (Configuration.GetSection("AzureAD").Exists())
                 services.AddSingleton<IAzureAdClient, AzureAdClient>();
@@ -121,11 +150,20 @@ namespace QuartierLatin.Admin
 
                 app.UseStaticFiles(); // for wwwroot
             }
-
-            StaticFiles();
-
+            
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSwagger(c =>
+            {
+                c.SerializeAsV2 = true;
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "QuartierLatin API");
+            });
+            
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

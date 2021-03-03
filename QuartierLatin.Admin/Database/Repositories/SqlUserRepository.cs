@@ -21,19 +21,18 @@ namespace QuartierLatin.Admin.Database.Repositories
             return _db.Exec(db => db.Users.First(x => x.Id == id));
         }
 
-        public User FindByLogin(string login)
-        {
-            return _db.Exec(db => db.Users.FirstOrDefault(x => x.Email == login));
-        }
+        public User FindByLogin(string login) => 
+            _db.Exec(db => db.Users.FirstOrDefault(x => x.Email == login));
 
-        public int Create(string email, Guid identityId, string name, string passwordHash)
+        public int Create(string email, Guid identityId, string name, string passwordHash, bool confirmed = false)
         {
             return _db.Exec(d => d.InsertWithInt32Identity(new User
             {
                 Email = email,
                 AzureIdentityId = identityId,
                 Name = name,
-                PasswordHash = passwordHash
+                PasswordHash = passwordHash,
+                Confirmed = confirmed,
             }));
         }
 
