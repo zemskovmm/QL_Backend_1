@@ -15,7 +15,7 @@ namespace QuartierLatin.Admin.Controllers
 {
     public record AdminLoginModel(string Username, string Password, bool RememberMe);
     
-    [Route("[Controller]")]
+    [Route("/api/auth")]
     [AllowAnonymous]
     public class Auth : Controller
     {
@@ -30,7 +30,7 @@ namespace QuartierLatin.Admin.Controllers
         }
 
         // GET
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]AdminLoginModel model)
         {
             UserProfileDto user;
@@ -77,7 +77,7 @@ namespace QuartierLatin.Admin.Controllers
             return Ok();
         }
 
-        [HttpGet("Logout")]
+        [HttpGet("logout")]
         public async Task<IActionResult> AdminLogout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

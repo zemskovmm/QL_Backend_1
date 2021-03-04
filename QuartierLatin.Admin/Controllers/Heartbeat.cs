@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace QuartierLatin.Admin.Controllers
 {
-    [Route("[Controller]")]
+    [Route("/api/heartbeat")]
     [Authorize]
     public class Heartbeat : Controller
     {
-        [HttpGet("pulseAdmin")]
+        [HttpGet("admin")]
         [Authorize(Policy = "Admin")]
         public Task PulseAdmin()
         {
