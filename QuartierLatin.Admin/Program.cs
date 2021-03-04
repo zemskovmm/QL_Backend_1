@@ -71,9 +71,7 @@ namespace QuartierLatin.Admin
                     .UseServer(new EmptyServer());
 
             if (args.Contains("--Web") || args.Length is 0)
-                hostBuilder
-                    .UseKestrel()
-                    .UseUrls("http://0.0.0.0:12321");
+                hostBuilder.UseKestrel();
 
             return hostBuilder;
         }
