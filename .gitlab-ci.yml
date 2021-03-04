@@ -6,11 +6,14 @@ stages:
 
 build:
   stage: build
-  script: 
-    - dotnet publish -c Release -o out QuartierLatin.Admin
   tags:
     - shell
-    - dev
+    - ql-dev
+  artifacts:
+    paths:
+      - out
+  script: 
+    - dotnet publish -c Release -o out QuartierLatin.Admin
 
 #tests:
 #  stage: test
@@ -19,12 +22,14 @@ build:
 
 deploy:
   stage: deploy
+  tags:
+    - shell
+    - ql-dev
+  dependencies:
+    - build
   only: 
     - master
   script: 
     - sudo systemctl stop quartier-admin
-    - rm -rf /opt/quartier-admin/ && cp -r out/ /opt/quartier-admin/
+    - rm -rf /apps/quartier-admin/app/ && cp -r out/ /apps/quartier-admin/app/
     - sudo systemctl start quartier-admin
-  tags:
-    - shell
-    - dev
