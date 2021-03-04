@@ -1,0 +1,29 @@
+default:
+  image: mcr.microsoft.com/dotnet/sdk:5.0
+
+
+stages:
+  - build
+#  - test
+  - deploy
+
+
+build:
+  stage: build
+  script: 
+    - dotnet publish -c Release -o out QuartierLatin.Admin
+
+#tests:
+#  stage: test
+#  script: 
+#    - dotnet run -c Release QuartierLatin.Admin.Tests
+
+deploy:
+  stage: deploy
+  artifacts:
+    paths:
+    - out
+  script: 
+    - sudo systemctl stop quartier-admin
+    - rm -rf /opt/quartier-admin/ && cp -r out/ /opt/quartier-admin/
+    - sudo systemctl start quartier-admin
