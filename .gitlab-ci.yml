@@ -8,6 +8,9 @@ build:
   stage: build
   script: 
     - dotnet publish -c Release -o out QuartierLatin.Admin
+  tags:
+    - shell
+    - dev
 
 #tests:
 #  stage: test
@@ -23,3 +26,6 @@ deploy:
     - sudo systemctl stop quartier-admin
     - rm -rf /opt/quartier-admin/ && cp -r out/ /opt/quartier-admin/
     - sudo systemctl start quartier-admin
+  tags:
+    - shell
+    - dev
