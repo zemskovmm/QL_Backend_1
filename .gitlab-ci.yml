@@ -6,6 +6,12 @@ stages:
 
 build:
   stage: build
+  tags:
+    - shell
+    - ql-dev
+  artifacts:
+    paths:
+      - out
   script: 
     - dotnet publish -c Release -o out QuartierLatin.Admin
 
@@ -16,9 +22,10 @@ build:
 
 deploy:
   stage: deploy
-  artifacts:
-    paths:
-    - out
+    - shell
+    - ql-dev
+  dependencies:
+    - build
   script: 
     - sudo systemctl stop quartier-admin
     - rm -rf /opt/quartier-admin/ && cp -r out/ /opt/quartier-admin/
