@@ -162,7 +162,8 @@ namespace QuartierLatin.Admin
             });
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "QuartierLatin API");
+                c.RoutePrefix = "/api/swagger";
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "QuartierLatin API");
             });
             
             
