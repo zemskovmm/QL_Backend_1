@@ -19,9 +19,8 @@ build:
 
 deploy:
   stage: deploy
-  artifacts:
-    paths:
-    - out
+  only: 
+    - master
   script: 
     - sudo systemctl stop quartier-admin
     - rm -rf /opt/quartier-admin/ && cp -r out/ /opt/quartier-admin/

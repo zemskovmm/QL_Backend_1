@@ -60,7 +60,7 @@ namespace QuartierLatin.Admin
                     cb.Sources.Clear();
                     cb.AddJsonFile("config.defaults.json")
                         .AddJsonFile("config.local.json", true)
-                        .AddJsonFile("/data/quartier-config.json", true)
+                        .AddJsonFile("/apps/quartier-admin/wd/quartier-config.json", true)
                         .AddEnvironmentVariables()
                         .AddCommandLine(args);
                 }).UseStartup<Startup>();
