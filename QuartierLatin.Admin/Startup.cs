@@ -156,17 +156,24 @@ namespace QuartierLatin.Admin
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseSwagger(c =>
+            const string swaggerApiPrefix = "/api/swagger"; 
+            app.Map(swaggerApiPrefix, swaggerApp =>
             {
-                c.SerializeAsV2 = true;
+                swaggerApp.Use((ctx, next) =>
+                {
+                    ctx.Request.PathBase = "/";
+                    ctx.Request.Path = "/swagger" + ctx.Request.Path;
+                    return next();
+                });
+                swaggerApp.UseSwagger(c =>
+                {
+                    c.SerializeAsV2 = true;
+                });
+                swaggerApp.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "QuartierLatin API");
+                });
             });
-            app.UseSwaggerUI(c =>
-            {
-                c.RoutePrefix = "/api/swagger";
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "QuartierLatin API");
-            });
-            
-            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

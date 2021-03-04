@@ -15,7 +15,7 @@ namespace QuartierLatin.Admin.Controllers
 {
     public record AdminLoginModel(string Username, string Password, bool RememberMe);
     
-    [Route("/api/auth")]
+    [Route("/api/admin/auth")]
     [AllowAnonymous]
     public class Auth : Controller
     {
@@ -82,6 +82,13 @@ namespace QuartierLatin.Admin.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Redirect("/");
+        }
+        
+        [HttpGet("check")]
+        [Authorize(Policy = "Admin")]
+        public Task PulseAdmin()
+        {
+            return Task.CompletedTask;
         }
     }
 }
