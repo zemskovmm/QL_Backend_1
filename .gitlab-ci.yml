@@ -13,12 +13,12 @@ build:
     paths:
       - out
   script: 
-    - dotnet publish -c Release -o out QuartierLatin.Admin
+    - dotnet publish -c Release -o out QuartierLatin.Backend
 
 #tests:
 #  stage: test
 #  script: 
-#    - dotnet run -c Release QuartierLatin.Admin.Tests
+#    - dotnet run -c Release QuartierLatin.Backend.Tests
 
 deploy:
   stage: deploy

@@ -1,0 +1,15 @@
+@model QuartierLatin.Backend.ViewModels.EmailConfirmTemplateViewModel
+<!DOCTYPE html>
+
+<html>
+<head>
+</head>
+<body>
+<div>
+    Подтвердите ваш аккаунт по ссылке ниже
+</div>
+<div>
+    <a href="@Model.RedirectUrl?code=@Model.ConfirmationsCode" target="_blank">Подтвердить аккаунт</a>
+</div>
+</body>
+</html>
