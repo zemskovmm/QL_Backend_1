@@ -24,6 +24,8 @@ namespace QuartierLatin.Backend
 {
     public class Startup
     {
+        public static IServiceProvider AppServices { get; private set; }
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -210,6 +212,8 @@ namespace QuartierLatin.Backend
                             Confirmed = true
                         });
                 });
+            
+            AppServices = app.ApplicationServices;
         }
     }
 }
