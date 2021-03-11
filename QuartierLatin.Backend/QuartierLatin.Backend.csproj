@@ -45,4 +45,8 @@
         <EmbeddedResource Remove="webapp\build\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Application\Interfaces\" />
+      <Folder Include="Dto\PageModuleDto\" />
+    </ItemGroup>
 </Project>
