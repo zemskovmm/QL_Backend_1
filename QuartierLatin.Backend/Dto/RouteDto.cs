@@ -8,9 +8,9 @@ namespace QuartierLatin.Backend.Dto
         public Dictionary<string, string> Urls { get; protected set; }
         public T Module { get; protected set; }
 
-        public RouteDto(Dictionary<string, string> urls, T module)
+        public RouteDto(Dictionary<string, string> urls, T module, string moduleName)
         {
-            ModuleName = module.GetType().Name.ToLower();
+            ModuleName = moduleName;
             Urls = urls;
             Module = module;
         }

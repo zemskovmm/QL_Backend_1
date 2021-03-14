@@ -6,5 +6,10 @@ namespace QuartierLatin.Backend.Dto.PageModuleDto
     {
         [JsonProperty("page")]
         public PageDto PageDto { get; set; }
+
+        public PageModuleDto(PageDto pageDto)
+        {
+            PageDto = pageDto;
+        }
     }
 }

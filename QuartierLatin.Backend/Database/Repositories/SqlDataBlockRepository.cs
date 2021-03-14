@@ -20,7 +20,6 @@ namespace QuartierLatin.Backend.Database.Repositories
         {
             return _db.Exec(db => db.InsertWithInt32Identity(new DataBlock
             {
-                Title = title,
                 BlockData = blockData,
                 LanguageId = languageId,
                 PageId = pageId,

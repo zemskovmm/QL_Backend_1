@@ -10,5 +10,11 @@ namespace QuartierLatin.Backend.Dto.PageModuleDto
 
         [JsonProperty("data")]
         public JObject PageData { get; set; }
+
+        public PageBlockDto(string typeName, JObject pageData)
+        {
+            TypeName = typeName;
+            PageData = pageData;
+        }
     }
 }
