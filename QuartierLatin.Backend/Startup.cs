@@ -16,10 +16,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using QuartierLatin.Backend.Database.AppDbContextSeed;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend
 {
@@ -131,7 +133,7 @@ namespace QuartierLatin.Backend
             else
                 services.AddSingleton<IAzureAdClient, NoopAzureAdClient>();
 
-            services.AddRazorPages();
+            services.AddRazorPages().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -201,6 +203,7 @@ namespace QuartierLatin.Backend
                 return next();
             });
 
+            
             StaticFiles();
             MigrationRunner.MigrateDb(DatabaseConfig.ConnectionString, typeof(Startup).Assembly, DatabaseConfig.Type);
             AppDbContextSeed.Seed(app.ApplicationServices.GetRequiredService<AppDbContextManager>());

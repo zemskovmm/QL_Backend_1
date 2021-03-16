@@ -24,7 +24,7 @@ namespace QuartierLatin.Backend.Application
 
         public async Task<JObject> GetPageByUrlAsync(string url)
         {
-            var route = await _pageAppService.GetPageByUrlAdminAsync(url);
+            var route = await _pageAppService.GetPageByUrlAsync(url);
 
             var response = JObject.FromObject(route);
 

@@ -8,6 +8,7 @@ using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Application
 {
@@ -31,12 +32,14 @@ namespace QuartierLatin.Backend.Application
 
         public async Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url)
         {
-            var pages = (List<Page>)await _pageRepository.GetPagesByPageUrlAsync(url);
+            var clearUrl = RewriteRouteRules.ReWriteRequests(url);
+
+            var pages = (List<Page>)await _pageRepository.GetPagesByPageUrlAsync(clearUrl);
 
             if (pages.Count is 0)
                 return null;
 
-            var pageMain = pages.Find(page => page.Url == url);
+            var pageMain = pages.Find(page => page.Url == clearUrl);
 
             var urls = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
                 .ConfigureAwait(false)
@@ -74,12 +77,14 @@ namespace QuartierLatin.Backend.Application
 
         public async Task<RouteDto<PageModuleDto>> GetPageByUrlAsync(string url)
         {
-            var pages = (List<Page>)await _pageRepository.GetPagesByPageUrlAsync(url);
+            var clearUrl = RewriteRouteRules.ReWriteRequests(url);
+
+            var pages = (List<Page>)await _pageRepository.GetPagesByPageUrlAsync(clearUrl);
 
             if (pages.Count is 0)
                 return null;
 
-            var pageMain = pages.Find(page => page.Url == url);
+            var pageMain = pages.Find(page => page.Url == clearUrl);
 
             var urls = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
                 .ConfigureAwait(false)
