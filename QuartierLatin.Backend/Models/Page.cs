@@ -2,6 +2,7 @@
 
 namespace QuartierLatin.Backend.Models
 {
+    [Table("Pages")]
     public class Page : BaseModel
     {
         [Column] public string Url { get; set; }

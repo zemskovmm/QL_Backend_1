@@ -5,7 +5,7 @@ namespace QuartierLatin.Backend.Models.Repositories
 {
     public interface IPageRepository
     {
-        public int CreatePage(string url, int languageId, int pageRootId);
+        public int CreatePage(string url, int languageId, string title, int pageRootId);
 
         public Task<IList<Page>> GetPagesByPageUrlAsync(string url);
 

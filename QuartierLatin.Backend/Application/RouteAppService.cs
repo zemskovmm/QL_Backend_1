@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces;
 
@@ -14,9 +13,18 @@ namespace QuartierLatin.Backend.Application
             _pageAppService = pageAppService;
         }
 
-        public async Task<JObject> GetPageByUrl(string url)
+        public async Task<JObject> GetPageByUrlAdminAsync(string url)
         {
-            var route = await _pageAppService.GetPageByUrl(url);
+            var route = await _pageAppService.GetPageByUrlAdminAsync(url);
+
+            var response = JObject.FromObject(route);
+
+            return response;
+        }
+
+        public async Task<JObject> GetPageByUrlAsync(string url)
+        {
+            var route = await _pageAppService.GetPageByUrlAdminAsync(url);
 
             var response = JObject.FromObject(route);
 

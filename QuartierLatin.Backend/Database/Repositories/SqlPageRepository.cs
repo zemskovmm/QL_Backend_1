@@ -16,13 +16,14 @@ namespace QuartierLatin.Backend.Database.Repositories
             _db = db;
         }
 
-        public int CreatePage(string url, int languageId, int pageRootId = 0)
+        public int CreatePage(string url, int languageId, string title, int pageRootId = 0)
         {
             var page = new Page
             {
                 Url = url,
                 LanguageId = languageId,
-                PageRootId = pageRootId
+                PageRootId = pageRootId,
+                Title = title
             };
 
             var rootId = _db.Exec(db => db.InsertWithInt32Identity(page));

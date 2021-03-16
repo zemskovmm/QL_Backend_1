@@ -5,6 +5,8 @@ namespace QuartierLatin.Backend.Application.Interfaces
 {
     public interface IRouteAppService
     {
-        public Task<JObject> GetPageByUrl(string url);
+        public Task<JObject> GetPageByUrlAsync(string url);
+
+        public Task<JObject> GetPageByUrlAdminAsync(string url);
     }
 }

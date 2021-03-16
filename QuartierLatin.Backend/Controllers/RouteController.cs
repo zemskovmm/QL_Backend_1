@@ -18,7 +18,19 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/api/route/{route}")]
         public async Task<IActionResult> GetPage(string route)
         {
-            var routeResponse = await _routeAppService.GetPageByUrl(route);
+            var routeResponse = await _routeAppService.GetPageByUrlAsync(route);
+
+            if (routeResponse is null)
+                return BadRequest();
+
+            return Ok(routeResponse);
+        }
+
+        [Authorize]
+        [HttpGet("/admin/api/route/{route}")]
+        public async Task<IActionResult> GetPageAdmin(string route)
+        {
+            var routeResponse = await _routeAppService.GetPageByUrlAdminAsync(route);
 
             if (routeResponse is null)
                 return BadRequest();

@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using QuartierLatin.Backend.Database.AppDbContextSeed;
 
 namespace QuartierLatin.Backend
 {
@@ -202,16 +203,7 @@ namespace QuartierLatin.Backend
 
             StaticFiles();
             MigrationRunner.MigrateDb(DatabaseConfig.ConnectionString, typeof(Startup).Assembly, DatabaseConfig.Type);
-            app.ApplicationServices.GetRequiredService<AppDbContextManager>()
-                .Exec(db =>
-                {
-                    if (!db.Users.Any())
-                        db.Users.Insert(() => new User
-                        {
-                            Email = "user@example.com", PasswordHash = PasswordToolkit.EncodeSshaPassword("123321"),
-                            Confirmed = true
-                        });
-                });
+            AppDbContextSeed.Seed(app.ApplicationServices.GetRequiredService<AppDbContextManager>());
             
             AppServices = app.ApplicationServices;
         }

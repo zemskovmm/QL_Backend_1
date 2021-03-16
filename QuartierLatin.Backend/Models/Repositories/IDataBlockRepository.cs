@@ -6,9 +6,11 @@ namespace QuartierLatin.Backend.Models.Repositories
 {
     public interface IDataBlockRepository
     {
-        public int CreateDataBlock(string title, string blockData, int languageId, int pageId);
+        public int CreateDataBlock(string type, string blockData, int languageId, int pageId, int blockRootId);
 
         public Task<IList<DataBlock>> GetDataBlockListForPageAsync(int pageId);
+
+        public Task<IList<DataBlock>> GetDataBlockListForPageByBlockRootIdAsync(int blockRootId);
 
         public Task<IList<DataBlock>> GetDataBlockListForPageAndLanguageAsync(int languageId, int pageId);
 

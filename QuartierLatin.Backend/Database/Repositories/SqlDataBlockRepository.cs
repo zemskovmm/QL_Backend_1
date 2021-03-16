@@ -16,14 +16,27 @@ namespace QuartierLatin.Backend.Database.Repositories
             _db = db;
         }
 
-        public int CreateDataBlock(string title, string blockData, int languageId, int pageId)
+        public int CreateDataBlock(string type, string blockData, int languageId, int pageId, int blockRootId = 0)
         {
-            return _db.Exec(db => db.InsertWithInt32Identity(new DataBlock
+            var block = new DataBlock
             {
                 BlockData = blockData,
                 LanguageId = languageId,
                 PageId = pageId,
-            }));
+                BlockRootId = 0,
+                Type = type
+            };
+
+            var rootId =  _db.Exec(db => db.InsertWithInt32Identity(block));
+
+            if(blockRootId is 0)
+            {
+                block.BlockRootId = rootId;
+                block.Id = rootId;
+            }
+
+            _db.Exec(db => db.Update(block));
+            return rootId;
         }
 
         public async Task EditDataBlockAsync(DataBlock dataBlock)
@@ -45,6 +58,11 @@ namespace QuartierLatin.Backend.Database.Repositories
         public async Task<int> RemoveDataBlockAsync(int dataBlockId)
         {
             return await _db.ExecAsync(db => db.DataBlocks.Where(block => block.Id == dataBlockId).DeleteAsync());
+        }
+
+        public async Task<IList<DataBlock>> GetDataBlockListForPageByBlockRootIdAsync(int blockRootId)
+        {
+            return await _db.ExecAsync(db => db.DataBlocks.Where(block => block.BlockRootId == blockRootId).ToListAsync());
         }
     }
 }
