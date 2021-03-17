@@ -9,7 +9,7 @@ namespace QuartierLatin.Backend.Database.Migrations.Roles
         {
             Create.Table("AdminRole")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
-                .WithColumn("UserId").AsInt32().NotNullable()
+                .WithColumn("AdminId").AsInt32().NotNullable()
                 .WithColumn("Role").AsString().NotNullable();
 
             Create.ForeignKey().FromTable("AdminRole").ForeignColumn("AdminId").ToTable("Admins").PrimaryColumn("Id");
