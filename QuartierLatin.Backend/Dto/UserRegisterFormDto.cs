@@ -8,7 +8,7 @@ namespace QuartierLatin.Backend.Dto
         public string Password { get; set; }
         public string Name { get; set; }
 
-        public User ToUser(int id, string passwordHash)
+        public Admin ToUser(int id, string passwordHash)
         {
             return new()
             {

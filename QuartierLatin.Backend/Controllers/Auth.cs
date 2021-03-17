@@ -33,7 +33,7 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]AdminLoginModel model)
         {
-            UserProfileDto user;
+            AdminProfileDto user;
             
             try
             { 

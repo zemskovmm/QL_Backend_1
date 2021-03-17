@@ -23,9 +23,9 @@ namespace QuartierLatin.Backend.Auth
 
     public class NoopEmailConfirmationService : IEmailConfirmationService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IAdminRepository _userRepository;
 
-        public NoopEmailConfirmationService(IUserRepository userRepository)
+        public NoopEmailConfirmationService(IAdminRepository userRepository)
         {
             _userRepository = userRepository;
         }
@@ -53,12 +53,12 @@ namespace QuartierLatin.Backend.Auth
     public class EmailConfirmationService : IEmailConfirmationService, IDisposable
     {
         private readonly AsyncLock _asyncLock = new AsyncLock();
-        private readonly IUserRepository _userRepository;
+        private readonly IAdminRepository _userRepository;
         private readonly IRazorRenderer _razorRenderer;
         private readonly SmtpClient _smtpClient = new SmtpClient();
         private readonly EmailOptions _options;
 
-        public EmailConfirmationService(IUserRepository userRepository, IRazorRenderer razorRenderer,
+        public EmailConfirmationService(IAdminRepository userRepository, IRazorRenderer razorRenderer,
             IOptions<EmailOptions> options)
         {
             _userRepository = userRepository;

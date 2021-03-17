@@ -17,7 +17,7 @@ namespace QuartierLatin.Backend.Auth
             _authManager = authManager;
         }
 
-        protected User ApiUser { get; private set; }
+        protected Admin ApiUser { get; private set; }
         protected List<string> UserRoles { get; private set; }
 
         private string Token()

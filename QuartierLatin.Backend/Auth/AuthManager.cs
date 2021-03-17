@@ -1,13 +1,13 @@
+using Microsoft.Extensions.Logging;
+using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Dto;
-using QuartierLatin.Backend.Models;
-using QuartierLatin.Backend.Models.Repositories;
-using QuartierLatin.Backend.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace QuartierLatin.Backend.Auth
 {
@@ -48,24 +48,24 @@ namespace QuartierLatin.Backend.Auth
             });
         }
 
-        public async Task<Result<(TUser user, string token)>> Login(string login, string password)
+        public async Task<Result<(TUser admin, string token)>> Login(string login, string password)
         {
-            var user = _repo.FindByLogin(login);
-            if (user == null)
+            var admin = _repo.FindByLogin(login);
+            if (admin == null)
                 return ErrorCode.UserNotFound;
-            if (!PasswordToolkit.CheckPassword(user.PasswordHash, password))
+            if (!PasswordToolkit.CheckPassword(admin.PasswordHash, password))
                 return ErrorCode.InvalidPassword;
-            var userRoles = (await _roleRepository.UserRolesByIds(user.Id))
-                .Where(x => x.UserId == user.Id)
+            var adminRoles = (await _roleRepository.UserRolesByIds(admin.Id))
+                .Where(x => x.AdminId == admin.Id)
                 .Select(x => x.Role)
                 .ToList();
 
-            var token = CreateToken(user, userRoles);
+            var token = CreateToken(admin, adminRoles);
 
-            return (user, token);
+            return (admin, token);
         }
 
-        public abstract Task<Result<(User user, string token)>> LoginViaAzure(string code);
+        public abstract Task<Result<(Admin admin, string token)>> LoginViaAzure(string code);
 
         private class AuthToken<T>
         {
@@ -74,13 +74,13 @@ namespace QuartierLatin.Backend.Auth
         }
     }
 
-    public class UserAuthManager : AuthManager<User>
+    public class UserAuthManager : AuthManager<Admin>
     {
         private readonly IAzureAdClient _azure;
         private readonly ILogger _logger;
-        private readonly IUserRepository _repo;
+        private readonly IAdminRepository _repo;
 
-        public UserAuthManager(ITokenStorage tokenStorage, IUserRepository repo, IAzureAdClient azure,
+        public UserAuthManager(ITokenStorage tokenStorage, IAdminRepository repo, IAzureAdClient azure,
             IRoleRepository roleRepository, ILoggerFactory loggerFactory)
             : base(tokenStorage, repo, roleRepository)
         {
@@ -89,20 +89,20 @@ namespace QuartierLatin.Backend.Auth
             _logger = loggerFactory.CreateLogger("UserAuthManager");
         }
 
-        public override async Task<Result<(User user, string token)>> LoginViaAzure(string code)
+        public override async Task<Result<(Admin admin, string token)>> LoginViaAzure(string code)
         {
             var authResult = await _azure.GetTokenFromCode(code);
-            var user = await _azure.GetUserInfo(authResult);
+            var admin = await _azure.GetUserInfo(authResult);
             return Result.Catch(() =>
             {
-                var appUser = _repo.FindByLogin(user.Email);
+                var appUser = _repo.FindByLogin(admin.Email);
                 if (appUser is null)
                 {
-                    _repo.Create(user.Email, Guid.Parse(user.Id), user.Name, null);
-                    appUser = _repo.FindByLogin(user.Email);
+                    _repo.Create(admin.Email, Guid.Parse(admin.Id), admin.Name, null);
+                    appUser = _repo.FindByLogin(admin.Email);
                 }
 
-                var token = CreateToken(appUser, user.Groups);
+                var token = CreateToken(appUser, admin.Groups);
                 return (appUser, token);
             }, ErrorCode.AccessDenied, _logger);
         }
@@ -122,7 +122,7 @@ namespace QuartierLatin.Backend.Auth
             return _azure.GetReloginUrl();
         }
 
-        public Result<UserProfileDto> Register(string email, string name, Guid identityId, string password)
+        public Result<AdminProfileDto> Register(string email, string name, Guid identityId, string password)
         {
             email = email?.Trim().ToLowerInvariant();
             if (string.IsNullOrWhiteSpace(email) || !Regex.IsMatch(email, @"[\w.-]+@.+\.[a-z]{2,3}"))
@@ -132,14 +132,14 @@ namespace QuartierLatin.Backend.Auth
                 return ErrorCode.WeakPassword;
             return Result.Catch(() =>
             {
-                var userId = _repo.Create(email, identityId, name, PasswordToolkit.EncodeSshaPassword(password));
-                var registeredUser = new UserProfileDto
+                var adminId = _repo.Create(email, identityId, name, PasswordToolkit.EncodeSshaPassword(password));
+                var registeredAdmin = new AdminProfileDto()
                 {
-                    Id = userId,
+                    Id = adminId,
                     Email = email,
                     Name = name
                 };
-                return registeredUser;
+                return registeredAdmin;
             }, ErrorCode.EmailIsAlreadyRegistered, _logger);
         }
     }

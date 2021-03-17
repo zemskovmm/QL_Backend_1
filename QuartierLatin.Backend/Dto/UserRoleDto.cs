@@ -13,7 +13,7 @@ namespace QuartierLatin.Backend.Dto
             return new()
             {
                 Id = role.Id,
-                UserId = role.UserId,
+                UserId = role.AdminId,
                 Role = role.Role
             };
         }

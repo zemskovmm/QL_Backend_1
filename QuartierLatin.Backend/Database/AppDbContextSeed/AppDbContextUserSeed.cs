@@ -11,8 +11,8 @@ namespace QuartierLatin.Backend.Database.AppDbContextSeed
         {
             dbManager.Exec(db =>
             {
-                if (!db.Users.Any())
-                    db.Users.Insert(() => new User
+                if (!db.Admins.Any())
+                    db.Admins.Insert(() => new Admin
                     {
                         Email = "user@example.com",
                         PasswordHash = PasswordToolkit.EncodeSshaPassword("123321"),

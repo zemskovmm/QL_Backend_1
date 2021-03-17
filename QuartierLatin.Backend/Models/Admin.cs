@@ -15,8 +15,8 @@ namespace QuartierLatin.Backend.Models
         public string PasswordHash { get; }
     }
 
-    [Table("Users")]
-    public class User : IHaveId, IHavePasswordAuth
+    [Table("Admins")]
+    public class Admin : IHaveId, IHavePasswordAuth
     {
         [PrimaryKey, Identity] public int Id { get; set; }
         [Column] public Guid AzureIdentityId { get; set; }

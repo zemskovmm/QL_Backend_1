@@ -2,7 +2,7 @@ using QuartierLatin.Backend.Models;
 
 namespace QuartierLatin.Backend.Dto
 {
-    public class UserProfileDto
+    public class AdminProfileDto
     {
         public int Id { get; set; }
         public string Email { get; set; }
@@ -11,14 +11,14 @@ namespace QuartierLatin.Backend.Dto
 
         public long AvatarImage { get; set; }
 
-        public static UserProfileDto FromUser(User user)
+        public static AdminProfileDto FromAdmin(Admin admin)
         {
             return new()
             {
-                Id = user.Id,
-                Email = user.Email,
-                Name = user.Name,
-                AvatarImage = user.AvatarImage
+                Id = admin.Id,
+                Email = admin.Email,
+                Name = admin.Name,
+                AvatarImage = admin.AvatarImage
             };
         }
     }

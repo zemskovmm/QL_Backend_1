@@ -16,7 +16,7 @@ namespace QuartierLatin.Backend.Models
     {
         [PrimaryKey] [Identity] public int Id { get; set; }
 
-        [Column] public int UserId { get; set; }
+        [Column] public int AdminId { get; set; }
 
         [Column] public string Role { get; set; }
     }
