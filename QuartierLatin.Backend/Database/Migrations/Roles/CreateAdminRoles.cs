@@ -13,7 +13,7 @@ namespace QuartierLatin.Backend.Database.Migrations.Roles
                 .WithColumn("Role").AsString().NotNullable();
 
             Create.ForeignKey().FromTable("AdminRole").ForeignColumn("AdminId").ToTable("Admins").PrimaryColumn("Id");
-            Create.UniqueConstraint().OnTable("AdminRole").Columns("UserId", "Role");
+            Create.UniqueConstraint().OnTable("AdminRole").Columns("AdminId", "Role");
         }
     }
 }

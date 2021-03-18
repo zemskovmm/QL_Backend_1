@@ -2,7 +2,7 @@
 
 namespace QuartierLatin.Backend.Database.Migrations.Language
 {
-    [MigrationDate(2021, 3, 14, 23, 30)]
+    [MigrationDate(2021, 3, 14, 22, 30)]
     public class CreateLanguages : AutoReversingMigration
     {
         public override void Up()

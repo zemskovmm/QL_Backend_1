@@ -13,8 +13,9 @@ namespace QuartierLatin.Backend.Database.Migrations.Page
             Create.Table("Pages")
                 .WithColumn("Url").AsString().NotNullable()
                 .WithColumn("Title").AsString().NotNullable()
-                .WithColumn("LanguageId").AsInt64().NotNullable().ForeignKey("Languages", "Id").PrimaryKey()
-                .WithColumn("PageRootId").AsInt64().NotNullable().ForeignKey("PageRoots", "Id").PrimaryKey();
+                .WithColumn("PageData").AsCustom("jsonb").Nullable()
+                .WithColumn("LanguageId").AsInt64().ForeignKey("Languages", "Id").PrimaryKey().Identity()
+                .WithColumn("PageRootId").AsInt64().ForeignKey("PageRoots", "Id").PrimaryKey().Identity();
         }
     }
 }

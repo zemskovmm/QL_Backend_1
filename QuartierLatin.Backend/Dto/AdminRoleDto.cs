@@ -2,13 +2,13 @@ using QuartierLatin.Backend.Models;
 
 namespace QuartierLatin.Backend.Dto
 {
-    public class UserRoleDto
+    public class AdminRoleDto
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Role { get; set; }
 
-        public static UserRoleDto FromModel(UserRole role)
+        public static AdminRoleDto FromModel(AdminRole role)
         {
             return new()
             {

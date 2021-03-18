@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Dto.AdminPageModuleDto
 {
@@ -9,9 +10,9 @@ namespace QuartierLatin.Backend.Dto.AdminPageModuleDto
         public Dictionary<string, string> Title { get; set; }
 
         [JsonProperty("blocks")]
-        public IEnumerable<AdminPageBlockDto> Blocks { get; set; }
+        public Dictionary<string, JObject> Blocks { get; set; }
 
-        public AdminPageDto(Dictionary<string, string> title, IEnumerable<AdminPageBlockDto> adminPageBlockDtos)
+        public AdminPageDto(Dictionary<string, string> title, Dictionary<string, JObject> adminPageBlockDtos)
         {
             Title = title;
             Blocks = adminPageBlockDtos;

@@ -30,7 +30,7 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPost("/api/pages/")]
         public async Task<IActionResult> CreatePage([FromBody] CreatePageDto createPageDto)
         {
-            var response = _pageAppService.CreatePage(createPageDto);
+            var response = await _pageAppService.CreatePageAsync(createPageDto);
 
             return Ok(response);
         }

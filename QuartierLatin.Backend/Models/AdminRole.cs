@@ -12,7 +12,7 @@ namespace QuartierLatin.Backend.Models
         };
     }
 
-    public class UserRole
+    public class AdminRole
     {
         [PrimaryKey] [Identity] public int Id { get; set; }
 

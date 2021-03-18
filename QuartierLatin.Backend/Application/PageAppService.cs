@@ -25,9 +25,9 @@ namespace QuartierLatin.Backend.Application
             _dataBlockRepository = dataBlockRepository;
         }
 
-        public int CreatePage(CreatePageDto createPageDto)
+        public async Task<int> CreatePageAsync(CreatePageDto createPageDto)
         {
-            return _pageRepository.CreatePage(createPageDto.Url, createPageDto.LanguageId, createPageDto.Title, createPageDto.PageRootId);
+            return await _pageRepository.CreatePageAsync(createPageDto.Url, createPageDto.LanguageId, createPageDto.Title, createPageDto.PageData, createPageDto.PageRootId);
         }
 
         public async Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url)
@@ -39,34 +39,19 @@ namespace QuartierLatin.Backend.Application
             if (pages.Count is 0)
                 return null;
 
-            var pageMain = pages.Find(page => page.Url == clearUrl);
-
             var urls = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
                 .ConfigureAwait(false)
                 .GetAwaiter()
                 .GetResult(), page => page.Url);
 
-            var dataBlocks = (List<DataBlock>)await _dataBlockRepository.GetDataBlockListForPageAndLanguageAsync(pageMain.Id, pageMain.LanguageId);
-
             var titles = urls.ToDictionary(url => url.Key, url => pages.FirstOrDefault(page => page.Url == url.Value).Title);
 
-            var blocksData = new List<AdminPageBlockDto>();
+            var blocks = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult(), page => JObject.Parse(page.PageData));
 
-            foreach (var dataBlock in dataBlocks)
-            {
-                var blocks = await _dataBlockRepository.GetDataBlockListForPageByBlockRootIdAsync(dataBlock.BlockRootId);
-
-                var dataBlocksWithLanguage = blocks.ToDictionary(block => _languageRepository.GetLanguageShortNameAsync(block.LanguageId)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult(), block => JObject.Parse(block.BlockData));
-
-                var adminPageBlockDto = new AdminPageBlockDto(dataBlock.Type, dataBlocksWithLanguage);
-
-                blocksData.Add(adminPageBlockDto);
-            }
-
-            var adminPageDto = new AdminPageDto(titles, blocksData);
+            var adminPageDto = new AdminPageDto(titles, blocks);
 
             var adminPageModuleDto = new AdminPageModuleDto(adminPageDto);
 
@@ -91,7 +76,7 @@ namespace QuartierLatin.Backend.Application
                 .GetAwaiter()
                 .GetResult(), page => page.Url);
 
-            var dataBlocks = (List<DataBlock>)await _dataBlockRepository.GetDataBlockListForPageAndLanguageAsync(pageMain.Id, pageMain.LanguageId);
+            var dataBlocks = (List<DataBlock>)await _dataBlockRepository.GetDataBlockListForPageAndLanguageAsync(pageMain.LanguageId, pageMain.PageRootId);
 
             var dataBlockDtos = dataBlocks.Select(block => new PageBlockDto(block.Type, JObject.Parse(block.BlockData)));
 

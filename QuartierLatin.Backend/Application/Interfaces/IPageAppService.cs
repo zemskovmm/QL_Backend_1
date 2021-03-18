@@ -11,6 +11,6 @@ namespace QuartierLatin.Backend.Application.Interfaces
 
         public Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url);
 
-        public int CreatePage(CreatePageDto createPageDto);
+        public Task<int> CreatePageAsync(CreatePageDto createPageDto);
     }
 }

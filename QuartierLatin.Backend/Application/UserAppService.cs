@@ -10,7 +10,7 @@ namespace QuartierLatin.Backend.Application
 {
     public interface IUserAppService
     {
-        Task RegisterAdmin(UserRegisterFormDto model, string role);
+        Task RegisterAdmin(AdminRegisterFormDto model, string role);
         AdminProfileDto FindAdmin(string email);
         AdminProfileDto Login(string email, string password);
     }
@@ -28,7 +28,7 @@ namespace QuartierLatin.Backend.Application
             _role = role;
         }
 
-        public async Task RegisterAdmin(UserRegisterFormDto model, string role)
+        public async Task RegisterAdmin(AdminRegisterFormDto model, string role)
         {
             var (email, password, name) = model;
 
@@ -39,7 +39,7 @@ namespace QuartierLatin.Backend.Application
                 throw new ArgumentException("Weak password");
 
             var id = _admin.Create(email, Guid.Empty, name, PasswordToolkit.EncodeSshaPassword(password));
-            await _role.AttachRole(new UserRole
+            await _role.AttachRole(new AdminRole()
             {
                 Role = role,
                 AdminId = id

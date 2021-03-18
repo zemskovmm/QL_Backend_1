@@ -4,6 +4,8 @@ using LinqToDB;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
+using System.Text.Json;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Database.Repositories
 {
@@ -16,26 +18,25 @@ namespace QuartierLatin.Backend.Database.Repositories
             _db = db;
         }
 
-        public int CreatePage(string url, int languageId, string title, int pageRootId = 0)
+        public async Task<int> CreatePageAsync(string url, int languageId, string title, JObject pageData, int pageRootId = 0)
         {
+            if (pageRootId is 0)
+            {
+                pageRootId = await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new PageRoot()));
+            }
+
             var page = new Page
             {
                 Url = url,
                 LanguageId = languageId,
                 PageRootId = pageRootId,
-                Title = title
+                Title = title,
+                PageData = pageData.ToString(Newtonsoft.Json.Formatting.None)
             };
 
-            var rootId = _db.Exec(db => db.InsertWithInt32Identity(page));
+            var pageId = await _db.ExecAsync(db => db.InsertAsync(page));
 
-            if (pageRootId is 0)
-            {
-                page.PageRootId = rootId;
-                page.Id = rootId;
-            }
-
-            _db.Exec(db => db.Update(page));
-            return rootId;
+            return pageRootId;
         }
 
         public async Task EditPageAsync(Page page)
@@ -53,7 +54,7 @@ namespace QuartierLatin.Backend.Database.Repositories
 
         public async Task<int> RemovePageAsync(int pageId)
         {
-            return await _db.ExecAsync(db => db.Pages.Where(page => page.Id == pageId).DeleteAsync());
+            return await _db.ExecAsync(db => db.Pages.Where(page => page.PageRootId == pageId).DeleteAsync());
         }
     }
 }

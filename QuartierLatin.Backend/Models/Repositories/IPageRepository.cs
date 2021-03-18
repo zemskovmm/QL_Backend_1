@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Models.Repositories
 {
     public interface IPageRepository
     {
-        public int CreatePage(string url, int languageId, string title, int pageRootId);
+        public Task<int> CreatePageAsync(string url, int languageId, string title, JObject pageData, int pageRootId);
 
         public Task<IList<Page>> GetPagesByPageUrlAsync(string url);
 
