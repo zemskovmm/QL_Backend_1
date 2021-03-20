@@ -20,26 +20,26 @@ namespace QuartierLatin.Backend.Database.AppDbContextSeed
 
                     db.Languages.Insert(() => new Language
                     {
-                        LanguageName = "en",
-                        LanguageShortName = "English"
+                        LanguageName = "English",
+                        LanguageShortName = "en"
                     });
 
                     db.Languages.Insert(() => new Language
                     {
-                        LanguageName = "fr",
-                        LanguageShortName = "Français"
+                        LanguageName = "Français",
+                        LanguageShortName = "fr"
                     });
 
                     db.Languages.Insert(() => new Language
                     {
-                        LanguageName = "cn",
-                        LanguageShortName = "中文"
+                        LanguageName = "中文",
+                        LanguageShortName = "cn"
                     });
 
                     db.Languages.Insert(() => new Language
                     {
-                        LanguageName = "es",
-                        LanguageShortName = "Español"
+                        LanguageName = "Español",
+                        LanguageShortName = "es"
                     });
                 }
             });

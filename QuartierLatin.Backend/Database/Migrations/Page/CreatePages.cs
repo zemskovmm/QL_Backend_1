@@ -11,11 +11,11 @@ namespace QuartierLatin.Backend.Database.Migrations.Page
                 .WithColumn("Id").AsInt64().PrimaryKey().Identity();
 
             Create.Table("Pages")
-                .WithColumn("Url").AsString().NotNullable()
-                .WithColumn("Title").AsString().NotNullable()
-                .WithColumn("PageData").AsCustom("jsonb").Nullable()
-                .WithColumn("LanguageId").AsInt64().ForeignKey("Languages", "Id").PrimaryKey().Identity()
-                .WithColumn("PageRootId").AsInt64().ForeignKey("PageRoots", "Id").PrimaryKey().Identity();
+                .WithColumn("Url").AsString()
+                .WithColumn("Title").AsString()
+                .WithColumn("PageData").AsCustom("jsonb")
+                .WithColumn("LanguageId").AsInt64().ForeignKey("Languages", "Id").PrimaryKey()
+                .WithColumn("PageRootId").AsInt64().ForeignKey("PageRoots", "Id").PrimaryKey();
         }
     }
 }

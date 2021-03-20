@@ -9,7 +9,7 @@ namespace QuartierLatin.Backend.Models
         [Column] public string Url { get; set; }
         [Column] public string Title { get; set; }
         [Column(DataType = DataType.BinaryJson)] public string PageData { get; set; }
-        [Column] [Identity] [NotNull] public int LanguageId { get; set; }
-        [Column] [Identity] [NotNull] public int PageRootId { get; set; }
+        [Column] [PrimaryKey] public int LanguageId { get; set; }
+        [Column] [PrimaryKey] public int PageRootId { get; set; }
     }
 }

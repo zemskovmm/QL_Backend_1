@@ -14,5 +14,6 @@ namespace QuartierLatin.Backend.Models.Repositories
         public Task EditLanguageAsync(Language language);
 
         public Task<string> GetLanguageShortNameAsync(int languageId);
+        public Task<int> GetLanguageIdByShortNameAsync(string languageShortName);
     }
 }

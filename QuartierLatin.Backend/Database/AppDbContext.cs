@@ -26,6 +26,7 @@ namespace QuartierLatin.Backend.Database
         public ITable<Language> Languages => GetTable<Language>();
         public ITable<DataBlock> DataBlocks => GetTable<DataBlock>();
         public ITable<PageRoot> PageRoots => GetTable<PageRoot>();
+        public ITable<GlobalSetting> GlobalSettings => GetTable<GlobalSetting>();
     }
 
     public interface IAppDbConnectionFactory

@@ -25,9 +25,23 @@ namespace QuartierLatin.Backend.Application
             _dataBlockRepository = dataBlockRepository;
         }
 
-        public async Task<int> CreatePageAsync(CreatePageDto createPageDto)
+        public async Task<int> CreatePageAsync(string url, int languageId, string title, JObject pageData)
         {
-            return await _pageRepository.CreatePageAsync(createPageDto.Url, createPageDto.LanguageId, createPageDto.Title, createPageDto.PageData, createPageDto.PageRootId);
+            return await _pageRepository.CreatePageAsync(languageId, url, title, pageData);
+        }
+
+        public async Task CreateOrUpdatePageLanguageAsync(int pageRootId, string url, int languageId, string title, JObject pageData)
+        {
+            await _pageRepository.CreateOrUpdatePageLanguageAsync(pageRootId, languageId, url, title, pageData);
+        }
+
+        public async Task<(Dictionary<int, string>, (int totalResults, List<(int id, List<Page> pages)> results))> GetPageListBySearch(int page, string search, int pageSize)
+        {
+            var langs = (await _languageRepository.GetLanguageListAsync()).ToDictionary(x => x.Id,
+                x => x.LanguageShortName);
+            var results = await _pageRepository.GetPageRootsWithPagesAsync(search, pageSize * page, pageSize);
+
+            return (langs, results);
         }
 
         public async Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url)
@@ -53,7 +67,7 @@ namespace QuartierLatin.Backend.Application
 
             var adminPageDto = new AdminPageDto(titles, blocks);
 
-            var adminPageModuleDto = new AdminPageModuleDto(adminPageDto);
+            var adminPageModuleDto = new AdminPageModuleDto(adminPageDto, pages.First().PageRootId);
 
             var response = new RouteDto<AdminPageModuleDto>(urls, adminPageModuleDto, "page");
 
@@ -80,7 +94,7 @@ namespace QuartierLatin.Backend.Application
 
             var dataBlockDtos = dataBlocks.Select(block => new PageBlockDto(block.Type, JObject.Parse(block.BlockData)));
 
-            var pageDto = new PageDto(pageMain.Title, dataBlockDtos);
+            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, dataBlockDtos);
 
             var pageModuleDto = new PageModuleDto(pageDto);
 

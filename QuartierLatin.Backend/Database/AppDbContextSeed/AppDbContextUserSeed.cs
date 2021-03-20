@@ -12,12 +12,20 @@ namespace QuartierLatin.Backend.Database.AppDbContextSeed
             dbManager.Exec(db =>
             {
                 if (!db.Admins.Any())
+                {
                     db.Admins.Insert(() => new Admin
                     {
                         Email = "user@example.com",
                         PasswordHash = PasswordToolkit.EncodeSshaPassword("123321"),
                         Confirmed = true
                     });
+
+                    db.Insert(new AdminRole()
+                    {
+                        Role = "Admin",
+                        AdminId = 1
+                    });
+                }
             });
             return;
         }

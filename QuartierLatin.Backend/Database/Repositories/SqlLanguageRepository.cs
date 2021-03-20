@@ -41,6 +41,11 @@ namespace QuartierLatin.Backend.Database.Repositories
             return await _db.ExecAsync(db => db.Languages.Where(language => language.Id == languageId).Select(language => language.LanguageShortName).FirstAsync());
         }
 
+        public async Task<int> GetLanguageIdByShortNameAsync(string languageShortName)
+        {
+            return await _db.ExecAsync(db => db.Languages.Where(language => language.LanguageShortName == languageShortName).Select(language => language.Id).FirstAsync());
+        }
+
         public async Task<int> RemoveLanguageAsync(int languageId)
         {
             return await _db.ExecAsync(db => db.Languages.Where(language => language.Id == languageId).DeleteAsync());
