@@ -7,7 +7,6 @@ using Xunit;
 
 namespace QuartierLatin.Backend.Tests.PageTests
 {
-    [Collection("PageAdminTests")]
     public class PageTestAdminCreatePage : TestBase
     {
         [Theory]

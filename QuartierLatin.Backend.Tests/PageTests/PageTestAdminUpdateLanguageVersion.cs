@@ -8,18 +8,25 @@ using Xunit;
 
 namespace QuartierLatin.Backend.Tests.PageTests
 {
-    [Collection("PageAdminTests")]
     public class PageTestAdminUpdateLanguageVersion : TestBase
     {
         [Theory]
         [MemberData(nameof(Data))]
-        public async Task Admin_Should_Be_Able_To_Update_Language_VersionsAsync(JObject pageEn, string expectedTitle, int pageId, string langShortName)
+        public async Task Admin_Should_Be_Able_To_Create_And_Update_Language_VersionsAsync(JObject pageEn, string expectedTitle, string langShortName)
         {
+            pageEn["language"] = langShortName;
+            var resp = SendAdminRequest<JObject>("/api/admin/pages", pageEn);
+            var pageId = int.Parse(resp["id"].ToString());
+
             var repo = GetService<IPageRepository>();
+
+            var pageEnEntity = await repo.GetPagesByPageRootIdAndLanguageIdAsync(pageId, LangIds[langShortName]);
+            Assert.Equal(pageEnEntity.PageRootId, pageId);
+
             pageEn["title"] = expectedTitle;
             SendAdminRequest<object>($"/api/admin/pages/{pageId}/{langShortName}", pageEn, HttpMethod.Put);
 
-            var pageEnEntity = await repo.GetPagesByPageRootIdAndLanguageIdAsync(pageId, LangIds[langShortName]);
+            pageEnEntity = await repo.GetPagesByPageRootIdAndLanguageIdAsync(pageId, LangIds[langShortName]);
             Assert.Equal(expectedTitle, pageEnEntity.Title);
         }
 
@@ -27,7 +34,7 @@ namespace QuartierLatin.Backend.Tests.PageTests
         {
             var pageEn = JObject.FromObject(new
             {
-                url = "/test",
+                url = "/test/123",
                 title = "test",
                 pageData = new
                 {
@@ -58,15 +65,13 @@ namespace QuartierLatin.Backend.Tests.PageTests
                 new object[]
                 {
                     pageEn,
-                    "New title",
-                    1,
+                    "New title12",
                     "en"
                 },
                 new object[]
                 {
                     pageEn,
-                    "Заголовок",
-                    1,
+                    "Заголовок12",
                     "ru"
                 }
             };

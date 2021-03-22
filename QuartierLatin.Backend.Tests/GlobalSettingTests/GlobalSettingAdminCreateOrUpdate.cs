@@ -10,7 +10,6 @@ using Xunit;
 
 namespace QuartierLatin.Backend.Tests.GlobalSettingTests
 {
-    [Collection("GlobalSettingTests")]
     public class GlobalSettingAdminCreateOrUpdate : TestBase
     {
         [Theory]

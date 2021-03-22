@@ -11,15 +11,13 @@ namespace QuartierLatin.Backend.Controllers
     public class AdminController : Controller
     {
         private readonly IPageAppService _pageAppService;
-        private readonly IDataBlockAppService _dataBlockAppService;
         private readonly ILanguageRepository _languageRepository;
         private readonly IPageRepository _pageRepository;
 
-        public AdminController(IPageAppService pageAppService, IDataBlockAppService dataBlockAppService, ILanguageRepository languageRepository,
+        public AdminController(IPageAppService pageAppService,ILanguageRepository languageRepository,
             IPageRepository pageRepository)
         {
             _pageAppService = pageAppService;
-            _dataBlockAppService = dataBlockAppService;
             _languageRepository = languageRepository;
             _pageRepository = pageRepository;
         }

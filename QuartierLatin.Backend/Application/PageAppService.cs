@@ -16,13 +16,11 @@ namespace QuartierLatin.Backend.Application
     {
         private readonly IPageRepository _pageRepository;
         private readonly ILanguageRepository _languageRepository;
-        private readonly IDataBlockRepository _dataBlockRepository;
 
-        public PageAppService(IPageRepository pageRepository, ILanguageRepository languageRepository, IDataBlockRepository dataBlockRepository)
+        public PageAppService(IPageRepository pageRepository, ILanguageRepository languageRepository)
         {
             _pageRepository = pageRepository;
             _languageRepository = languageRepository;
-            _dataBlockRepository = dataBlockRepository;
         }
 
         public async Task<int> CreatePageAsync(string url, int languageId, string title, JObject pageData)
@@ -90,11 +88,7 @@ namespace QuartierLatin.Backend.Application
                 .GetAwaiter()
                 .GetResult(), page => page.Url);
 
-            var dataBlocks = (List<DataBlock>)await _dataBlockRepository.GetDataBlockListForPageAndLanguageAsync(pageMain.LanguageId, pageMain.PageRootId);
-
-            var dataBlockDtos = dataBlocks.Select(block => new PageBlockDto(block.Type, JObject.Parse(block.BlockData)));
-
-            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, dataBlockDtos);
+            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData));
 
             var pageModuleDto = new PageModuleDto(pageDto);
 
