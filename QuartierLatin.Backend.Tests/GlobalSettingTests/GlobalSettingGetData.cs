@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Cache;
-using QuartierLatin.Backend.Models.Repositories;
-using QuartierLatin.Backend.Storages.Cache;
+﻿using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Tests.Infrastructure;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.GlobalSettingTests
