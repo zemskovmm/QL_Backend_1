@@ -3,10 +3,11 @@ using LinqToDB.Mapping;
 
 namespace QuartierLatin.Backend.Models
 {
+    [Table("GlobalSettings")]
     public class GlobalSetting
     {
-        [Column] public string Key { get; set; }
-        [Column] public int LanguageId { get; set; }
+        [Column] [PrimaryKey] public string Key { get; set; }
+        [Column] [PrimaryKey] public int LanguageId { get; set; }
         [Column(DataType = DataType.BinaryJson)] public string JsonData { get; set; }
     }
 }

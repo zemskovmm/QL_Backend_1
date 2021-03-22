@@ -20,7 +20,9 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Database.AppDbContextSeed;
+using QuartierLatin.Backend.Storages.Cache;
 using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend
@@ -74,6 +76,8 @@ namespace QuartierLatin.Backend
             AutoRegisterByTypeName(services);
             services.AddSingleton<UserAuthManager>();
             services.AddSingleton<BlobManager>();
+
+            services.AddSingleton<GlobalSettingsCache<JObject>>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
