@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace QuartierLatin.Backend.Models.Repositories
 {
-    public interface IUserRepository : IPasswordAuthRepository<User>
+    public interface IAdminRepository : IPasswordAuthRepository<Admin>
     {
         int Create(string email, Guid identityId, string name, string passwordHash, bool confirmed = false);
-        void Update(User user);
-        User FindByConfirmCode(string code);
-        List<User> GetByIds(IEnumerable<int> ids);
+        void Update(Admin admin);
+        Admin FindByConfirmCode(string code);
+        List<Admin> GetByIds(IEnumerable<int> ids);
     }
 }

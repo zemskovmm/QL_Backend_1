@@ -1,14 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Runtime.ExceptionServices;
+using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
+using QuartierLatin.Backend.Database;
+using QuartierLatin.Backend.Database.AppDbContextSeed;
+using QuartierLatin.Backend.Models.Repositories;
 
 namespace QuartierLatin.Backend.Tests.Infrastructure
 {
@@ -40,7 +48,7 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
             var testConfig = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(customConfig));
             Directory.SetCurrentDirectory("QuartierLatin.Backend.Tests");
 
-            var conns = testConfig["ConnectionString"].Value<string>();
+            var conns = testConfig["Database"]["ConnectionString"].Value<string>();
             using (var conn = new NpgsqlConnection(conns))
             {
                 conn.Open();
@@ -52,8 +60,11 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
                 }
             }
 
+
+
             var host = Program
                 .CreateHostBuilder(new string[0])
+                .ConfigureLogging(l => l.AddDebug())
                 .ConfigureAppConfiguration((hb, cb) =>
                 {
                     cb.Sources.Clear();
@@ -64,6 +75,10 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
                 .Build();
 
             host.Start();
+            LangIds = host.Services.GetRequiredService<ILanguageRepository>().GetLanguageListAsync().Result
+                .ToDictionary(x => x.LanguageShortName, x => x.Id);
+            SendApiRequest<object>(AdminClient, "/api/admin/auth/login",
+                new {Username = "user@example.com", Password = "123321"});
         }
         
         private static void AppStart()
@@ -97,5 +112,34 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
             listener.Stop();
             return port;
         }
+
+        static HttpClient AnonClient = new HttpClient();
+
+        private static HttpClient AdminClient = new HttpClient(new HttpClientHandler
+            {CookieContainer = new CookieContainer()});
+
+        protected static T SendAdminRequest<T>(string url, object data, HttpMethod method = null,
+            Action<HttpRequestMessage> configure = null) =>
+            SendApiRequest<T>(AdminClient, url, data, method, configure);
+
+        protected static T SendAnonRequest<T>(string url, object data, HttpMethod method = null,
+            Action<HttpRequestMessage> configure = null) =>
+            SendApiRequest<T>(AnonClient, url, data, method, configure);
+
+        protected static T SendApiRequest<T>(HttpClient client, string url, object data, HttpMethod method = null, Action<HttpRequestMessage> configure = null)
+        {
+            url = AppUrl + "/" + url.TrimStart('/');
+            var msg = new  HttpRequestMessage(method ?? (data == null ? HttpMethod.Get :  HttpMethod.Post), url);
+            if (data != null)
+                msg.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            configure?.Invoke(msg);
+            var resp = AnonClient.Send(msg);
+            var respString = resp.Content.ReadAsStringAsync().Result;
+            if (resp.IsSuccessStatusCode)
+                return JsonConvert.DeserializeObject<T>(respString);
+            throw new Exception($"Status code {resp.StatusCode}:\n{respString}");
+        }
+
+        protected static Dictionary<string, int> LangIds;
     }
 }

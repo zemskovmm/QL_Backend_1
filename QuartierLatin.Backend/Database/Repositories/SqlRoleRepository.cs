@@ -17,27 +17,27 @@ namespace QuartierLatin.Backend.Database.Repositories
             _db = db;
         }
 
-        public async Task<List<UserRole>> UserRolesByIds(params int[] userIds)
+        public async Task<List<AdminRole>> UserRolesByIds(params int[] adminIds)
         {
-            return _db.Exec(db => db.UserRoles.Where(x => userIds.Contains(x.UserId)).ToList());
+            return _db.Exec(db => db.AdminRoles.Where(x => adminIds.Contains(x.AdminId)).ToList());
         }
 
-        public async Task<bool> UserHasRole(int userId, string role)
+        public async Task<bool> UserHasRole(int adminId, string role)
         {
-            return _db.Exec(db => db.UserRoles.Where(x => x.UserId == userId).Select(x => x.Role).Contains(role));
+            return _db.Exec(db => db.AdminRoles.Where(x => x.AdminId == adminId).Select(x => x.Role).Contains(role));
         }
 
-        public async Task AttachRole(UserRole role)
+        public async Task AttachRole(AdminRole role)
         {
             _db.Exec(db => db.Insert(role));
         }
 
-        public void AttachRoles(int userId, List<UserRole> roles)
+        public void AttachRoles(int adminId, List<AdminRole> roles)
         {
             _db.Exec(db =>
             {
                 using var trx = (db.Connection as NpgsqlConnection).BeginTransaction();
-                db.UserRoles.Where(x => x.UserId == userId).Delete();
+                db.AdminRoles.Where(x => x.AdminId == adminId).Delete();
                 roles.ForEach(x => db.Insert(x));
                 trx.Commit();
             });
@@ -45,20 +45,20 @@ namespace QuartierLatin.Backend.Database.Repositories
 
         public async Task RemoveRole(int id)
         {
-            _db.Exec(db => db.UserRoles.Where(x => x.Id == id).Delete());
+            _db.Exec(db => db.AdminRoles.Where(x => x.Id == id).Delete());
         }
 
-        public async Task AttachRole(int userId, string role)
+        public async Task AttachRole(int adminId, string role)
         {
             _db.Exec(db =>
             {
-                var user = db.Users.FirstOrDefault(x => x.Id == userId);
-                if (user == null) return;
+                var admin = db.Admins.FirstOrDefault(x => x.Id == adminId);
+                if (admin == null) return;
 
-                db.Insert(new UserRole
+                db.Insert(new AdminRole()
                 {
                     Role = role,
-                    UserId = userId
+                    AdminId = adminId
                 });
             });
         }

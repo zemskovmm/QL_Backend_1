@@ -19,9 +19,13 @@ namespace QuartierLatin.Backend.Database
         {
         }
 
-        public ITable<User> Users => GetTable<User>();
-        public ITable<UserRole> UserRoles => GetTable<UserRole>();
+        public ITable<Admin> Admins => GetTable<Admin>();
+        public ITable<AdminRole> AdminRoles => GetTable<AdminRole>();
         public ITable<Blob> Blobs => GetTable<Blob>();
+        public ITable<Page> Pages => GetTable<Page>();
+        public ITable<Language> Languages => GetTable<Language>();
+        public ITable<PageRoot> PageRoots => GetTable<PageRoot>();
+        public ITable<GlobalSetting> GlobalSettings => GetTable<GlobalSetting>();
     }
 
     public interface IAppDbConnectionFactory

@@ -13,6 +13,8 @@
 
     <ItemGroup>
         <PackageReference Include="linq2db.PostgreSQL" Version="3.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.4" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="Nito.AsyncEx" Version="5.1.0" />
         <PackageReference Include="Serenity.FluentMigrator" Version="1.6.904" />
         <PackageReference Include="Serenity.FluentMigrator.Runner" Version="1.6.904" />
@@ -45,4 +47,10 @@
         <EmbeddedResource Remove="webapp\build\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Dto\PageModuleDto\" />
+      <Folder Include="Database\Migrations\Page\" />
+      <Folder Include="Database\Migrations\Language\" />
+      <Folder Include="Database\AppDbContextSeed\" />
+    </ItemGroup>
 </Project>
