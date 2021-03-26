@@ -5,8 +5,10 @@ namespace QuartierLatin.Backend.Models
     [Table("Blobs")]
     public class Blob
     {
-        [PrimaryKey] [Identity] public long Id { get; set; }
+        [PrimaryKey, Identity] public long Id { get; set; }
 
-        // TODO: Storage type and stuff
+        [Column] public string FileType { get; set; }
+
+        [Column] public string OriginalFileName { get; set; }
     }
 }

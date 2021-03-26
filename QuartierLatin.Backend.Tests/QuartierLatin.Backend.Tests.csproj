@@ -35,4 +35,8 @@
       <ProjectReference Include="..\QuartierLatin.Backend\QuartierLatin.Backend.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="TestData\" />
+    </ItemGroup>
+
 </Project>
