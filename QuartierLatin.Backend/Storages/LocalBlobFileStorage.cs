@@ -28,10 +28,17 @@ namespace QuartierLatin.Backend.Storages
 
         public Stream OpenBlob(long id, int? dimension = null)
         {
+            var path = "";
+
             if (dimension is null)
-                return File.OpenRead(GetPath(id, false));
+                path = GetPath(id, false);
             else
-                return File.OpenRead(GetPath(id, false, dimension));
+                path = GetPath(id, false, dimension);
+
+            if (dimension is null)
+                return File.OpenRead(path);
+            else
+                return File.OpenRead(path);
         }
 
         public async Task DeleteBlob(long id, int? dimension = null)

@@ -9,7 +9,7 @@
   "Blob": {
     "Type": "Local",
     "Local": {
-      "Path": "/tmp"
+      "Path": "/tmp/blob"
     }
   },
   "Email": {

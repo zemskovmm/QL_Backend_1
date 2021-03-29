@@ -48,6 +48,11 @@ namespace QuartierLatin.Backend.Tests.FileTests
             var fileFromHdd = Convert.ToBase64String(output.ToArray());
 
             Assert.Equal(fileFromHdd, requestAnswer);
+
+            var secondRequestAnswer =
+                SendAnonRequest<string>($"/media/scaled/{id}?dimension={mediaDimension}", null, null, null, true);
+
+            Assert.Equal(requestAnswer, secondRequestAnswer);
         }
 
         public static IEnumerable<object[]> Data()

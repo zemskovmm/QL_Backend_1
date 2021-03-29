@@ -51,6 +51,11 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
             var testConfig = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(customConfig));
             Directory.SetCurrentDirectory("QuartierLatin.Backend.Tests");
 
+            var blobPath = Path.GetFullPath(testConfig["Blob"]["Local"]["Path"].Value<string>());
+            if (Directory.Exists(blobPath))
+                Directory.Delete(blobPath, true);
+            Directory.CreateDirectory(blobPath);
+
             var enviroment = System.Environment.CurrentDirectory;
             _assetPath = Path.Combine(enviroment, "Assets");
 

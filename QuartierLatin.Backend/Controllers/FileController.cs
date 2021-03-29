@@ -46,13 +46,17 @@ namespace QuartierLatin.Backend.Controllers
 
                 imageScaler.Scale(responseFromService.Value.Item1, stream);
 
-                await _fileAppService.UploadFileAsync(stream, responseFromService.Value.Item3, responseFromService.Value.Item2, dimension, id);
+                var fileContent = stream.ToArray();
+
+                await using var fileStream = new MemoryStream(fileContent);
+
+                await _fileAppService.UploadFileAsync(fileStream, responseFromService.Value.Item3, responseFromService.Value.Item2, dimension, id);
 
                 var provider = new FileExtensionContentTypeProvider();
 
                 provider.TryGetContentType(responseFromService.Value.Item3, out var contentType);
 
-                return File(stream.ToArray(), contentType, responseFromService.Value.Item3);
+                return File(fileContent, contentType, responseFromService.Value.Item3);
             }
             else
             {

@@ -37,7 +37,7 @@ namespace QuartierLatin.Backend.Application
         {
             if (!_blobFileStorage.CheckIfExist(id, dimension)) return null;
 
-            var stream = _blobFileStorage.OpenBlob(id);
+            var stream = _blobFileStorage.OpenBlob(id, dimension);
             var fileRecord = await _blobRepository.GetBlobInfoAsync(id);
 
             return (stream, fileRecord.FileType, fileRecord.OriginalFileName);
