@@ -25,10 +25,9 @@ namespace QuartierLatin.Backend.Controllers
 
             var provider = new FileExtensionContentTypeProvider();
 
-            provider.TryGetContentType(response.Item3, out var contentType);
+            provider.TryGetContentType(response.Value.Item3, out var contentType);
 
-
-            return File(response.Item1, contentType, response.Item3);
+            return File(response.Value.Item1, contentType, response.Value.Item3);
         }
 
         [AllowAnonymous]
@@ -37,24 +36,41 @@ namespace QuartierLatin.Backend.Controllers
         {
             await using var stream = new MemoryStream();
 
-            var responseFromService = await _fileAppService.GetFileAsync(id);
+            var responseFromService = await _fileAppService.GetFileAsync(id, dimension);
 
-            var imageScaler = new ImageScaler(dimension);
+            if (responseFromService is null)
+            {
+                responseFromService = await _fileAppService.GetFileAsync(id);
 
-            imageScaler.Scale(responseFromService.Item1, stream);
+                var imageScaler = new ImageScaler(dimension);
 
-            var provider = new FileExtensionContentTypeProvider();
+                imageScaler.Scale(responseFromService.Value.Item1, stream);
 
-            provider.TryGetContentType(responseFromService.Item3, out var contentType);
+                await _fileAppService.UploadFileAsync(stream, responseFromService.Value.Item3, responseFromService.Value.Item2, dimension, id);
 
-            return File(stream.ToArray(), contentType, responseFromService.Item3);
+                var provider = new FileExtensionContentTypeProvider();
+
+                provider.TryGetContentType(responseFromService.Value.Item3, out var contentType);
+
+                return File(stream.ToArray(), contentType, responseFromService.Value.Item3);
+            }
+            else
+            {
+                var provider = new FileExtensionContentTypeProvider();
+
+                provider.TryGetContentType(responseFromService.Value.Item3, out var contentType);
+
+                await responseFromService.Value.Item1.CopyToAsync(stream);
+
+                return File(stream.ToArray(), contentType, responseFromService.Value.Item3);
+            }
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost("/media/")]
         public async Task<IActionResult> CreateMedia([FromForm] CreateMediaDto createMediaDto)
         {
-            var response = await _fileAppService.UploadFileAsync(createMediaDto.UploadedFile, createMediaDto.FileType);
+            var response = await _fileAppService.UploadFileAsync(createMediaDto.UploadedFile.OpenReadStream(), createMediaDto.UploadedFile.FileName, createMediaDto.FileType);
 
             return Ok(new {id = response});
         }

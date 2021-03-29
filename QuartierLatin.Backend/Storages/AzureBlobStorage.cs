@@ -24,22 +24,28 @@ namespace QuartierLatin.Backend.Storages
         private BlobServiceClient Client { get; }
         private BlobContainerClient BlobContainer { get; }
 
-        public async Task CreateBlobAsync(long id, Stream s)
+        public async Task CreateBlobAsync(long id, Stream s, int? dimension)
         {
             var blob = BlobContainer.GetBlobClient($"{id}");
             await blob.UploadAsync(s);
         }
 
-        public Stream OpenBlob(long id)
+        public Stream OpenBlob(long id, int? dimension)
         {
             var blob = BlobContainer.GetBlobClient($"{id}");
             return blob.OpenRead();
         }
 
-        public async Task DeleteBlob(long id)
+        public async Task DeleteBlob(long id, int? dimension)
         {
             var blob = BlobContainer.GetBlobClient($"{id}");
             await blob.DeleteIfExistsAsync();
+        }
+
+        public bool CheckIfExist(long id, int? dimension = null)
+        {
+            var blob = BlobContainer.GetBlobClient($"{id}");
+            return blob.Exists();
         }
     }
 }
