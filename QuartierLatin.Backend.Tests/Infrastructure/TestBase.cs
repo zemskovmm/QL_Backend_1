@@ -25,13 +25,17 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
         private static ExceptionDispatchInfo _appStartFailed;
         private static readonly object AppStartLock = new();
         private static readonly string AppUrl = $"http://127.0.0.1:{GetFreePort()}";
+        private static string _assetPath;
+
 
         protected TestBase() => AppStart();
 
         protected string RpcUri => AppUrl.TrimEnd('/') + "/tsrpc";
 
         protected T GetService<T>() => (T) Startup.AppServices.GetRequiredService(typeof (T));
-        
+
+        protected static string GetAssetPath() => _assetPath;
+
         private static void AppStartCore()
         {
             Startup.IntegrationTestMode = true;
@@ -46,6 +50,9 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
             var customConfig = Path.GetFullPath("QuartierLatin.Backend.Tests/config.json");
             var testConfig = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(customConfig));
             Directory.SetCurrentDirectory("QuartierLatin.Backend.Tests");
+
+            var enviroment = System.Environment.CurrentDirectory;
+            _assetPath = Path.Combine(enviroment, "Assets");
 
             var conns = testConfig["Database"]["ConnectionString"].Value<string>();
             using (var conn = new NpgsqlConnection(conns))

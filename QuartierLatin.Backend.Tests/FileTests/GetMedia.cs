@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Tests.Extensions;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.FileTests
@@ -14,8 +16,10 @@ namespace QuartierLatin.Backend.Tests.FileTests
     {
         [Theory]
         [MemberData(nameof(Data))]
-        public async Task Anon_Should_Be_Able_To_Get_MediaAsync(string filePath, string fileName, string mediaType)
+        public async Task Anon_Should_Be_Able_To_Get_MediaAsync(string fileName, string mediaType)
         {
+            var filePath = Path.Combine(GetAssetPath(), this.GetType().Name, MethodBase.GetCurrentMethod().GetDeclaringName(), fileName);
+
             var repo = GetService<IBlobRepository>();
 
             var multipartContent = new MultipartFormDataContent();
@@ -39,17 +43,12 @@ namespace QuartierLatin.Backend.Tests.FileTests
 
         public static IEnumerable<object[]> Data()
         {
-            var fileName = "test.jpg";
-            var enviroment = System.Environment.CurrentDirectory;
-            var projectDirectory = Directory.GetParent(enviroment).Parent.Parent.FullName;
-
-            var filePath = Path.Combine(projectDirectory, @"TestData\" + fileName);
+            var fileName = "test1.jpg";
 
             return new List<object[]>
             {
                 new object[]
                 {
-                    filePath,
                     fileName,
                     "Image"
                 },
