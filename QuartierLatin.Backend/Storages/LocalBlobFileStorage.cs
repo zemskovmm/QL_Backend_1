@@ -1,5 +1,7 @@
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Storages
@@ -7,6 +9,7 @@ namespace QuartierLatin.Backend.Storages
     public class LocalBlobFileStorage : IBlobFileStorage
     {
         private readonly string _blobsPath;
+        private ConcurrentDictionary<string, SemaphoreSlim> _locks = new ConcurrentDictionary<string, SemaphoreSlim>();
 
         public LocalBlobFileStorage(string blobsPath)
         {
@@ -15,15 +18,43 @@ namespace QuartierLatin.Backend.Storages
 
         public async Task CreateBlobAsync(long id, Stream s, int? dimension = null)
         {
-            var path = "";
+            if (CheckIfExist(id, dimension)) return;
+
+            var key = "";
 
             if (dimension is null)
-                path = GetPath(id, true);
+            {
+                key = id.ToString();
+            }
             else
-                path = GetPath(id, true, dimension);
+            {
+                key = id.ToString() + "_" + dimension.Value.ToString();
+            }
 
-            await using var f = File.Create(path);
-            await s.CopyToAsync(f);
+            var myLock = _locks.GetOrAdd(key, k => new SemaphoreSlim(1, 1));
+
+            await myLock.WaitAsync();
+
+            try
+            {
+                if (!CheckIfExist(id, dimension))
+                {
+                    var path = "";
+
+                    if (dimension is null)
+                        path = GetPath(id, true);
+                    else
+                        path = GetPath(id, true, dimension);
+
+                    await using var f = File.Create(path);
+                    await s.CopyToAsync(f);
+                }
+            }
+            finally
+            {
+                myLock.Release();
+            }
+            return;
         }
 
         public Stream OpenBlob(long id, int? dimension = null)

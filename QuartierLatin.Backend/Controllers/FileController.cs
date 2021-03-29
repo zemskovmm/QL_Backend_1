@@ -1,11 +1,9 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Dto.Media;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -34,40 +32,13 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/media/scaled/{id}")]
         public async Task<IActionResult> GetCompressedMedia(long id, [FromQuery]int dimension)
         {
-            await using var stream = new MemoryStream();
+            var response = await _fileAppService.GetCompressedFileAsync(id, dimension);
 
-            var responseFromService = await _fileAppService.GetFileAsync(id, dimension);
+            var provider = new FileExtensionContentTypeProvider();
 
-            if (responseFromService is null)
-            {
-                responseFromService = await _fileAppService.GetFileAsync(id);
+            provider.TryGetContentType(response.Value.Item3, out var contentType);
 
-                var imageScaler = new ImageScaler(dimension);
-
-                imageScaler.Scale(responseFromService.Value.Item1, stream);
-
-                var fileContent = stream.ToArray();
-
-                await using var fileStream = new MemoryStream(fileContent);
-
-                await _fileAppService.UploadFileAsync(fileStream, responseFromService.Value.Item3, responseFromService.Value.Item2, dimension, id);
-
-                var provider = new FileExtensionContentTypeProvider();
-
-                provider.TryGetContentType(responseFromService.Value.Item3, out var contentType);
-
-                return File(fileContent, contentType, responseFromService.Value.Item3);
-            }
-            else
-            {
-                var provider = new FileExtensionContentTypeProvider();
-
-                provider.TryGetContentType(responseFromService.Value.Item3, out var contentType);
-
-                await responseFromService.Value.Item1.CopyToAsync(stream);
-
-                return File(stream.ToArray(), contentType, responseFromService.Value.Item3);
-            }
+            return File(response.Value.Item1, contentType, response.Value.Item3);
         }
 
         [Authorize(Roles = "Admin")]

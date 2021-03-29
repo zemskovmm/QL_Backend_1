@@ -1,6 +1,7 @@
 ﻿using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Storages;
+using QuartierLatin.Backend.Utils;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -42,6 +43,36 @@ namespace QuartierLatin.Backend.Application
 
             return (stream, fileRecord.FileType, fileRecord.OriginalFileName);
 
+        }
+
+        public async Task<(byte[], string, string)?> GetCompressedFileAsync(long id, int dimension)
+        {
+            await using var stream = new MemoryStream();
+
+            var responseFromService = await GetFileAsync(id, dimension);
+
+            if (responseFromService is null)
+            {
+                responseFromService = await GetFileAsync(id);
+
+                var imageScaler = new ImageScaler(dimension);
+
+                imageScaler.Scale(responseFromService.Value.Item1, stream);
+
+                var fileContent = stream.ToArray();
+
+                await using var fileStream = new MemoryStream(fileContent);
+
+                await UploadFileAsync(fileStream, responseFromService.Value.Item3, responseFromService.Value.Item2, dimension, id);
+
+                return (fileStream.ToArray(), responseFromService.Value.Item2, responseFromService.Value.Item3);
+            }
+            else
+            {
+                await responseFromService.Value.Item1.CopyToAsync(stream);
+
+                return (stream.ToArray(), responseFromService.Value.Item2, responseFromService.Value.Item3);
+            }
         }
 
         public async Task DeleteFileAsync(long id, int? dimension = null)

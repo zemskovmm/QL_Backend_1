@@ -10,6 +10,8 @@ namespace QuartierLatin.Backend.Application.Interfaces
 
         Task<(Stream, string, string)?> GetFileAsync(long id, int? dimension = null);
 
+        Task<(byte[], string, string)?> GetCompressedFileAsync(long id, int dimension);
+
         Task DeleteFileAsync(long id, int? dimension = null);
     }
 }
