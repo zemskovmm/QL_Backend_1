@@ -11,7 +11,8 @@ namespace QuartierLatin.Backend.Database.Migrations.University
                 .WithColumn("UniversityId").AsInt64().ForeignKey("Universities", "Id").PrimaryKey()
                 .WithColumn("LanguageId").AsInt64().ForeignKey("Languages", "Id").PrimaryKey()
                 .WithColumn("Name").AsString()
-                .WithColumn("Description").AsString();
+                .WithColumn("Description").AsString()
+                .WithColumn("Url").AsString();
         }
     }
 }

@@ -10,5 +10,6 @@ namespace QuartierLatin.Backend.Models.CatalogModels
 
         [Column] public string Name { get; set; }
         [Column] public string Description { get; set; }
+        [Column] public string Url { get; set; }
     }
 }

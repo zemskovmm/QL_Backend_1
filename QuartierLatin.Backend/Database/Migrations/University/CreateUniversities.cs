@@ -8,7 +8,9 @@ namespace QuartierLatin.Backend.Database.Migrations.University
         public override void Up()
         {
             Create.Table("Universities")
-                .WithColumn("Id").AsInt32().PrimaryKey().Identity();
+                .WithColumn("Id").AsInt32().PrimaryKey().Identity()
+                .WithColumn("Website").AsString()
+                .WithColumn("FoundationYear").AsInt64();
         }
     }
 }
