@@ -72,6 +72,15 @@ namespace QuartierLatin.Backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins().AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                    });
+            });
+
             services.AddControllers();
             AutoRegisterByTypeName(services);
             services.AddSingleton<UserAuthManager>();
@@ -145,6 +154,12 @@ namespace QuartierLatin.Backend
         {
             var roleRepository = app.ApplicationServices.GetRequiredService<IRoleRepository>();
             var userAuthManager = app.ApplicationServices.GetRequiredService<UserAuthManager>();
+            app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed((host) => true)
+                .AllowCredentials()
+            );
 
             void StaticFiles()
             {
