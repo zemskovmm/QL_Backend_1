@@ -1,8 +1,10 @@
-﻿using LinqToDB;
-using QuartierLatin.Backend.Models.CatalogModels;
-using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LinqToDB;
+using LinqToDB.Data;
+using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {
@@ -15,46 +17,58 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             _db = db;
         }
 
-        public async Task<int> CreateUniversityLanguageAsync(int languageId, string name, string description, string url, string website, int foundationYear)
+        public async Task CreateOrUpdateUniversityLanguageAsync(int universityId, int languageId, string name,
+            string description, string url)
         {
-            return await _db.ExecAsync(async db =>
+            await _db.ExecAsync(
+                db => CreateOrUpdateUniversityCore(db, universityId, languageId, name, description, url));
+        }
+
+        public async Task<List<int>> GetUniversityIdListAsync()
+        {
+            return await _db.ExecAsync(db => db.Universities.Select(university => university.Id).ToListAsync());
+        }
+
+        public async Task<Dictionary<int, UniversityLanguage>> GetUniversityLanguageByUniversityIdAsync(
+            int universityId)
+        {
+            return await _db.ExecAsync(db => db.UniversityLanguages
+                .Where(universityLanguage => universityLanguage.UniversityId == universityId)
+                .ToDictionaryAsync(universityLanguage => universityLanguage.LanguageId,
+                    universityLanguage => universityLanguage));
+        }
+
+        public async Task<University> GetUniversityByIdAsync(int id)
+        {
+            return await _db.ExecAsync(db => db.Universities.FirstOrDefaultAsync(university => university.Id == id));
+        }
+
+        public async Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage)
+        {
+            await _db.ExecAsync(db => db.BulkCopyAsync(universityLanguage));
+        }
+
+        public async Task<int> CreateUniversityAsync(int foundationYear, string website)
+        {
+            return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new University
             {
-                await using var t = await db.BeginTransactionAsync();
-
-                var universityId = await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new University
-                {
-                    FoundationYear = foundationYear,
-                    Website = website
-                }));
-
-                await CreateOrUpdateUniversityCore(db, universityId, languageId, name, description, url);
-                await t.CommitAsync();
-
-                return universityId;
-            });
+                FoundationYear = foundationYear,
+                Website = website
+            }));
         }
 
-        public async Task CreateOrUpdateUniversityLanguageAsync(int universityId, int languageId, string name, string description, string url) =>
-            await _db.ExecAsync(db => CreateOrUpdateUniversityCore(db, universityId, languageId, name, description, url));
-
-        public async Task DeleteUniversityLanguageAsync(int universityId, int languageId)
+        public async Task UpdateUniversityAsync(int id, int foundationYear, string website)
         {
-            await _db.ExecAsync(db => db.UniversityLanguages.Where(university =>
-                university.UniversityId == universityId && university.LanguageId == languageId).DeleteAsync());
+            await _db.ExecAsync(db => db.UpdateAsync(new University
+            {
+                Id = id,
+                FoundationYear = foundationYear,
+                Website = website
+            }));
         }
 
-        public async Task<(University, UniversityLanguage)> GetUniversityLanguageAsync(int universityId, int languageId)
-        {
-            var university = await _db.ExecAsync(db =>
-                db.Universities.FirstOrDefaultAsync(university => university.Id == universityId));
-
-            var universityLanguage = await _db.ExecAsync(db => db.UniversityLanguages.FirstOrDefaultAsync(university =>
-                university.UniversityId == universityId && university.LanguageId == languageId));
-
-            return (university, universityLanguage);
-        }
-
-        private static async Task CreateOrUpdateUniversityCore(AppDbContext db, int universityId, int languageId, string name, string description, string url)
+        private static async Task CreateOrUpdateUniversityCore(AppDbContext db, int universityId, int languageId,
+            string name, string description, string url)
         {
             await db.InsertOrReplaceAsync(new UniversityLanguage
             {

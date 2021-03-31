@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
 using Newtonsoft.Json;
@@ -46,14 +47,12 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             }));
         }
 
-        public async Task DeleteCommonTraitTypeAsync(int id)
+        public async Task DeleteCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType)
         {
-            await _db.ExecAsync(db => db.CommonTraitTypes.Where(trait => trait.Id == id).DeleteAsync());
-        }
-
-        public async Task DeleteCommonTraitTypesForEntityAsync(int commonTraitId)
-        {
-            await _db.ExecAsync(db => db.CommonTraitTypesForEntities.Where(trait => trait.CommonTraitId == commonTraitId).DeleteAsync());
+            await _db.ExecAsync(db =>
+                db.CommonTraitTypesForEntities
+                    .Where(trait => trait.CommonTraitId == commonTraitId && trait.EntityType == entityType)
+                    .DeleteAsync());
         }
 
         public async Task<CommonTraitType> GetCommonTraitTypeAsync(int id)
@@ -61,9 +60,40 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             return await _db.ExecAsync(db => db.CommonTraitTypes.FirstOrDefaultAsync(trait => trait.Id == id));
         }
 
-        public async Task<CommonTraitTypesForEntity> GetCommonTraitTypesForEntityAsync(int commonTraitId)
+        public async Task<List<CommonTraitType>> GetCommonTraitTypeListAsync()
         {
-            return await _db.ExecAsync(db => db.CommonTraitTypesForEntities.FirstOrDefaultAsync(trait => trait.CommonTraitId == commonTraitId));
+            return await _db.ExecAsync(db => db.CommonTraitTypes.ToListAsync());
+        }
+
+        public async Task<IEnumerable<int>> GetTraitTypeForEntitiesByEntityTypeIdListAsync(EntityType entityType)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraitTypesForEntities.Where(trait => trait.EntityType == entityType)
+                    .Select(trait => trait.CommonTraitId).ToListAsync());
+        }
+
+        public async Task<List<int>> GetEntityTraitToUniversityIdListAsync(int universityId)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraitsToUniversities.Where(trait => trait.UniversityId == universityId)
+                    .Select(trait => trait.CommonTraitId).ToListAsync());
+        }
+
+        public async Task CreateEntityTraitToUniversityAsync(int universityId, int commonTraitId)
+        {
+            await _db.ExecAsync(db => db.InsertAsync(new CommonTraitsToUniversity
+            {
+                CommonTraitId = commonTraitId,
+                UniversityId = universityId
+            }));
+        }
+
+        public async Task DeleteEntityTraitToUniversityAsync(int universityId, int commonTraitId)
+        {
+            await _db.ExecAsync(db =>
+                db.CommonTraitsToUniversities
+                    .Where(trait => trait.UniversityId == universityId && trait.CommonTraitId == commonTraitId)
+                    .DeleteAsync());
         }
     }
 }

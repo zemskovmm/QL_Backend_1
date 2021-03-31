@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
@@ -8,14 +9,14 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
     public interface ICommonTraitTypeRepository
     {
         Task<int> CreateCommonTraitTypeAsync(JObject names, string? identifier);
-
         Task UpdateCommonTraitTypeAsync(int id, JObject names, string? identifier);
         Task CreateOrUpdateCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType);
-
-        Task DeleteCommonTraitTypeAsync(int id);
-        Task DeleteCommonTraitTypesForEntityAsync(int commonTraitId);
-
+        Task DeleteCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType);
         Task<CommonTraitType> GetCommonTraitTypeAsync(int id);
-        Task<CommonTraitTypesForEntity> GetCommonTraitTypesForEntityAsync(int commonTraitId);
+        Task<List<CommonTraitType>> GetCommonTraitTypeListAsync();
+        Task<IEnumerable<int>> GetTraitTypeForEntitiesByEntityTypeIdListAsync(EntityType entityType);
+        Task<List<int>> GetEntityTraitToUniversityIdListAsync(int universityId);
+        Task CreateEntityTraitToUniversityAsync(int universityId, int commonTraitId);
+        Task DeleteEntityTraitToUniversityAsync(int universityId, int commonTraitId);
     }
 }

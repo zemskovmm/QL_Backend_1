@@ -1,10 +1,11 @@
-﻿using LinqToDB;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using LinqToDB;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
-using System.Linq;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {
@@ -17,7 +18,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             _db = db;
         }
 
-        public async Task<int> CreateCommonTraitAsync(int commonTraitTypeId, JObject names, int iconBlobId, int order)
+        public async Task<int> CreateCommonTraitAsync(int commonTraitTypeId, JObject names, long? iconBlobId, int order)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new CommonTrait
             {
@@ -37,7 +38,8 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             }));
         }
 
-        public async Task UpdateCommonTraitAsync(int id, int commonTraitTypeId, JObject names, int iconBlobId, int order)
+        public async Task UpdateCommonTraitAsync(int id, int commonTraitTypeId, JObject names, long? iconBlobId,
+            int order)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new CommonTrait
             {
@@ -63,6 +65,12 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
         public async Task<CommonTrait> GetCommonTraitAsync(int id)
         {
             return await _db.ExecAsync(db => db.CommonTraits.FirstOrDefaultAsync(trait => trait.Id == id));
+        }
+
+        public async Task<List<CommonTrait>> GetCommonTraitListByTypeId(int typeId)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraits.Where(trait => trait.CommonTraitTypeId == typeId).ToListAsync());
         }
     }
 }
