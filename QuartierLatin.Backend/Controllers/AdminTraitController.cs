@@ -109,7 +109,8 @@ namespace QuartierLatin.Backend.Controllers
                 CommonTraitTypeId = trait.CommonTraitTypeId,
                 IconBlobId = trait.IconBlobId,
                 Names = JObject.FromObject(trait.Names),
-                Order = trait.Order
+                Order = trait.Order,
+                ParentId = trait.ParentId
             });
 
             return Ok(response);
@@ -121,7 +122,7 @@ namespace QuartierLatin.Backend.Controllers
             int typeId)
         {
             var response = await _commonTraitAppService.CreateCommonTraitAsync(typeId, createCommonTraitDto.Names,
-                createCommonTraitDto.Order, createCommonTraitDto.IconBlobId);
+                createCommonTraitDto.Order, createCommonTraitDto.IconBlobId, createCommonTraitDto.ParentId);
             return Ok(new {id = response});
         }
 
@@ -136,7 +137,8 @@ namespace QuartierLatin.Backend.Controllers
                 CommonTraitTypeId = trait.CommonTraitTypeId,
                 IconBlobId = trait.IconBlobId,
                 Names = JObject.FromObject(trait.Names),
-                Order = trait.Order
+                Order = trait.Order,
+                ParentId = trait.ParentId
             };
 
             return Ok(response);
@@ -148,7 +150,7 @@ namespace QuartierLatin.Backend.Controllers
         {
             await _commonTraitAppService.UpdateCommonTraitAsync(id, commonTraitDto.Names,
                 commonTraitDto.CommonTraitTypeId,
-                commonTraitDto.IconBlobId, commonTraitDto.Order);
+                commonTraitDto.IconBlobId, commonTraitDto.Order, commonTraitDto.ParentId);
             return Ok(new object());
         }
 

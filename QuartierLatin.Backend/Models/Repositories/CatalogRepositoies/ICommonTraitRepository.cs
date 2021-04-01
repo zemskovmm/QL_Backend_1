@@ -7,10 +7,10 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
 {
     public interface ICommonTraitRepository
     {
-        Task<int> CreateCommonTraitAsync(int commonTraitTypeId, JObject names, long? iconBlobId, int order);
+        Task<int> CreateCommonTraitAsync(int commonTraitTypeId, JObject names, long? iconBlobId, int order, int? parentId);
         Task CreateOrUpdateCommonTraitToUniversityAsync(int universityId, int commonTraitId);
 
-        Task UpdateCommonTraitAsync(int id, int commonTraitTypeId, JObject names, long? iconBlobId, int order);
+        Task UpdateCommonTraitAsync(int id, int commonTraitTypeId, JObject names, long? iconBlobId, int order, int? parentId);
 
         Task DeleteCommonTraitAsync(int id);
         Task DeleteCommonTraitToUniversityAsync(int universityId, int commonTraitId);

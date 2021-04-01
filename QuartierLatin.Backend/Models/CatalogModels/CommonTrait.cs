@@ -10,5 +10,6 @@ namespace QuartierLatin.Backend.Models.CatalogModels
         [Column(DataType = DataType.BinaryJson)] public string Names { get; set; }
         [Column] public long? IconBlobId { get; set; } 
         [Column] public int Order { get; set; }
+        [Column] public int? ParentId { get; set; }
     }
 }

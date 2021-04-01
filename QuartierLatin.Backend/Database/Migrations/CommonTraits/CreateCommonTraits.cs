@@ -12,7 +12,8 @@ namespace QuartierLatin.Backend.Database.Migrations.CommonTraits
                 .WithColumn("CommonTraitTypeId").AsInt64().ForeignKey("CommonTraitTypes", "Id")
                 .WithColumn("Names").AsCustom("jsonb")
                 .WithColumn("IconBlobId").AsInt64().ForeignKey("Blobs", "Id")
-                .WithColumn("Order").AsInt64();
+                .WithColumn("Order").AsInt64()
+                .WithColumn("ParentId").AsInt64().ForeignKey("CommonTraits", "Id");
         }
     }
 }
