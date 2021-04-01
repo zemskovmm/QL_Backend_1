@@ -1,5 +1,7 @@
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Storages
@@ -7,33 +9,96 @@ namespace QuartierLatin.Backend.Storages
     public class LocalBlobFileStorage : IBlobFileStorage
     {
         private readonly string _blobsPath;
+        private ConcurrentDictionary<string, SemaphoreSlim> _locks = new ConcurrentDictionary<string, SemaphoreSlim>();
 
         public LocalBlobFileStorage(string blobsPath)
         {
             _blobsPath = blobsPath;
         }
 
-        public async Task CreateBlobAsync(long id, Stream s)
+        public async Task CreateBlobAsync(long id, Stream s, int? dimension = null)
         {
-            var path = GetPath(id, true);
-            await using var f = File.Create(path);
-            await s.CopyToAsync(f);
+            if (CheckIfExist(id, dimension)) return;
+
+            var key = "";
+
+            if (dimension is null)
+            {
+                key = id.ToString();
+            }
+            else
+            {
+                key = id.ToString() + "_" + dimension.Value.ToString();
+            }
+
+            var myLock = _locks.GetOrAdd(key, k => new SemaphoreSlim(1, 1));
+
+            await myLock.WaitAsync();
+
+            try
+            {
+                if (!CheckIfExist(id, dimension))
+                {
+                    var path = "";
+
+                    if (dimension is null)
+                        path = GetPath(id, true);
+                    else
+                        path = GetPath(id, true, dimension);
+
+                    await using var f = File.Create(path);
+                    await s.CopyToAsync(f);
+                }
+            }
+            finally
+            {
+                myLock.Release();
+            }
+            return;
         }
 
-        public Stream OpenBlob(long id)
+        public Stream OpenBlob(long id, int? dimension = null)
         {
-            return File.OpenRead(GetPath(id, false));
+            var path = "";
+
+            if (dimension is null)
+                path = GetPath(id, false);
+            else
+                path = GetPath(id, false, dimension);
+
+            if (dimension is null)
+                return File.OpenRead(path);
+            else
+                return File.OpenRead(path);
         }
 
-        public async Task DeleteBlob(long id)
+        public async Task DeleteBlob(long id, int? dimension = null)
         {
-            var path = GetPath(id, false);
+            var path = "";
+
+            if (dimension is null)
+                path = GetPath(id, false);
+            else
+                path = GetPath(id, false, dimension);
+
             if (!File.Exists(path)) return;
             File.Delete(path);
             await Task.Yield();
         }
 
-        private string GetPath(long id, bool create)
+        public bool CheckIfExist(long id, int? dimension = null)
+        {
+            var path = "";
+
+            if (dimension is null)
+                path = GetPath(id, false);
+            else
+                path = GetPath(id, false, dimension);
+
+            return File.Exists(path);
+        }
+
+        private string GetPath(long id, bool create, int? dimension = null)
         {
             var s = id.ToString();
             if (s.Length == 0)
@@ -43,7 +108,13 @@ namespace QuartierLatin.Backend.Storages
             var dir = Path.Combine(ds.Select(x => x.ToString()).Prepend(_blobsPath).ToArray());
             if (create)
                 Directory.CreateDirectory(dir);
-            return Path.Combine(dir, s.Last() + ".bin");
+
+            var path = Path.Combine(dir, s.Last() + ".bin");
+
+            if (dimension is null)
+                return path;
+            else
+                return Path.Combine(dir, s.Last() + "_" + dimension.ToString()  + ".bin");
         }
     }
 }

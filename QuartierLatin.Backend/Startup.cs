@@ -1,29 +1,27 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Auth;
+using QuartierLatin.Backend.Config;
+using QuartierLatin.Backend.Database;
+using QuartierLatin.Backend.Database.AppDbContextSeed;
+using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Storages;
+using QuartierLatin.Backend.Storages.Cache;
+using QuartierLatin.Backend.Utils.Swagger;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Auth;
-using QuartierLatin.Backend.Config;
-using QuartierLatin.Backend.Database;
-using QuartierLatin.Backend.Managers;
-using QuartierLatin.Backend.Models;
-using QuartierLatin.Backend.Models.Repositories;
-using QuartierLatin.Backend.Storages;
-using LinqToDB;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Rewrite;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
-using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Database.AppDbContextSeed;
-using QuartierLatin.Backend.Storages.Cache;
-using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend
 {
@@ -84,7 +82,7 @@ namespace QuartierLatin.Backend
             services.AddControllers();
             AutoRegisterByTypeName(services);
             services.AddSingleton<UserAuthManager>();
-            services.AddSingleton<BlobManager>();
+
 
             services.AddSingleton<GlobalSettingsCache<JObject>>();
 
@@ -103,8 +101,14 @@ namespace QuartierLatin.Backend
                         return Task.CompletedTask;
                     };
                 });
-            
-            services.AddSwaggerGen();
+
+
+            services.AddSwaggerGen(options =>
+            {
+                options.OperationFilter<SwaggerFileOperationFilter>();
+                options.MapType(typeof(IFormFile), () => new OpenApiSchema() { Type = "file", Format = "binary" });
+            });
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Admin", policy =>

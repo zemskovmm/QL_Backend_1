@@ -1,12 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Sockets;
-using System.Runtime.ExceptionServices;
-using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +5,17 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
-using QuartierLatin.Backend.Database;
-using QuartierLatin.Backend.Database.AppDbContextSeed;
 using QuartierLatin.Backend.Models.Repositories;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Sockets;
+using System.Runtime.ExceptionServices;
+using System.Text;
 
 namespace QuartierLatin.Backend.Tests.Infrastructure
 {
@@ -26,13 +25,17 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
         private static ExceptionDispatchInfo _appStartFailed;
         private static readonly object AppStartLock = new();
         private static readonly string AppUrl = $"http://127.0.0.1:{GetFreePort()}";
+        private static string _assetPath;
+
 
         protected TestBase() => AppStart();
 
         protected string RpcUri => AppUrl.TrimEnd('/') + "/tsrpc";
 
         protected T GetService<T>() => (T) Startup.AppServices.GetRequiredService(typeof (T));
-        
+
+        protected static string GetAssetPath() => _assetPath;
+
         private static void AppStartCore()
         {
             Startup.IntegrationTestMode = true;
@@ -48,6 +51,14 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
             var testConfig = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(customConfig));
             Directory.SetCurrentDirectory("QuartierLatin.Backend.Tests");
 
+            var blobPath = Path.GetFullPath(testConfig["Blob"]["Local"]["Path"].Value<string>());
+            if (Directory.Exists(blobPath))
+                Directory.Delete(blobPath, true);
+            Directory.CreateDirectory(blobPath);
+
+            var enviroment = System.Environment.CurrentDirectory;
+            _assetPath = Path.Combine(enviroment, "Assets");
+
             var conns = testConfig["Database"]["ConnectionString"].Value<string>();
             using (var conn = new NpgsqlConnection(conns))
             {
@@ -59,8 +70,6 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
                     cmd.ExecuteNonQuery();
                 }
             }
-
-
 
             var host = Program
                 .CreateHostBuilder(new string[0])
@@ -119,24 +128,45 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
             {CookieContainer = new CookieContainer()});
 
         protected static T SendAdminRequest<T>(string url, object data, HttpMethod method = null,
-            Action<HttpRequestMessage> configure = null) =>
-            SendApiRequest<T>(AdminClient, url, data, method, configure);
+            Action<HttpRequestMessage> configure = null, bool isFile = false) =>
+            SendApiRequest<T>(AdminClient, url, data, method, configure, isFile);
 
         protected static T SendAnonRequest<T>(string url, object data, HttpMethod method = null,
-            Action<HttpRequestMessage> configure = null) =>
-            SendApiRequest<T>(AnonClient, url, data, method, configure);
+            Action<HttpRequestMessage> configure = null, bool isFile = false) =>
+            SendApiRequest<T>(AnonClient, url, data, method, configure, isFile);
 
-        protected static T SendApiRequest<T>(HttpClient client, string url, object data, HttpMethod method = null, Action<HttpRequestMessage> configure = null)
+        protected static T SendApiRequest<T>(HttpClient client, string url, object data, HttpMethod method = null, Action<HttpRequestMessage> configure = null, bool isFile = false)
         {
             url = AppUrl + "/" + url.TrimStart('/');
             var msg = new  HttpRequestMessage(method ?? (data == null ? HttpMethod.Get :  HttpMethod.Post), url);
             if (data != null)
-                msg.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            {
+                if (data.GetType() == typeof(MultipartFormDataContent))
+                {
+                    msg.Content = (MultipartFormDataContent)data;
+                }
+                else
+                {
+                    msg.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+                }
+            }
+
+            var respString = "";
+
             configure?.Invoke(msg);
             var resp = AnonClient.Send(msg);
-            var respString = resp.Content.ReadAsStringAsync().Result;
+            
             if (resp.IsSuccessStatusCode)
+            {
+                if (isFile is true)
+                {
+                    return (T)(object)Convert.ToBase64String(resp.Content.ReadAsByteArrayAsync().ConfigureAwait(false).GetAwaiter().GetResult());
+                }
+
+                respString = resp.Content.ReadAsStringAsync().Result;
                 return JsonConvert.DeserializeObject<T>(respString);
+            }
+
             throw new Exception($"Status code {resp.StatusCode}:\n{respString}");
         }
 
