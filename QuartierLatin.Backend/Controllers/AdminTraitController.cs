@@ -32,7 +32,7 @@ namespace QuartierLatin.Backend.Controllers
             {
                 Id = trait.Id,
                 Identifier = trait.Identifier,
-                Names = JObject.FromObject(trait.Names)
+                Names = JObject.Parse(trait.Names)
             });
 
             return Ok(response);
@@ -57,7 +57,7 @@ namespace QuartierLatin.Backend.Controllers
             var response = new TraitTypeDto
             {
                 Identifier = traitType.Identifier,
-                Names = JObject.FromObject(traitType.Names)
+                Names = JObject.Parse(traitType.Names)
             };
 
             return Ok(response);
@@ -82,18 +82,18 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("/api/admin/entity-trait-types/{entityType}/{traitTypeId}")]
-        public async Task<IActionResult> CreateTraitTypeForEntityByEntityType(EntityType entityType, int traitTypeId)
+        [HttpPost("/api/admin/entity-trait-types/{entityType}/{commonTraitId}")]
+        public async Task<IActionResult> CreateTraitTypeForEntityByEntityType(EntityType entityType, int commonTraitId)
         {
-            await _commonTraitTypeAppService.CreateTraitTypeForEntityByEntityTypeAsync(entityType, traitTypeId);
+            await _commonTraitTypeAppService.CreateTraitTypeForEntityByEntityTypeAsync(entityType, commonTraitId);
             return Ok(new object());
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("/api/admin/entity-trait-types/{entityType}/{traitTypeId}")]
-        public async Task<IActionResult> DeleteTraitTypeForEntityByEntityType(EntityType entityType, int traitTypeId)
+        [HttpDelete("/api/admin/entity-trait-types/{entityType}/{commonTraitId}")]
+        public async Task<IActionResult> DeleteTraitTypeForEntityByEntityType(EntityType entityType, int commonTraitId)
         {
-            await _commonTraitTypeAppService.DeleteTraitTypeForEntityByEntityTypeAsync(entityType, traitTypeId);
+            await _commonTraitTypeAppService.DeleteTraitTypeForEntityByEntityTypeAsync(entityType, commonTraitId);
             return Ok(new object());
         }
 
@@ -108,7 +108,7 @@ namespace QuartierLatin.Backend.Controllers
                 Id = trait.Id,
                 CommonTraitTypeId = trait.CommonTraitTypeId,
                 IconBlobId = trait.IconBlobId,
-                Names = JObject.FromObject(trait.Names),
+                Names = JObject.Parse(trait.Names),
                 Order = trait.Order,
                 ParentId = trait.ParentId
             });
@@ -136,7 +136,7 @@ namespace QuartierLatin.Backend.Controllers
             {
                 CommonTraitTypeId = trait.CommonTraitTypeId,
                 IconBlobId = trait.IconBlobId,
-                Names = JObject.FromObject(trait.Names),
+                Names = JObject.Parse(trait.Names),
                 Order = trait.Order,
                 ParentId = trait.ParentId
             };
@@ -155,7 +155,7 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet(" /api/admin/entity-traits-university/{universityId}")]
+        [HttpGet("/api/admin/entity-traits-university/{universityId}")]
         public async Task<IActionResult> GetEntityTraitToUniversity(int universityId)
         {
             var response = await _commonTraitTypeAppService.GetEntityTraitToUniversityIdListAsync(universityId);
