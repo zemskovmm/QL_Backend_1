@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Tests.Infrastructure;
+using QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.TraitTest.TraitTypeTest
@@ -24,32 +25,7 @@ namespace QuartierLatin.Backend.Tests.TraitTest.TraitTypeTest
 
         public static IEnumerable<object[]> Data()
         {
-            var traitType = JObject.FromObject(new
-            {
-                identifier = "test",
-                names = new
-                {
-                    blocks = new object[]
-                    {
-                        new
-                        {
-                            type = "text",
-                            data = "Lorem ipsum dolor sit amet"
-                        },
-                        new
-                        {
-                            type = "standard-service-block",
-                            data = new
-                            {
-                                generalInformation = "Lorem ipsum",
-                                advantages = new[] {"Lorem", "ipsum"},
-                                requirements = new[] {"Lorem", "ipsum"},
-                                prices = new[] {"Lorem", "ipsum"}
-                            }
-                        }
-                    },
-                }
-            });
+            var traitType = TraitDataSet.GetTraitType();
 
             return new List<object[]>
             {

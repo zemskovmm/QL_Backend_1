@@ -4,6 +4,7 @@ using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.TraitTest.CommonTraitTest
@@ -43,87 +44,11 @@ namespace QuartierLatin.Backend.Tests.TraitTest.CommonTraitTest
 
         public static IEnumerable<object[]> Data()
         {
-            var traitType = JObject.FromObject(new
-            {
-                identifier = "test",
-                names = new
-                {
-                    blocks = new object[]
-                    {
-                        new
-                        {
-                            type = "text",
-                            data = "Lorem ipsum dolor sit amet"
-                        },
-                        new
-                        {
-                            type = "standard-service-block",
-                            data = new
-                            {
-                                generalInformation = "Lorem ipsum",
-                                advantages = new[] {"Lorem", "ipsum"},
-                                requirements = new[] {"Lorem", "ipsum"},
-                                prices = new[] {"Lorem", "ipsum"}
-                            }
-                        }
-                    },
-                }
-            });
+            var traitType = TraitDataSet.GetTraitType();
 
-            var commonTrait = JObject.FromObject(new
-            {
-                names = new
-                {
-                    blocks = new object[]
-                    {
-                        new
-                        {
-                            type = "text",
-                            data = "Lorem ipsum dolor sit amet"
-                        },
-                        new
-                        {
-                            type = "standard-service-block",
-                            data = new
-                            {
-                                generalInformation = "Lorem ipsum",
-                                advantages = new[] {"Lorem", "ipsum"},
-                                requirements = new[] {"Lorem", "ipsum"},
-                                prices = new[] {"Lorem", "ipsum"}
-                            }
-                        }
-                    },
-                },
-                order = 1
-            });
+            var commonTrait = TraitDataSet.GetCommonTrait();
 
-            var updatedCommonTrait = JObject.FromObject(new
-            {
-                traitTypeId = 0,
-                names = new
-                {
-                    blocks = new object[]
-                    {
-                        new
-                        {
-                            type = "text",
-                            data = "Lorem ipsum dolor sit amet"
-                        },
-                        new
-                        {
-                            type = "standard-service-block",
-                            data = new
-                            {
-                                generalInformation = "Lorem ipsum",
-                                advantages = new[] {"Lorem", "ipsum"},
-                                requirements = new[] {"Lorem", "ipsum"},
-                                prices = new[] {"Lorem", "ipsum"}
-                            }
-                        }
-                    },
-                },
-                order = 1
-            });
+            var updatedCommonTrait = TraitDataSet.GetCommonTraitWithTraitTypeId();
 
             return new List<object[]>
             {

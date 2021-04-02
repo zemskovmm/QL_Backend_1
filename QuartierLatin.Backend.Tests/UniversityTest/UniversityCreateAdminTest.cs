@@ -4,6 +4,7 @@ using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Tests.UniversityTest.UniversityTestsDataSet;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.UniversityTest
@@ -35,26 +36,7 @@ namespace QuartierLatin.Backend.Tests.UniversityTest
 
         public static IEnumerable<object[]> Data()
         {
-            var university = JObject.FromObject(new
-            {
-                website = "/test",
-                foundationYear = 1999,
-                languages = new
-                {
-                    ru = new
-                    {
-                        name = "тест",
-                        htmlDescription = "Видишь тест. И я его не вижу, а он есть",
-                        url = ""
-                    },
-                    en = new 
-                    {
-                        name = "text",
-                        htmlDescription = "Lorem ipsum dolor sit amet",
-                        url = ""
-                    },
-                }
-            });
+            var university = UniversityDataSet.GetUniversity();
 
             return new List<object[]>
             {
