@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuartierLatin.Backend", "Qu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuartierLatin.Backend.Tests", "QuartierLatin.Backend.Tests\QuartierLatin.Backend.Tests.csproj", "{EBCB66CF-D05D-44DD-8C59-1D2AE500E3E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuartierLatin.Importer", "QuartierLatin.Importer\QuartierLatin.Importer.csproj", "{F47241C7-8F81-4E94-963D-D2451C5E7923}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuartierLatin.Importer.DataModel", "QuartierLatin.Importer.DataModel\QuartierLatin.Importer.DataModel.csproj", "{0086E34A-7600-4B5A-8D13-44C0F0598104}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{EBCB66CF-D05D-44DD-8C59-1D2AE500E3E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBCB66CF-D05D-44DD-8C59-1D2AE500E3E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBCB66CF-D05D-44DD-8C59-1D2AE500E3E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F47241C7-8F81-4E94-963D-D2451C5E7923}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F47241C7-8F81-4E94-963D-D2451C5E7923}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F47241C7-8F81-4E94-963D-D2451C5E7923}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F47241C7-8F81-4E94-963D-D2451C5E7923}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0086E34A-7600-4B5A-8D13-44C0F0598104}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0086E34A-7600-4B5A-8D13-44C0F0598104}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0086E34A-7600-4B5A-8D13-44C0F0598104}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0086E34A-7600-4B5A-8D13-44C0F0598104}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
