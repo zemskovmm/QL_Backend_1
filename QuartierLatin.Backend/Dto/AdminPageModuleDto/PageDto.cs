@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Dto.AdminPageModuleDto
 {
     public class PageDto
     {
-        public string Url { get; set; }
-        public string Title { get; set; }
-
-        public JObject PageData { get; set; }
-
+        public Dictionary<string, PageLanguageDto> Languages { get; set; }
     }
 }

@@ -15,7 +15,13 @@ namespace QuartierLatin.Backend.Tests.PageTests
         {
             var createReq = pageEn.DeepClone();
             createReq["language"] = "en";
-            var resp = SendAdminRequest<JObject>("/api/admin/pages", createReq);
+            var resp = SendAdminRequest<JObject>("/api/admin/pages", new
+            {
+                languages = new
+                {
+                    en = pageEn
+                }
+            });
             var id = int.Parse(resp["id"].ToString());
             var repo = GetService<IPageRepository>();
 

@@ -23,15 +23,28 @@ namespace QuartierLatin.Backend.Application
             _languageRepository = languageRepository;
         }
 
-        public async Task<int> CreatePageAsync(string url, int languageId, string title, JObject pageData)
+        private async Task<List<Page>> Convert(Dictionary<string, (string url, string title,
+            JObject pageData)> languages)
         {
-            return await _pageRepository.CreatePageAsync(languageId, url, title, pageData);
+            var langs = (await _languageRepository.GetLanguageListAsync()).ToDictionary(x => x.LanguageShortName,
+                x => x.Id);
+            return languages.Select(x => new Page
+            {
+                Url = x.Value.url,
+                Title = x.Value.title,
+                PageData = x.Value.pageData.ToString(),
+                LanguageId = langs[x.Key]
+            }).ToList();
         }
 
-        public async Task CreateOrUpdatePageLanguageAsync(int pageRootId, string url, int languageId, string title, JObject pageData)
-        {
-            await _pageRepository.CreateOrUpdatePageLanguageAsync(pageRootId, languageId, url, title, pageData);
-        }
+        public async Task<int> CreatePageAsync(Dictionary<string, (string url, string title,
+            JObject pageData)> languages) =>
+            await _pageRepository.CreatePages(await Convert(languages));
+        
+        public async Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData)> languages) 
+            => await _pageRepository.UpdatePages(id, await Convert(languages));
+
+        public Task<IList<Page>> GetPageLanguages(int id) => _pageRepository.GetPagesByPageRootIdAsync(id);
 
         public async Task<(Dictionary<int, string>, (int totalResults, List<(int id, List<Page> pages)> results))> GetPageListBySearch(int page, string search, int pageSize)
         {
@@ -72,7 +85,9 @@ namespace QuartierLatin.Backend.Application
             return response;
         }
 
-        public async Task<RouteDto<PageModuleDto>> GetPageByUrlAsync(string url)
+        public Task<IList<Page>> GetPagesByRootIdAsync(int id) => _pageRepository.GetPagesByPageRootIdAsync(id);
+        
+        public async Task<RouteDto<PageModuleDto>> GetPagesByRootIdAsync(string url)
         {
             var clearUrl = RewriteRouteRules.ReWriteRequests(url);
 
