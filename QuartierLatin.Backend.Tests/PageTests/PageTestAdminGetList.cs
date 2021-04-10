@@ -18,7 +18,14 @@ namespace QuartierLatin.Backend.Tests.PageTests
             pageEn["language"] = langShortName;
             pageEn["title"] = newTitle;
 
-            var resp = SendAdminRequest<JObject>("/api/admin/pages", pageEn);
+            var resp = SendAdminRequest<JObject>("/api/admin/pages", new
+            {
+                languages = new
+                {
+                    en = pageEn
+                }
+            });
+            
             var id = int.Parse(resp["id"].ToString());
 
             var repo = GetService<IPageRepository>();

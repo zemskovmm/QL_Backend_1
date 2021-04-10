@@ -15,7 +15,13 @@ namespace QuartierLatin.Backend.Tests.PageTests
         public async Task Admin_Should_Be_Able_To_Create_And_Update_Language_VersionsAsync(JObject pageEn, string expectedTitle, string langShortName)
         {
             pageEn["language"] = langShortName;
-            var resp = SendAdminRequest<JObject>("/api/admin/pages", pageEn);
+            var resp = SendAdminRequest<JObject>("/api/admin/pages", new
+            {
+                languages = new Dictionary<string, object>()
+                {
+                    [langShortName] = pageEn
+                }
+            });
             var pageId = int.Parse(resp["id"].ToString());
 
             var repo = GetService<IPageRepository>();
@@ -24,7 +30,13 @@ namespace QuartierLatin.Backend.Tests.PageTests
             Assert.Equal(pageEnEntity.PageRootId, pageId);
 
             pageEn["title"] = expectedTitle;
-            SendAdminRequest<object>($"/api/admin/pages/{pageId}/{langShortName}", pageEn, HttpMethod.Put);
+            SendAdminRequest<object>($"/api/admin/pages/{pageId}", new
+            {
+                languages = new Dictionary<string, object>()
+                {
+                    [langShortName] = pageEn
+                }
+            }, HttpMethod.Put);
 
             pageEnEntity = await repo.GetPagesByPageRootIdAndLanguageIdAsync(pageId, LangIds[langShortName]);
             Assert.Equal(expectedTitle, pageEnEntity.Title);
