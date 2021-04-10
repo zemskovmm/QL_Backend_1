@@ -10,15 +10,16 @@ namespace QuartierLatin.Backend.Application.Interfaces
 {
     public interface IPageAppService
     {
-        Task<RouteDto<PageModuleDto>> GetPageByUrlAsync(string url);
+        Task<RouteDto<PageModuleDto>> GetPagesByRootIdAsync(string url);
+        Task<IList<Page>> GetPagesByRootIdAsync(int id);
 
         Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url);
 
-        Task<int> CreatePageAsync(string url, int languageId, string title,
-            JObject pageData);
+        Task<int> CreatePageAsync(Dictionary<string, (string url, string title, JObject pageData)> languages);
 
-        Task CreateOrUpdatePageLanguageAsync(int pageRootId, string url, int languageId, string title,
-            JObject pageData);
+        Task<IList<Page>> GetPageLanguages(int id);
+
+        Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData)> languages);
 
         Task<(Dictionary<int, string>, (int totalResults, List<(int id, List<Page> pages)> results))>
             GetPageListBySearch(int page, string search, int pageSize);

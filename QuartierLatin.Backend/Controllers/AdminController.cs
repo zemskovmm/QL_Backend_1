@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly IPageAppService _pageAppService;
@@ -24,8 +25,7 @@ namespace QuartierLatin.Backend.Controllers
 
         static int PageCount(int resultCount, int pageSize) =>
             resultCount / pageSize + (resultCount % pageSize == 0 ? 0 : 1);
-
-        [Authorize(Roles = "Admin")]
+        
         [HttpGet("/api/admin/pages/"), ProducesResponseType(typeof(PageListDto), 200)]
         public async Task<IActionResult> GetPageList([FromQuery]int page, [FromQuery]string search)
         {
@@ -44,26 +44,31 @@ namespace QuartierLatin.Backend.Controllers
             });
         }
 
-        [Authorize(Roles = "Admin")]
+        
         [HttpPost("/api/admin/pages/")]
-        public async Task<IActionResult> CreatePage([FromBody] CreateNewPageDto createPageDto)
+        public async Task<IActionResult> CreatePage([FromBody] PageDto createPageDto)
         {
-            var languageId =  await _languageRepository.GetLanguageIdByShortNameAsync(createPageDto.Language);
-
-            var response = await _pageAppService.CreatePageAsync(createPageDto.Url, languageId, createPageDto.Title, createPageDto.PageData);
-
-            return Ok(new {id = response});
+            var id = await _pageAppService.CreatePageAsync(createPageDto.Languages.ToDictionary(x => x.Key,
+                x => (x.Value.Url, x.Value.Title, x.Value.PageData)));
+            return Ok(new {id = id});
         }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPut("/api/admin/pages/{id}/{lang}")]
-        public async Task<IActionResult> CreateOrUpdatePageLanguage([FromBody] PageDto pageDto, int id, string lang)
+        
+        [HttpPut("/api/admin/pages/{id}")]
+        public async Task<IActionResult> UpdatePage(int id, [FromBody] PageDto createPageDto)
         {
-            var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
-
-            await _pageAppService.CreateOrUpdatePageLanguageAsync(id, pageDto.Url, languageId, pageDto.Title, pageDto.PageData);
-
-            return Ok(new object());
+            await _pageAppService.UpdatePage(id, createPageDto.Languages.ToDictionary(x => x.Key,
+                x => (x.Value.Url, x.Value.Title, x.Value.PageData)));
+            return Ok(new {id = id});
         }
+        
+        [HttpGet("/api/admin/pages/{id}")]
+        public async Task<IActionResult> GetPage(int id, [FromBody] PageDto createPageDto)
+        {
+            _pageAppService.GetPagesByRootIdAsync(id);
+            await _pageAppService.UpdatePage(id, createPageDto.Languages.ToDictionary(x => x.Key,
+                x => (x.Value.Url, x.Value.Title, x.Value.PageData)));
+            return Ok(new {id = id});
+        }
+        
     }
 }

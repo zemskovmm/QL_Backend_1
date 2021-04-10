@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Models.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Database.Repositories
 {
@@ -17,36 +18,28 @@ namespace QuartierLatin.Backend.Database.Repositories
             _db = db;
         }
 
-        public Task<int> CreatePageAsync(int languageId, string url, string title, JObject pageData)
-        {
-            return _db.ExecAsync(async db =>
-            {
-                await using var t = await db.BeginTransactionAsync();
+        public Task UpdatePages(int rootId, IList<Page> pages) => CreateOrUpdatePageCore(rootId, pages);
 
-                var pageRootId = await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new PageRoot()));
-                await CreateOrUpdatePageCore(db, pageRootId, languageId, url, title, pageData);
-                await t.CommitAsync();
-                return pageRootId;
-            });
+        public Task<int> CreatePages(IList<Page> pagesWithoutRoot)
+        {
+            return CreateOrUpdatePageCore(null, pagesWithoutRoot);
         }
 
-        public Task CreateOrUpdatePageLanguageAsync(int pageRootId, int languageId, string url, string title,
-            JObject pageData)
-            => _db.ExecAsync(db => CreateOrUpdatePageCore(db, pageRootId, languageId, url, title, pageData));
-
-        private static async Task CreateOrUpdatePageCore(AppDbContext db, int pageRootId, int languageId, string url, string title,
-            JObject pageData)
-        {
-            await db.InsertOrReplaceAsync(new Page
+        private Task<int> CreateOrUpdatePageCore(int? pageRootId, IList<Page> pages) =>
+            _db.ExecAsync(db => db.InTransaction(async () =>
             {
-                Url = url,
-                LanguageId = languageId,
-                PageRootId = pageRootId,
-                Title = title,
-                PageData = pageData.ToString(Newtonsoft.Json.Formatting.None)
-            });
-        }
+                var rootId = pageRootId ?? await db.InsertWithInt32IdentityAsync(new PageRoot());
+                if (pageRootId.HasValue)
+                    await db.Pages.DeleteAsync(x => x.PageRootId == rootId);
+                foreach (var p in pages)
+                {
+                    p.PageRootId = rootId;
+                    await db.InsertAsync(p);
+                }
 
+                return rootId;
+            }));
+        
         public async Task EditPageAsync(Page page)
         {
             await _db.ExecAsync(db => db
