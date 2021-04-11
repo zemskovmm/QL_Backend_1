@@ -48,7 +48,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             await _db.ExecAsync(db => db.BulkCopyAsync(universityLanguage));
         }
 
-        public async Task<int> CreateUniversityAsync(int foundationYear, string website)
+        public async Task<int> CreateUniversityAsync(int? foundationYear, string website)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new University
             {
@@ -57,7 +57,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             }));
         }
 
-        public async Task UpdateUniversityAsync(int id, int foundationYear, string website)
+        public async Task UpdateUniversityAsync(int id, int? foundationYear, string website)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new University
             {

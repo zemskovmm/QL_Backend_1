@@ -15,15 +15,15 @@ namespace QuartierLatin.Backend.Database.Repositories
             _db = db;
         }
 
-        public async Task<long> CreateBlobIdAsync(string fileType, string originalFileName)
+        public async Task<int> CreateBlobIdAsync(string fileType, string originalFileName)
         {
-            return await _db.ExecAsync(db => db.InsertWithInt64IdentityAsync(new Blob {FileType = fileType, OriginalFileName = originalFileName}));
+            return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new Blob {FileType = fileType, OriginalFileName = originalFileName}));
         }
 
-        public async Task DeleteBlobAsync(long id) =>
+        public async Task DeleteBlobAsync(int id) =>
             await _db.ExecAsync(db => db.Blobs.Select(x => x.Id == id).DeleteAsync());
 
-        public async Task EditBlobAsync(long id, string fileType)
+        public async Task EditBlobAsync(int id, string fileType)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new Blob
             {
@@ -32,7 +32,7 @@ namespace QuartierLatin.Backend.Database.Repositories
             }));
         }
 
-        public async Task<Blob> GetBlobInfoAsync(long id)
+        public async Task<Blob> GetBlobInfoAsync(int id)
         {
             return await _db.ExecAsync(db => db.Blobs.FirstOrDefaultAsync(blob => blob.Id == id));
         }

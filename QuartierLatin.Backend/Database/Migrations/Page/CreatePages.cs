@@ -8,14 +8,14 @@ namespace QuartierLatin.Backend.Database.Migrations.Page
         public override void Up()
         {
             Create.Table("PageRoots")
-                .WithColumn("Id").AsInt64().PrimaryKey().Identity();
+                .WithColumn("Id").AsInt32().PrimaryKey().Identity();
 
             Create.Table("Pages")
                 .WithColumn("Url").AsString()
                 .WithColumn("Title").AsString()
                 .WithColumn("PageData").AsCustom("jsonb")
-                .WithColumn("LanguageId").AsInt64().ForeignKey("Languages", "Id").PrimaryKey()
-                .WithColumn("PageRootId").AsInt64().ForeignKey("PageRoots", "Id").PrimaryKey();
+                .WithColumn("LanguageId").AsInt32().ForeignKey("Languages", "Id").PrimaryKey()
+                .WithColumn("PageRootId").AsInt32().ForeignKey("PageRoots", "Id").PrimaryKey();
         }
     }
 }

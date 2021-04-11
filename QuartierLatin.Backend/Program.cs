@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CommandLine;
 using QuartierLatin.Backend.Auth;
 using QuartierLatin.Backend.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -11,17 +12,13 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using QuartierLatin.Backend.Cmdlets;
 
 namespace QuartierLatin.Backend
 {
     public class Program
     {
-        private static void ConfigureServices(IServiceCollection services)
-        {
-            ServiceRunner.RegisterServices(services);
-        }
-
-        public static async Task Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             if (args.FirstOrDefault() == "encodepass")
             {
@@ -37,16 +34,24 @@ namespace QuartierLatin.Backend
                 }
 
                 Console.WriteLine(PasswordToolkit.EncodeSshaPassword(pass));
-                return;
+                return 0;
             }
-            
-            var built = CreateHostBuilder(args).Build();
 
-            if (args.Contains("--Services")) ServiceRunner.StartServices(built.Services);
+
+            if (CmdletManager.IsCommand(args))
+                return await CmdletManager.Execute(transformedArgs => CreateHostBuilder(true, transformedArgs), args);
+            
+            var builder = CreateHostBuilder(false, args);
+            
+            var built = builder
+                .UseKestrel()
+                .Build(); 
+            
             await built.RunAsync();
+            return 0;
         }
 
-        public static IWebHostBuilder CreateHostBuilder(string[] args)
+        public static IWebHostBuilder CreateHostBuilder(bool skipServer, string[] args)
         {
             var hostBuilder = new WebHostBuilder()
                 .UseContentRoot(Directory.GetCurrentDirectory())
@@ -64,37 +69,9 @@ namespace QuartierLatin.Backend
                         .AddEnvironmentVariables()
                         .AddCommandLine(args);
                 }).UseStartup<Startup>();
-
-            if (args.Contains("--Services"))
-                hostBuilder
-                    .ConfigureServices(ConfigureServices)
-                    .UseServer(new EmptyServer());
-
-            if (args.Contains("--Web") || args.Length is 0)
+            if (!skipServer)
                 hostBuilder.UseKestrel();
-
             return hostBuilder;
-        }
-
-        // Used if Recognizer mode only
-        private class EmptyServer : IServer
-        {
-            public IFeatureCollection Features => new FeatureCollection();
-
-            public Task StartAsync<TContext>(IHttpApplication<TContext> application,
-                CancellationToken cancellationToken)
-            {
-                return Task.CompletedTask;
-            }
-
-            public Task StopAsync(CancellationToken cancellationToken)
-            {
-                return Task.CompletedTask;
-            }
-
-            public void Dispose()
-            {
-            }
         }
     }
 }

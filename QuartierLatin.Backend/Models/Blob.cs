@@ -5,7 +5,7 @@ namespace QuartierLatin.Backend.Models
     [Table("Blobs")]
     public class Blob
     {
-        [PrimaryKey, Identity] public long Id { get; set; }
+        [PrimaryKey, Identity] public int Id { get; set; }
 
         [Column] public string FileType { get; set; }
 

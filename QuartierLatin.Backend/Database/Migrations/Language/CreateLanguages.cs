@@ -8,7 +8,7 @@ namespace QuartierLatin.Backend.Database.Migrations.Language
         public override void Up()
         {
             Create.Table("Languages")
-                .WithColumn("Id").AsInt64().PrimaryKey().Identity()
+                .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("LanguageName").AsString().NotNullable()
                 .WithColumn("LanguageShortName").AsString().NotNullable();
         }

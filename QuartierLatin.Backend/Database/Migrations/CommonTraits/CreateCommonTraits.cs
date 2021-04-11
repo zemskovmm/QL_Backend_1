@@ -9,11 +9,12 @@ namespace QuartierLatin.Backend.Database.Migrations.CommonTraits
         {
             Create.Table("CommonTraits")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
-                .WithColumn("CommonTraitTypeId").AsInt64().ForeignKey("CommonTraitTypes", "Id")
+                .WithColumn("CommonTraitTypeId").AsInt32().ForeignKey("CommonTraitTypes", "Id")
                 .WithColumn("Names").AsCustom("jsonb")
-                .WithColumn("IconBlobId").AsInt64().ForeignKey("Blobs", "Id").Nullable()
-                .WithColumn("Order").AsInt64()
-                .WithColumn("ParentId").AsInt64().ForeignKey("CommonTraits", "Id").Nullable();
+                .WithColumn("IconBlobId").AsInt32().ForeignKey("Blobs", "Id").Nullable()
+                .WithColumn("Order").AsInt32()
+                .WithColumn("Identifier").AsString().Nullable()
+                .WithColumn("ParentId").AsInt32().ForeignKey("CommonTraits", "Id").Nullable();
         }
     }
 }

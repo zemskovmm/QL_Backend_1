@@ -18,7 +18,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             _db = db;
         }
 
-        public async Task<int> CreateCommonTraitAsync(int commonTraitTypeId, JObject names, long? iconBlobId, int order, int? parentId)
+        public async Task<int> CreateCommonTraitAsync(int commonTraitTypeId, JObject names, int? iconBlobId, int order, int? parentId)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new CommonTrait
             {
@@ -39,7 +39,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             }));
         }
 
-        public async Task UpdateCommonTraitAsync(int id, int commonTraitTypeId, JObject names, long? iconBlobId,
+        public async Task UpdateCommonTraitAsync(int id, int commonTraitTypeId, JObject names, int? iconBlobId,
             int order, int? parentId)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new CommonTrait

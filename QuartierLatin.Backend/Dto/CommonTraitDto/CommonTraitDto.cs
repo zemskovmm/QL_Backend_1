@@ -10,7 +10,7 @@ namespace QuartierLatin.Backend.Dto.CommonTraitDto
         [JsonProperty("names")]
         public JObject Names { get; set; }
         [JsonProperty("iconId")]
-        public long? IconBlobId { get; set; }
+        public int? IconBlobId { get; set; }
         [JsonProperty("order")]
         public int Order { get; set; }
         [JsonProperty("parentId")]

@@ -39,7 +39,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             return (university, universityLanguageDictionary);
         }
 
-        public async Task UpdateUniversityByIdAsync(int id, int foundationYear, string website)
+        public async Task UpdateUniversityByIdAsync(int id, int? foundationYear, string website)
         {
             await _universityRepository.UpdateUniversityAsync(id, foundationYear, website);
         }
@@ -50,7 +50,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             await _universityRepository.CreateOrUpdateUniversityLanguageAsync(id, languageId, name, description, url);
         }
 
-        public async Task<int> CreateUniversityAsync(int universityFoundationYear, string universityWebsite)
+        public async Task<int> CreateUniversityAsync(int? universityFoundationYear, string universityWebsite)
         {
             return await _universityRepository.CreateUniversityAsync(universityFoundationYear, universityWebsite);
         }

@@ -32,6 +32,7 @@ namespace QuartierLatin.Backend.Controllers
                 {
                     Id = university.Item1.Id,
                     FoundationYear = university.Item1.FoundationYear,
+                    MinimumAge = university.Item1.MinimumAge,
                     Website = university.Item1.Website,
                     Languages = university.Item2.ToDictionary(university => _languageRepository
                         .GetLanguageShortNameAsync(university.Key)
@@ -84,6 +85,7 @@ namespace QuartierLatin.Backend.Controllers
             {
                 FoundationYear = university.Item1.FoundationYear,
                 Website = university.Item1.Website,
+                MinimumAge = university.Item1.MinimumAge,
                 Languages = university.Item2.ToDictionary(university => _languageRepository
                     .GetLanguageShortNameAsync(university.Key)
                     .ConfigureAwait(false)

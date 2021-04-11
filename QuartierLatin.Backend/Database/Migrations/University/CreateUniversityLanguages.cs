@@ -8,8 +8,8 @@ namespace QuartierLatin.Backend.Database.Migrations.University
         public override void Up()
         {
             Create.Table("UniversityLanguages")
-                .WithColumn("UniversityId").AsInt64().ForeignKey("Universities", "Id").PrimaryKey()
-                .WithColumn("LanguageId").AsInt64().ForeignKey("Languages", "Id").PrimaryKey()
+                .WithColumn("UniversityId").AsInt32().ForeignKey("Universities", "Id").PrimaryKey()
+                .WithColumn("LanguageId").AsInt32().ForeignKey("Languages", "Id").PrimaryKey()
                 .WithColumn("Name").AsString()
                 .WithColumn("Description").AsString()
                 .WithColumn("Url").AsString();

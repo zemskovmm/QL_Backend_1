@@ -30,6 +30,6 @@ namespace QuartierLatin.Backend.Models
         [Column, Nullable] public string ConfirmationCode { get; set; }
 
         [Column, Nullable] public string PasswordHash { get; set; }
-        [Column, Nullable] public long AvatarImage { get; set; }
+        [Column, Nullable] public int AvatarImage { get; set; }
     }
 }

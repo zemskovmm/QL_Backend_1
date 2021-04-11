@@ -12,7 +12,7 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task<Dictionary<int, UniversityLanguage>> GetUniversityLanguageByUniversityIdAsync(int universityId);
         Task<University> GetUniversityByIdAsync(int id);
         Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage);
-        Task<int> CreateUniversityAsync(int foundationYear, string website);
-        Task UpdateUniversityAsync(int id, int foundationYear, string website);
+        Task<int> CreateUniversityAsync(int? foundationYear, string website);
+        Task UpdateUniversityAsync(int id, int? foundationYear, string website);
     }
 }

@@ -8,8 +8,8 @@ namespace QuartierLatin.Backend.Database.Migrations.CommonTraits
         public override void Up()
         {
             Create.Table("CommonTraitTypesForEntites")
-                .WithColumn("CommonTraitId").AsInt64().ForeignKey("CommonTraits", "Id").PrimaryKey()
-                .WithColumn("EntityType").AsInt64();
+                .WithColumn("CommonTraitId").AsInt32().ForeignKey("CommonTraitTypes", "Id").PrimaryKey()
+                .WithColumn("EntityType").AsInt32();
         }
     }
 }

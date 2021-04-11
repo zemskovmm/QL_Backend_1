@@ -9,9 +9,9 @@ namespace QuartierLatin.Backend.Application.Interfaces.Catalog
     {
         Task<List<(University, Dictionary<int, UniversityLanguage>)>> GetUniversityListAsync();
         Task<(University, Dictionary<int, UniversityLanguage>)> GetUniversityByIdAsync(int id);
-        Task UpdateUniversityByIdAsync(int id, int foundationYear, string website);
+        Task UpdateUniversityByIdAsync(int id, int? foundationYear, string website);
         Task UpdateUniversityLanguageByIdAsync(int id, string description, int languageId, string name, string url);
-        Task<int> CreateUniversityAsync(int universityFoundationYear, string universityWebsite);
+        Task<int> CreateUniversityAsync(int? universityFoundationYear, string universityWebsite);
         Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage);
     }
 }

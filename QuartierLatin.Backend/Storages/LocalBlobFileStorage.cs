@@ -16,7 +16,7 @@ namespace QuartierLatin.Backend.Storages
             _blobsPath = blobsPath;
         }
 
-        public async Task CreateBlobAsync(long id, Stream s, int? dimension = null)
+        public async Task CreateBlobAsync(int id, Stream s, int? dimension = null)
         {
             if (CheckIfExist(id, dimension)) return;
 
@@ -57,7 +57,7 @@ namespace QuartierLatin.Backend.Storages
             return;
         }
 
-        public Stream OpenBlob(long id, int? dimension = null)
+        public Stream OpenBlob(int id, int? dimension = null)
         {
             var path = "";
 
@@ -72,7 +72,7 @@ namespace QuartierLatin.Backend.Storages
                 return File.OpenRead(path);
         }
 
-        public async Task DeleteBlob(long id, int? dimension = null)
+        public async Task DeleteBlob(int id, int? dimension = null)
         {
             var path = "";
 
@@ -86,7 +86,7 @@ namespace QuartierLatin.Backend.Storages
             await Task.Yield();
         }
 
-        public bool CheckIfExist(long id, int? dimension = null)
+        public bool CheckIfExist(int id, int? dimension = null)
         {
             var path = "";
 
@@ -98,7 +98,7 @@ namespace QuartierLatin.Backend.Storages
             return File.Exists(path);
         }
 
-        private string GetPath(long id, bool create, int? dimension = null)
+        private string GetPath(int id, bool create, int? dimension = null)
         {
             var s = id.ToString();
             if (s.Length == 0)

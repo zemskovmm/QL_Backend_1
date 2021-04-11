@@ -6,12 +6,12 @@ namespace QuartierLatin.Backend.Application.Interfaces
 {
     public interface IFileAppService
     {
-        Task<long> UploadFileAsync(Stream file, string fileName, string fileType, int? dimension = null, long ? id = null);
+        Task<int> UploadFileAsync(Stream file, string fileName, string fileType, int? dimension = null, int ? id = null);
 
-        Task<(Stream, string, string)?> GetFileAsync(long id, int? dimension = null);
+        Task<(Stream, string, string)?> GetFileAsync(int id, int? dimension = null);
 
-        Task<(byte[], string, string)?> GetCompressedFileAsync(long id, int dimension);
+        Task<(byte[], string, string)?> GetCompressedFileAsync(int id, int dimension);
 
-        Task DeleteFileAsync(long id, int? dimension = null);
+        Task DeleteFileAsync(int id, int? dimension = null);
     }
 }

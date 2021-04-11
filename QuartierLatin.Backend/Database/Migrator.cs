@@ -199,9 +199,9 @@ namespace QuartierLatin.Backend.Database
         {
         }
 
-        private static long Convert(DateTime dt)
+        private static int Convert(DateTime dt)
         {
-            return (long) (dt - UnixEpoch).TotalSeconds;
+            return (int) (dt - UnixEpoch).TotalSeconds;
         }
     }
 }

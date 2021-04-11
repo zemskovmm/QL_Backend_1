@@ -9,8 +9,9 @@ namespace QuartierLatin.Backend.Database.Migrations.University
         {
             Create.Table("Universities")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
-                .WithColumn("Website").AsString()
-                .WithColumn("FoundationYear").AsInt64();
+                .WithColumn("Website").AsString().Nullable()
+                .WithColumn("FoundationYear").AsInt32().Nullable()
+                .WithColumn("MinimumAge").AsInt32().Nullable();
         }
     }
 }

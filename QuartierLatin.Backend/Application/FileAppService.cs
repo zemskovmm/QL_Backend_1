@@ -17,7 +17,7 @@ namespace QuartierLatin.Backend.Application
             _blobFileStorage = blobFileStorage;
             _blobRepository = blobRepository;
         }
-        public async Task<long> UploadFileAsync(Stream file, string fileName, string fileType, int? dimension = null, long? id = null)
+        public async Task<int> UploadFileAsync(Stream file, string fileName, string fileType, int? dimension = null, int? id = null)
         {
             if (dimension is null && id is null)
             {
@@ -34,7 +34,7 @@ namespace QuartierLatin.Backend.Application
            
         }
 
-        public async Task<(Stream, string, string)?> GetFileAsync(long id, int? dimension = null)
+        public async Task<(Stream, string, string)?> GetFileAsync(int id, int? dimension = null)
         {
             if (!_blobFileStorage.CheckIfExist(id, dimension)) return null;
 
@@ -45,7 +45,7 @@ namespace QuartierLatin.Backend.Application
 
         }
 
-        public async Task<(byte[], string, string)?> GetCompressedFileAsync(long id, int dimension)
+        public async Task<(byte[], string, string)?> GetCompressedFileAsync(int id, int dimension)
         {
             await using var stream = new MemoryStream();
 
@@ -75,7 +75,7 @@ namespace QuartierLatin.Backend.Application
             }
         }
 
-        public async Task DeleteFileAsync(long id, int? dimension = null)
+        public async Task DeleteFileAsync(int id, int? dimension = null)
         {
             await _blobRepository.DeleteBlobAsync(id);
             await _blobFileStorage.DeleteBlob(id);
