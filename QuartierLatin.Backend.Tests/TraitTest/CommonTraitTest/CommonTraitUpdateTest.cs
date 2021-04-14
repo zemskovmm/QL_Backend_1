@@ -13,7 +13,7 @@ namespace QuartierLatin.Backend.Tests.TraitTest.CommonTraitTest
     {
         [Theory]
         [MemberData(nameof(Data))]
-        public async Task Admin_Should_Be_Able_To_Create_CommonTraitTypeAsync(JObject traitType, string identifier, JObject commonTrait, JObject updatedCommonTrait)
+        public async Task Admin_Should_Be_Able_To_Update_CommonTraitTypeAsync(JObject traitType, string identifier, JObject commonTrait, JObject updatedCommonTrait)
         {
             traitType["identifier"] = identifier;
             var resp = SendAdminRequest<JObject>("/api/admin/trait-types", traitType);

@@ -11,25 +11,8 @@ namespace QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet
                 identifier = identifier ??= "test",
                 names = new
                 {
-                    blocks = new object[]
-                    {
-                        new
-                        {
-                            type = "text",
-                            data = "Lorem ipsum dolor sit amet"
-                        },
-                        new
-                        {
-                            type = "standard-service-block",
-                            data = new
-                            {
-                                generalInformation = "Lorem ipsum",
-                                advantages = new[] {"Lorem", "ipsum"},
-                                requirements = new[] {"Lorem", "ipsum"},
-                                prices = new[] {"Lorem", "ipsum"}
-                            }
-                        }
-                    },
+                    ru = "тест",
+                    en = "тест"
                 }
             });
         }
@@ -40,25 +23,8 @@ namespace QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet
             {
                 names = new
                 {
-                    blocks = new object[]
-                    {
-                        new
-                        {
-                            type = "text",
-                            data = "Lorem ipsum dolor sit amet"
-                        },
-                        new
-                        {
-                            type = "standard-service-block",
-                            data = new
-                            {
-                                generalInformation = "Lorem ipsum",
-                                advantages = new[] {"Lorem", "ipsum"},
-                                requirements = new[] {"Lorem", "ipsum"},
-                                prices = new[] {"Lorem", "ipsum"}
-                            }
-                        }
-                    },
+                    ru = "тест",
+                    en = "тест"
                 },
                 order = order ??= 1
             });
@@ -71,25 +37,8 @@ namespace QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet
                 traitTypeId = traitTypeId ??= 0,
                 names = new
                 {
-                    blocks = new object[]
-                    {
-                        new
-                        {
-                            type = "text",
-                            data = "Lorem ipsum dolor sit amet"
-                        },
-                        new
-                        {
-                            type = "standard-service-block",
-                            data = new
-                            {
-                                generalInformation = "Lorem ipsum",
-                                advantages = new[] {"Lorem", "ipsum"},
-                                requirements = new[] {"Lorem", "ipsum"},
-                                prices = new[] {"Lorem", "ipsum"}
-                            }
-                        }
-                    },
+                    ru = "тест",
+                    en = "тест"
                 },
                 order = order ??= 1
             });

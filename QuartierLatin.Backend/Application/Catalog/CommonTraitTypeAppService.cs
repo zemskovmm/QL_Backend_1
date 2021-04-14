@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Application.Interfaces.Catalog;
+﻿using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Application.Catalog
 {
@@ -22,7 +21,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             return await _commonTraitTypeRepository.GetCommonTraitTypeListAsync();
         }
 
-        public async Task<int> CreateTraitTypeAsync(string? identifier, JObject names)
+        public async Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names)
         {
             return await _commonTraitTypeRepository.CreateCommonTraitTypeAsync(names, identifier);
         }
@@ -32,7 +31,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             return await _commonTraitTypeRepository.GetCommonTraitTypeAsync(id);
         }
 
-        public async Task UpdateTraitTypeByIdAsync(int id, string? identifier, JObject names)
+        public async Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names)
         {
             await _commonTraitTypeRepository.UpdateCommonTraitTypeAsync(id, names, identifier);
         }

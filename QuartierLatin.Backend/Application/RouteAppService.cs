@@ -22,9 +22,9 @@ namespace QuartierLatin.Backend.Application
             return response;
         }
 
-        public async Task<JObject> GetPageByUrlAsync(string url)
+        public async Task<JObject> GetPageByUrlAsync(string lang, string url)
         {
-            var route = await _pageAppService.GetPagesByRootIdAsync(url);
+            var route = await _pageAppService.GetPagesByRootIdAsync(lang, url);
 
             var response = JObject.FromObject(route);
 

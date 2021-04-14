@@ -21,7 +21,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             return await _commonTraitRepository.GetCommonTraitListByTypeId(typeId);
         }
 
-        public async Task<int> CreateCommonTraitAsync(int typeId, JObject names, int order, int? iconBlobId, int? parentId)
+        public async Task<int> CreateCommonTraitAsync(int typeId, Dictionary<string, string> names, int order, int? iconBlobId, int? parentId)
         {
             return await _commonTraitRepository.CreateCommonTraitAsync(typeId, names, iconBlobId, order, parentId);
         }
@@ -31,10 +31,15 @@ namespace QuartierLatin.Backend.Application.Catalog
             return await _commonTraitRepository.GetCommonTraitAsync(id);
         }
 
-        public async Task UpdateCommonTraitAsync(int id, JObject names, int commonTraitTypeId, int? iconBlobId,
+        public async Task UpdateCommonTraitAsync(int id, Dictionary<string, string> names, int commonTraitTypeId, int? iconBlobId,
             int order, int? parentId)
         {
             await _commonTraitRepository.UpdateCommonTraitAsync(id, commonTraitTypeId, names, iconBlobId, order, parentId);
+        }
+
+        public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndUniversityIdAsync(int typeId, int universityId)
+        {
+            return await _commonTraitRepository.GetCommonTraitListByTypeIdAndUniversityId(typeId, universityId);
         }
     }
 }

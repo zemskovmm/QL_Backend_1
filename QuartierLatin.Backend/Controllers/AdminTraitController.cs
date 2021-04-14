@@ -32,7 +32,7 @@ namespace QuartierLatin.Backend.Controllers
             {
                 Id = trait.Id,
                 Identifier = trait.Identifier,
-                Names = JObject.Parse(trait.Names)
+                Names = JObject.Parse(trait.NamesJson)
             });
 
             return Ok(response);
@@ -57,7 +57,7 @@ namespace QuartierLatin.Backend.Controllers
             var response = new TraitTypeDto
             {
                 Identifier = traitType.Identifier,
-                Names = JObject.Parse(traitType.Names)
+                Names = traitType.Names
             };
 
             return Ok(response);
@@ -108,7 +108,7 @@ namespace QuartierLatin.Backend.Controllers
                 Id = trait.Id,
                 CommonTraitTypeId = trait.CommonTraitTypeId,
                 IconBlobId = trait.IconBlobId,
-                Names = JObject.Parse(trait.Names),
+                Names = JObject.Parse(trait.NamesJson),
                 Order = trait.Order,
                 ParentId = trait.ParentId
             });
@@ -136,7 +136,7 @@ namespace QuartierLatin.Backend.Controllers
             {
                 CommonTraitTypeId = trait.CommonTraitTypeId,
                 IconBlobId = trait.IconBlobId,
-                Names = JObject.Parse(trait.Names),
+                Names = trait.Names,
                 Order = trait.Order,
                 ParentId = trait.ParentId
             };

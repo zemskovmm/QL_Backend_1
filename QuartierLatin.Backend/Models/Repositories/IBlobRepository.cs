@@ -10,7 +10,5 @@ namespace QuartierLatin.Backend.Models.Repositories
         Task EditBlobAsync(int id, string fileType);
 
         Task<Blob> GetBlobInfoAsync(int id);
-
-        Task<Blob> GetBlobInfoByFileNameAndFileTypeAsync(string fileName, string fileType);
     }
 }

@@ -67,6 +67,40 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             }));
         }
 
+        public async Task<int> GetUniversityIdByUrl(string url)
+        {
+            return await _db.ExecAsync(db =>
+                db.UniversityLanguages.Where(university => university.Url == url).Select(university => university.UniversityId).FirstAsync());
+        }
+
+        public async Task<List<UniversityInstructionLanguage>> GetUniversityLanguageInstructionByUniversityId(int universityId)
+        {
+            return await _db.ExecAsync(db =>
+                db.UniversityInstructionLanguages.Where(instruction => instruction.UniversityId == universityId)
+                    .ToListAsync());
+        }
+
+        public async Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId)
+        {
+            var response = new List<(Specialty, int)>();
+
+            var universitySpecialty = await _db.ExecAsync(db =>
+                db.UniversitySpecialties.Where(speciallty => speciallty.UniversityId == universityId).ToListAsync());
+
+            foreach (var specialty in universitySpecialty)
+            {
+                var specialtyEntity = await GetSpecialtyById(specialty.SpecialtyId);
+                response.Add((specialtyEntity, specialty.Cost));
+            }
+
+            return response;
+        }
+
+        public async Task<Specialty> GetSpecialtyById(int specialtyId)
+        {
+            return await _db.ExecAsync(db => db.Specialties.FirstOrDefaultAsync(specialty => specialty.Id == specialtyId));
+        }
+
         private static async Task CreateOrUpdateUniversityCore(AppDbContext db, int universityId, int languageId,
             string name, string description, string url)
         {

@@ -10,6 +10,8 @@ using QuartierLatin.Backend.Models.Repositories;
 
 namespace QuartierLatin.Backend.Controllers
 {
+    [Authorize(Roles = "Admin")]
+    [Route("/api/admin/universities")]
     public class AdminUniversityController : Controller
     {
         private readonly ILanguageRepository _languageRepository;
@@ -22,8 +24,7 @@ namespace QuartierLatin.Backend.Controllers
             _languageRepository = languageRepository;
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("/api/admin/universities")]
+        [HttpGet]
         public async Task<IActionResult> GetUniversity()
         {
             var universityList = await _universityAppService.GetUniversityListAsync();
@@ -50,8 +51,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("/api/admin/universities")]
+        [HttpPost]
         public async Task<IActionResult> CreateUniversity([FromBody] UniversityDto university)
         {
             var universityId =
@@ -75,8 +75,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new {id = universityId});
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("/api/admin/universities/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetUniversityById(int id)
         {
             var university = await _universityAppService.GetUniversityByIdAsync(id);
@@ -101,8 +100,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPut("/api/admin/universities/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUniversityById([FromBody] UniversityDto universityDto, int id)
         {
             await _universityAppService.UpdateUniversityByIdAsync(id, universityDto.FoundationYear,

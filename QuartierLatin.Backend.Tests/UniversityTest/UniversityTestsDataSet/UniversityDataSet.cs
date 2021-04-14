@@ -16,13 +16,13 @@ namespace QuartierLatin.Backend.Tests.UniversityTest.UniversityTestsDataSet
                     {
                         name = "тест",
                         htmlDescription = "Видишь тест. И я его не вижу, а он есть",
-                        url = ""
+                        url = "/тест/123"
                     },
                     en = new
                     {
                         name = "text",
                         htmlDescription = "Lorem ipsum dolor sit amet",
-                        url = ""
+                        url = "/test/123"
                     },
                 }
             });
@@ -40,19 +40,19 @@ namespace QuartierLatin.Backend.Tests.UniversityTest.UniversityTestsDataSet
                     {
                         name = "тест",
                         htmlDescription = "Видишь тест. И я его не вижу, а он есть",
-                        url = ""
+                        url = "/тест/123"
                     },
                     en = new
                     {
                         name = "text",
                         htmlDescription = "Lorem ipsum dolor sit amet",
-                        url = ""
+                        url = "/test/123"
                     },
                     cn = new
                     {
                         name = "text",
                         htmlDescription = "Lorem ipsum dolor sit amet",
-                        url = ""
+                        url = "/test/123"
                     },
                 }
             });

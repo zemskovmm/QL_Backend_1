@@ -18,13 +18,13 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             _db = db;
         }
 
-        public async Task<int> CreateCommonTraitAsync(int commonTraitTypeId, JObject names, int? iconBlobId, int order, int? parentId)
+        public async Task<int> CreateCommonTraitAsync(int commonTraitTypeId, Dictionary<string, string> names, int? iconBlobId, int order, int? parentId)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new CommonTrait
             {
                 CommonTraitTypeId = commonTraitTypeId,
                 IconBlobId = iconBlobId,
-                Names = names.ToString(Formatting.None),
+                Names = names,
                 Order = order,
                 ParentId = parentId
             }));
@@ -39,7 +39,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             }));
         }
 
-        public async Task UpdateCommonTraitAsync(int id, int commonTraitTypeId, JObject names, int? iconBlobId,
+        public async Task UpdateCommonTraitAsync(int id, int commonTraitTypeId, Dictionary<string, string> names, int? iconBlobId,
             int order, int? parentId)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new CommonTrait
@@ -47,7 +47,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 Id = id,
                 CommonTraitTypeId = commonTraitTypeId,
                 IconBlobId = iconBlobId,
-                Names = names.ToString(Formatting.None),
+                Names = names,
                 Order = order,
                 ParentId = parentId
             }));
@@ -73,6 +73,18 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
         {
             return await _db.ExecAsync(db =>
                 db.CommonTraits.Where(trait => trait.CommonTraitTypeId == typeId).ToListAsync());
+        }
+
+        public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndUniversityId(int typeId, int universityId)
+        {
+            var universityTraitsId = await _db.ExecAsync(db =>
+                db.CommonTraitsToUniversities.Where(trait => trait.UniversityId == universityId)
+                    .Select(trait => trait.CommonTraitId).ToListAsync());
+
+            return await _db.ExecAsync(db =>
+                db.CommonTraits
+                    .Where(trait => universityTraitsId.Contains(trait.Id) && trait.CommonTraitTypeId == typeId)
+                    .ToListAsync());
         }
     }
 }

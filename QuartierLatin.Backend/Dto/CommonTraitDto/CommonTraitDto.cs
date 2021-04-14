@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Dto.CommonTraitDto
@@ -8,7 +9,7 @@ namespace QuartierLatin.Backend.Dto.CommonTraitDto
         [JsonProperty("traitTypeId")]
         public int CommonTraitTypeId { get; set; }
         [JsonProperty("names")]
-        public JObject Names { get; set; }
+        public Dictionary<string, string> Names { get; set; }
         [JsonProperty("iconId")]
         public int? IconBlobId { get; set; }
         [JsonProperty("order")]

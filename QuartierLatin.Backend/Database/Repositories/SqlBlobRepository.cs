@@ -36,10 +36,5 @@ namespace QuartierLatin.Backend.Database.Repositories
         {
             return await _db.ExecAsync(db => db.Blobs.FirstOrDefaultAsync(blob => blob.Id == id));
         }
-
-        public async Task<Blob> GetBlobInfoByFileNameAndFileTypeAsync(string fileName, string fileType)
-        {
-            return await _db.ExecAsync(db => db.Blobs.FirstOrDefaultAsync(blob => blob.OriginalFileName == fileName && blob.FileType == fileType));
-        }
     }
 }
