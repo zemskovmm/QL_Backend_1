@@ -24,7 +24,6 @@ namespace QuartierLatin.Backend.Tests.RoutingTests.UniversityRoutingTests
             var resp = SendAdminRequest<JObject>("/api/admin/universities", university);
             var id = int.Parse(resp["id"].ToString());
             var repo = GetService<IUniversityRepository>();
-            var languageRepo = GetService<ILanguageRepository>();
 
             var universityEntity = await repo.GetUniversityByIdAsync(id);
             Assert.Equal(expectedTitle, universityEntity.Website);
@@ -33,8 +32,6 @@ namespace QuartierLatin.Backend.Tests.RoutingTests.UniversityRoutingTests
 
             foreach (var universityLanguage in universityLanguageEntity)
             {
-                var lang = await languageRepo.GetLanguageShortNameAsync(universityLanguage.Key);
-
                 Assert.Equal(universityLanguage.Value.UniversityId, id);
             }
 

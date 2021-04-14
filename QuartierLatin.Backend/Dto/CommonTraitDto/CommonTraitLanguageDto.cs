@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace QuartierLatin.Backend.Dto.TraitTypeDto
+namespace QuartierLatin.Backend.Dto.CommonTraitDto
 {
-    public class TraitTypeLanguageDto
+    public class CommonTraitLanguageDto
     {
         [JsonProperty("id")]
         public int Id { get; set; }

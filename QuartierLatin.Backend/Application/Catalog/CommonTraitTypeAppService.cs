@@ -65,5 +65,10 @@ namespace QuartierLatin.Backend.Application.Catalog
         {
             await _commonTraitTypeRepository.DeleteEntityTraitToUniversityAsync(universityId, commonTraitId);
         }
+
+        public async Task<List<CommonTraitType>> GetTraitTypesWithIndetifierAsync()
+        {
+            return await _commonTraitTypeRepository.GetTraitTypesWithIndetifierAsync();
+        }
     }
 }

@@ -1,13 +1,14 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto;
-using QuartierLatin.Backend.Dto.TraitTypeDto;
+using QuartierLatin.Backend.Dto.CommonTraitDto;
 using QuartierLatin.Backend.Dto.UniversityDto;
 using QuartierLatin.Backend.Models.Repositories;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -65,40 +66,29 @@ namespace QuartierLatin.Backend.Controllers
                     .GetResult(),
                 university => university.Value.Url);
 
-            var traitsType = await _traitTypeAppService.GetTraitTypesAsync();
+            var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();
 
-            var traitTypeCityId = traitsType.FirstOrDefault(trait => trait.Identifier == "city").Id;
-            var traitTypeDegreeId = traitsType.FirstOrDefault(trait => trait.Identifier == "degree").Id;
+            var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
 
-            var cityTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndUniversityIdAsync(traitTypeCityId, university.Item1.Id);
-            var degreeTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndUniversityIdAsync(traitTypeDegreeId, university.Item1.Id);
+            foreach (var traitType in traitsType)
+            {
+                var commonTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndUniversityIdAsync(traitType.Id, university.Item1.Id);
 
-            var instructionsLanguage =
-                await _universityAppService.GetUniversityLanguageInstructionByUniversityId(university.Item1.Id);
+                traits.Add(traitType.Identifier, commonTraits.Select(trait => new CommonTraitLanguageDto
+                {
+                    Id = trait.Id,
+                    IconBlobId = trait.IconBlobId,
+                    Identifier = trait.Identifier,
+                    Name = trait.Names[lang]
+                }).ToList());
+            }
+
             var specialtiesUniversity =
                 await _universityAppService.GetSpecialtiesUniversityByUniversityId(university.Item1.Id);
 
             var universityTraits = new UniversityModuleTraitsDto
             {
-                Cities = cityTraits.Select(city => new TraitTypeLanguageDto
-                {
-                    Id = city.Id, Identifier = city.Identifier, Name = city.Names[lang], IconBlobId = city.IconBlobId
-                }).ToList(),
-                Degrees = degreeTraits.Select(degree => new TraitTypeLanguageDto
-                {
-                    Id = degree.Id,
-                    IconBlobId = degree.IconBlobId,
-                    Identifier = degree.Identifier,
-                    Name = degree.Names[lang]
-                }).ToList(),
-                InstructionLanguage = instructionsLanguage.Select(instructions =>
-                    new UniversityInstructionLanguageDto
-                    {
-                        Name = _languageRepository.GetLanguageNameById(instructions.LanguageId)
-                            .ConfigureAwait(false)
-                            .GetAwaiter()
-                            .GetResult()
-                    }).ToList(),
+                NamedTraits = traits,
                 UniversitySpecialties = specialtiesUniversity.Select(specialties => new UniversitySpecialtiesDto
                 {
                     Name = specialties.Item1.Names[lang], Cost = specialties.Item2

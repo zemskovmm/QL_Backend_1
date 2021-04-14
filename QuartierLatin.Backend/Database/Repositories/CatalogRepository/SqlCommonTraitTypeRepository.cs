@@ -95,5 +95,12 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .Where(trait => trait.UniversityId == universityId && trait.CommonTraitId == commonTraitId)
                     .DeleteAsync());
         }
+
+        public async Task<List<CommonTraitType>> GetTraitTypesWithIndetifierAsync()
+        {
+            var test = await _db.ExecAsync(db => db.CommonTraitTypes.Where(trait => trait != null).ToListAsync());
+
+            return test;
+        }
     }
 }
