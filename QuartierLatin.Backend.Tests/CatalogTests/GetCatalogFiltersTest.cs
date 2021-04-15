@@ -67,11 +67,12 @@ namespace QuartierLatin.Backend.Tests.CatalogTests
                 .FirstOrDefault(filter => filter.Identifier == degreeTraitType["identifier"].ToString()));
 
             Assert.Equal(commonTrait["names"]["ru"],catalogFilterResponse.Filters
-                .FirstOrDefault(filter => filter.Identifier == cityTraitType["identifier"].ToString()).Options.FirstOrDefault(option => option.Id == commonTraitCityId).Name);
+                .FirstOrDefault(filter => filter.Identifier == cityTraitType["identifier"].ToString())
+                    .Options.FirstOrDefault(option => option.Id == commonTraitCityId).Name);
 
             Assert.Equal(commonTrait["names"]["ru"], catalogFilterResponse.Filters
                 .FirstOrDefault(filter => filter.Identifier == degreeTraitType["identifier"].ToString())
-                .Options.FirstOrDefault(option => option.Id == commonTraitDegreeId).Name);
+                    .Options.FirstOrDefault(option => option.Id == commonTraitDegreeId).Name);
         }
 
         public static IEnumerable<object[]> Data()
