@@ -101,6 +101,13 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             return await _db.ExecAsync(db => db.Specialties.FirstOrDefaultAsync(specialty => specialty.Id == specialtyId));
         }
 
+        public async Task<int> GetUniversityIdByUrlAndLanguage(int languageId, string url)
+        {
+            return await _db.ExecAsync(db =>
+                db.UniversityLanguages.Where(university => university.Url == url && university.LanguageId == languageId)
+                    .Select(university => university.UniversityId).FirstAsync());
+        }
+
         private static async Task CreateOrUpdateUniversityCore(AppDbContext db, int universityId, int languageId,
             string name, string description, string url)
         {

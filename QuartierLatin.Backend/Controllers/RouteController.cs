@@ -57,7 +57,9 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/api/route/{lang}/university/{**url}")]
         public async Task<IActionResult> GetUniversity(string lang, string url)
         {
-            var university = await _universityAppService.GetUniversityByUrl(url);
+            var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
+
+            var university = await _universityAppService.GetUniversityByUrlWithLanguage(languageId, url);
 
             var urls = university.Item2.ToDictionary(
                 university => _languageRepository.GetLanguageShortNameAsync(university.Key)
@@ -94,8 +96,6 @@ namespace QuartierLatin.Backend.Controllers
                     Name = specialties.Item1.Names[lang], Cost = specialties.Item2
                 }).ToList()
             };
-
-            var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
 
             var module = new UniversityModuleDto
             {
