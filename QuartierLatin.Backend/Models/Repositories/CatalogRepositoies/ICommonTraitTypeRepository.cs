@@ -19,5 +19,6 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task CreateEntityTraitToUniversityAsync(int universityId, int commonTraitId);
         Task DeleteEntityTraitToUniversityAsync(int universityId, int commonTraitId);
         Task<List<CommonTraitType>> GetTraitTypesWithIndetifierAsync();
+        Task<List<CommonTraitType>> GetTraitTypesWithIndetifierByEntityTypeAsync(EntityType entityType);
     }
 }

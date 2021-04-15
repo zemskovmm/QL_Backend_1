@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Dto.CatalogDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto;
@@ -18,10 +19,27 @@ namespace QuartierLatin.Backend.Controllers
 
         [AllowAnonymous]
         [HttpGet("/api/catalog-filters/{lang}/{entityType}")]
-        public async Task<IActionResult> GetCatalogByLangAndEntityType(string lang, EntityType entityType, [FromBody] CatalogFilterListDto catalogFilterListDto)
+        public async Task<IActionResult> GetCatalogByLangAndEntityType(string lang, EntityType entityType)
         {
-            
-            return Ok();
+            var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
+
+            var filters = commonTraits.Select(trait => new CatalogFilterDto
+            {
+                Name = trait.Item1.Names[lang],
+                Identifier = trait.Item1.Identifier,
+                Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
+                {
+                    Name = commonTrait.Names[lang],
+                    Id = commonTrait.Id
+                }).ToList()
+            }).ToList();
+
+            var response = new CatalogFilterResponseDto
+            {
+                Filters = filters
+            };
+
+            return Ok(response);
         }
 
         [AllowAnonymous]

@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using LinqToDB;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using LinqToDB;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {
@@ -98,9 +96,20 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 
         public async Task<List<CommonTraitType>> GetTraitTypesWithIndetifierAsync()
         {
-            var test = await _db.ExecAsync(db => db.CommonTraitTypes.Where(trait => trait != null).ToListAsync());
+            return await _db.ExecAsync(db => db.CommonTraitTypes.Where(trait => trait.Identifier != null).ToListAsync());
+        }
 
-            return test;
+        public async Task<List<CommonTraitType>> GetTraitTypesWithIndetifierByEntityTypeAsync(EntityType entityType)
+        {
+            var commonTraitsId = await _db.ExecAsync(db =>
+                db.CommonTraitTypesForEntities.Where(trait => trait.EntityType == entityType)
+                    .Select(trait => trait.CommonTraitId).ToListAsync());
+
+            var commonTraitTypesId = await _db.ExecAsync(db =>
+                db.CommonTraits.Where(trait => commonTraitsId.Contains(trait.Id))
+                    .Select(trait => trait.CommonTraitTypeId).Distinct().ToListAsync());
+
+            return await _db.ExecAsync(db => db.CommonTraitTypes.Where(trait => trait.Identifier != null && commonTraitTypesId.Contains(trait.Id)).ToListAsync());
         }
     }
 }
