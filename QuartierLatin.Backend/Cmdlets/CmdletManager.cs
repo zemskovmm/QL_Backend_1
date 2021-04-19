@@ -40,7 +40,7 @@ namespace QuartierLatin.Backend.Cmdlets
                 cmdlets.Add(baseType.GetGenericArguments()[0], t);
             }
 
-            var parserResult = Parser.Default.ParseArguments(args, cmdlets.Keys.ToArray());
+            var parserResult = Parser.Default.ParseArguments(commandArgs, cmdlets.Keys.ToArray());
             if (parserResult is NotParsed<object>)
                 return -1;
             var parsed = ((Parsed<object>) parserResult).Value;
