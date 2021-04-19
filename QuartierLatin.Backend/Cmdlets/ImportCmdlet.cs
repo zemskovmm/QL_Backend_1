@@ -17,6 +17,7 @@ using QuartierLatin.Backend.Database;
 using QuartierLatin.Backend.Database.AppDbContextSeed;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
+using QuartierLatin.Backend.Utils;
 using QuartierLatin.Importer.DataModel;
 
 namespace QuartierLatin.Backend.Cmdlets
@@ -37,31 +38,6 @@ namespace QuartierLatin.Backend.Cmdlets
             _db = db;
             _dbConfig = config.GetSection("Database").Get<DatabaseConfig>();
         }
-
-
-
-        static string Urlize(string name)
-        {
-            name = Transliteration.LatinToCyrillic(name, Language.Russian);
-
-            StringBuilder sb = new StringBuilder();
-            var arrayText = name.Normalize(NormalizationForm.FormD).ToCharArray();
-            foreach (char letter in arrayText)
-            {
-                if (
-                    (letter >= 'a' && letter <= 'z')
-                    || (letter >= 'A' && letter <= 'Z')
-                    || (letter >= '0' && letter <= '9')
-                    || letter == '-'
-                )
-                    sb.Append(letter);
-                if (letter == ' ')
-                    sb.Append("-");
-            }
-
-            return sb.ToString();
-        }
-
 
         protected override Task<int> Execute(ImportCmdletOptions args) =>
             _db.ExecAsync(async db =>
@@ -171,7 +147,7 @@ namespace QuartierLatin.Backend.Cmdlets
                 foreach (var lang in uni.Languages)
                     await db.InsertAsync(new UniversityLanguage
                     {
-                        Url = Urlize(lang.Value.Name),
+                        Url = Urlizer.Urlize(lang.Value.Name),
                         Description = lang.Value.HtmlData,
                         Name = lang.Value.Name,
                         LanguageId = langs[lang.Key],
