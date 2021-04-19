@@ -149,7 +149,7 @@ namespace QuartierLatin.Backend.Cmdlets
                 (lang: "esp", names: new Dictionary<string, string>
                     {{"ru", "Испанский"}, {"en", "Spanish"}, {"esp", "Español"}, {"fr", "Espanol"}}),
                 (lang: "fr", names: new Dictionary<string, string>
-                    {{"fr", "Французский"}, {"en", "French"}, {"esp", "Francés"}, {"fr", "Français"}}),
+                    {{"ru", "Французский"}, {"en", "French"}, {"esp", "Francés"}, {"fr", "Français"}}),
             }) 
                 languagesToTraits[lang.lang] = await EnsureTraitWithIdentifier(db, languageTraitId, lang.lang, lang.names);
 
