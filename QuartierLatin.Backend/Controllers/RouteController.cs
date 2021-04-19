@@ -104,7 +104,7 @@ namespace QuartierLatin.Backend.Controllers
                 Traits = universityTraits
             };
 
-            var response = new RouteDto<UniversityModuleDto>(urls, module, "university");
+            var response = new RouteDto<UniversityModuleDto>("university", urls, module, "university");
 
             return Ok(response);
         }
