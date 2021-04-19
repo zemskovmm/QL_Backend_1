@@ -71,7 +71,7 @@ namespace QuartierLatin.Backend.Cmdlets
                 Console.WriteLine($"Adding {identifier} trait type");
                 traitType = new CommonTraitType
                 {
-                    Identifier = "degree",
+                    Identifier = identifier,
                     Names = names,
                 };
                 traitType.Id = await db.InsertWithInt32IdentityAsync(traitType);
