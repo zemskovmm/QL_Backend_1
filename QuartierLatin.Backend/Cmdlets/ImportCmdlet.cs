@@ -52,7 +52,6 @@ namespace QuartierLatin.Backend.Cmdlets
                 var langs = db.Languages.ToDictionary(x => x.LanguageShortName, x => x.Id);
 
                 await db.UniversityLanguages.TruncateAsync();
-                await db.UniversityInstructionLanguages.TruncateAsync();
                 await db.CommonTraitsToUniversities.TruncateAsync();
                 await db.ExecuteAsync("TRUNCATE TABLE \"Universities\" CASCADE");
 
@@ -86,6 +85,23 @@ namespace QuartierLatin.Backend.Cmdlets
             return traitType.Id;
         }
 
+        private async Task<int> EnsureTraitWithIdentifier(AppDbContext db, int traitTypeId, string identifier,
+            Dictionary<string, string> names)
+        {
+            var trait = db.CommonTraits.FirstOrDefault(x =>
+                x.CommonTraitTypeId == traitTypeId && x.Identifier == identifier);
+            if (trait != null)
+                return trait.Id;
+            
+            Console.WriteLine("Adding " + identifier);
+            return await db.InsertWithInt32IdentityAsync(new CommonTrait
+            {
+                Identifier = identifier,
+                Names = names,
+                CommonTraitTypeId = traitTypeId
+            });
+        }
+
         private  async Task ImportUniversities(ImporterDatabase import, AppDbContext db, Dictionary<string, int> langs)
         {
             var degreeTraitType = await EnsureTraitType(db, "degree", new Dictionary<string, string>
@@ -116,23 +132,28 @@ namespace QuartierLatin.Backend.Cmdlets
             })
             {
                 var identifier = t.degree.ToString().ToLowerInvariant();
-                var trait = db.CommonTraits.FirstOrDefault(x =>
-                    x.CommonTraitTypeId == degreeTraitType && x.Identifier == identifier);
-                if (trait != null)
-                    degreesToTraits[t.degree] = trait.Id;
-                else
-                {
-                    Console.WriteLine("Adding degree " + t.degree);
-                    degreesToTraits[t.degree] = await db.InsertWithInt32IdentityAsync(new CommonTrait
-                    {
-                        Identifier = identifier,
-                        Names = t.names,
-                        CommonTraitTypeId = degreeTraitType
-                    });
-                }
+                degreesToTraits[t.degree] = await EnsureTraitWithIdentifier(db, degreeTraitType, identifier, t.names);
             }
 
-            
+            var languagesToTraits = new Dictionary<string, int>();
+            var languageTraitId = await EnsureTraitType(db, "instruction-language", new Dictionary<string, string>
+            {
+                {"en", "Language"}, {"ru", "Язык обучения"}, {"esp", "Idioma"}, {"fr", "Langue"}
+            });
+            foreach (var lang in new[]
+            {
+                (lang: "ru", names: new Dictionary<string, string>
+                    {{"ru", "Русский"}, {"en", "Russian"}, {"esp", "Ruso"}, {"fr", "Russe"}}),
+                (lang: "en", names: new Dictionary<string, string>
+                    {{"ru", "Английский"}, {"en", "English"}, {"esp", "Inglés"}, {"fr", "Anglais"}}),
+                (lang: "esp", names: new Dictionary<string, string>
+                    {{"ru", "Испанский"}, {"en", "Spanish"}, {"esp", "Español"}, {"fr", "Espanol"}}),
+                (lang: "fr", names: new Dictionary<string, string>
+                    {{"fr", "Французский"}, {"en", "French"}, {"esp", "Francés"}, {"fr", "Français"}}),
+            }) 
+                languagesToTraits[lang.lang] = await EnsureTraitWithIdentifier(db, languageTraitId, lang.lang, lang.names);
+
+
             foreach (var uni in import.Universities)
             {
                 Console.WriteLine("Importing " + uni.Id);
@@ -155,12 +176,13 @@ namespace QuartierLatin.Backend.Cmdlets
                     });
 
                 foreach (var lang in uni.LanguagesOfInstruction)
-                    await db.InsertAsync(new UniversityInstructionLanguage()
+                {
+                    await db.InsertAsync(new CommonTraitsToUniversity
                     {
-                        LanguageId = langs[lang],
-                        UniversityId = uni.Id
-                        
+                        UniversityId = uni.Id,
+                        CommonTraitId = languagesToTraits[lang]
                     });
+                }
 
                 foreach (var degree in uni.Degrees)
                     await db.InsertAsync(new CommonTraitsToUniversity
