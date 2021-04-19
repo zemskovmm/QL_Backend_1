@@ -48,7 +48,7 @@ namespace QuartierLatin.Backend.Tests.UniversityTest.UniversityTestsDataSet
                         htmlDescription = "Lorem ipsum dolor sit amet",
                         url = "/test/123"
                     },
-                    cn = new
+                    fr = new
                     {
                         name = "text",
                         htmlDescription = "Lorem ipsum dolor sit amet",
