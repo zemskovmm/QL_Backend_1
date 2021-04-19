@@ -10,6 +10,7 @@ using LinqToDB.DataProvider;
 using LinqToDB.DataProvider.PostgreSQL;
 using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.Options;
+using QuartierLatin.Backend.Models.CatalogModels;
 
 namespace QuartierLatin.Backend.Database
 {
@@ -26,6 +27,16 @@ namespace QuartierLatin.Backend.Database
         public ITable<Language> Languages => GetTable<Language>();
         public ITable<PageRoot> PageRoots => GetTable<PageRoot>();
         public ITable<GlobalSetting> GlobalSettings => GetTable<GlobalSetting>();
+        public ITable<University> Universities => GetTable<University>();
+        public ITable<UniversityLanguage> UniversityLanguages => GetTable<UniversityLanguage>();
+        public ITable<UniversityInstructionLanguage> UniversityInstructionLanguages => GetTable<UniversityInstructionLanguage>();
+        public ITable<SpecialtyCategory> SpecialtyCategories => GetTable<SpecialtyCategory>();
+        public ITable<Specialty> Specialties => GetTable<Specialty>();
+        public ITable<UniversitySpecialty> UniversitySpecialties => GetTable<UniversitySpecialty>();
+        public ITable<CommonTrait> CommonTraits => GetTable<CommonTrait>();
+        public ITable<CommonTraitType> CommonTraitTypes => GetTable<CommonTraitType>();
+        public ITable<CommonTraitsToUniversity> CommonTraitsToUniversities => GetTable<CommonTraitsToUniversity>();
+        public ITable<CommonTraitTypesForEntity> CommonTraitTypesForEntities => GetTable<CommonTraitTypesForEntity>();
     }
 
     public interface IAppDbConnectionFactory

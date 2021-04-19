@@ -30,7 +30,7 @@ namespace QuartierLatin.Backend.Tests.FileTests
 
             var resp = SendAdminRequest<JObject>("/media", multipartContent);
             var id = int.Parse(resp["id"].ToString());
-            var entity = await repo.GetBlobInfoByFileNameAndFileTypeAsync(fileName, mediaType);
+            var entity = await repo.GetBlobInfoAsync(id);
 
             Assert.Equal(entity.Id, id);
 

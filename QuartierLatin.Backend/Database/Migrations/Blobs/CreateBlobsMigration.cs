@@ -8,7 +8,7 @@ namespace QuartierLatin.Backend.Database.Migrations.Blobs
         public override void Up()
         {
             Create.Table("Blobs")
-                .WithColumn("Id").AsInt64().PrimaryKey().Identity()
+                .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("FileType").AsString()
                 .WithColumn("OriginalFileName").AsString();
         }

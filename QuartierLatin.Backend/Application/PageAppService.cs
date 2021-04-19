@@ -87,7 +87,7 @@ namespace QuartierLatin.Backend.Application
 
         public Task<IList<Page>> GetPagesByRootIdAsync(int id) => _pageRepository.GetPagesByPageRootIdAsync(id);
         
-        public async Task<RouteDto<PageModuleDto>> GetPagesByRootIdAsync(string url)
+        public async Task<RouteDto<PageModuleDto>> GetPagesByRootIdAsync(string lang, string url)
         {
             var clearUrl = RewriteRouteRules.ReWriteRequests(url);
 
@@ -96,7 +96,9 @@ namespace QuartierLatin.Backend.Application
             if (pages.Count is 0)
                 return null;
 
-            var pageMain = pages.Find(page => page.Url == clearUrl);
+            var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
+
+            var pageMain = pages.Find(page => page.LanguageId == langId);
 
             var urls = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
                 .ConfigureAwait(false)

@@ -4,13 +4,11 @@ namespace QuartierLatin.Backend.Models.Repositories
 {
     public interface IBlobRepository
     {
-        Task<long> CreateBlobIdAsync(string fileType, string originalFileName);
-        Task DeleteBlobAsync(long id);
+        Task<int> CreateBlobIdAsync(string fileType, string originalFileName);
+        Task DeleteBlobAsync(int id);
 
-        Task EditBlobAsync(long id, string fileType);
+        Task EditBlobAsync(int id, string fileType);
 
-        Task<Blob> GetBlobInfoAsync(long id);
-
-        Task<Blob> GetBlobInfoByFileNameAndFileTypeAsync(string fileName, string fileType);
+        Task<Blob> GetBlobInfoAsync(int id);
     }
 }
