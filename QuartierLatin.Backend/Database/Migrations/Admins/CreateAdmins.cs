@@ -9,11 +9,11 @@ namespace QuartierLatin.Backend.Database.Migrations.Users
         public override void Up()
         {
             Create.Table("Admins")
-                .WithColumn("Id").AsInt64().PrimaryKey().Identity()
+                .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("Email").AsString().Nullable().Unique()
                 .WithColumn("PasswordHash").AsString().Nullable();
 
-            Alter.Table("Admins").AddColumn("AvatarImage").AsInt64().Nullable();
+            Alter.Table("Admins").AddColumn("AvatarImage").AsInt32().Nullable();
 
             Alter.Table("Admins")
                 .AddColumn("Confirmed").AsBoolean().SetExistingRowsTo(false).WithDefaultValue(false)

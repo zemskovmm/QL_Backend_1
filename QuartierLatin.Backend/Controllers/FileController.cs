@@ -17,7 +17,7 @@ namespace QuartierLatin.Backend.Controllers
 
         [AllowAnonymous]
         [HttpGet("/media/{id}")]
-        public async Task<IActionResult> GetMedia(long id)
+        public async Task<IActionResult> GetMedia(int id)
         {
             var response = await _fileAppService.GetFileAsync(id);
 
@@ -30,7 +30,7 @@ namespace QuartierLatin.Backend.Controllers
 
         [AllowAnonymous]
         [HttpGet("/media/scaled/{id}")]
-        public async Task<IActionResult> GetCompressedMedia(long id, [FromQuery]int dimension)
+        public async Task<IActionResult> GetCompressedMedia(int id, [FromQuery]int dimension)
         {
             var response = await _fileAppService.GetCompressedFileAsync(id, dimension);
 

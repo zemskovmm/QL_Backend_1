@@ -9,7 +9,7 @@ namespace QuartierLatin.Backend.Database.Migrations.GlobalSettings
         {
             Create.Table("GlobalSettings")
                 .WithColumn("Key").AsString().PrimaryKey()
-                .WithColumn("LanguageId").AsInt64().ForeignKey("Languages", "Id").PrimaryKey()
+                .WithColumn("LanguageId").AsInt32().ForeignKey("Languages", "Id").PrimaryKey()
                 .WithColumn("JsonData").AsCustom("jsonb");
         }
     }

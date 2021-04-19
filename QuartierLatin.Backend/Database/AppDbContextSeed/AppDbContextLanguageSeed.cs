@@ -32,14 +32,8 @@ namespace QuartierLatin.Backend.Database.AppDbContextSeed
 
                     db.Languages.Insert(() => new Language
                     {
-                        LanguageName = "中文",
-                        LanguageShortName = "cn"
-                    });
-
-                    db.Languages.Insert(() => new Language
-                    {
                         LanguageName = "Español",
-                        LanguageShortName = "es"
+                        LanguageShortName = "esp"
                     });
                 }
             });

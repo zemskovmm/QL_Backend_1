@@ -10,7 +10,7 @@ namespace QuartierLatin.Backend.Application.Interfaces
 {
     public interface IPageAppService
     {
-        Task<RouteDto<PageModuleDto>> GetPagesByRootIdAsync(string url);
+        Task<RouteDto<PageModuleDto>> GetPagesByRootIdAsync(string lang, string url);
         Task<IList<Page>> GetPagesByRootIdAsync(int id);
 
         Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url);

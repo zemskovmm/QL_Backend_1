@@ -9,7 +9,7 @@ namespace QuartierLatin.Backend.Dto
 
         public string Name { get; set; }
 
-        public long AvatarImage { get; set; }
+        public int AvatarImage { get; set; }
 
         public static AdminProfileDto FromAdmin(Admin admin)
         {

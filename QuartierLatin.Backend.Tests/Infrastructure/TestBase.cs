@@ -72,7 +72,7 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
             }
 
             var host = Program
-                .CreateHostBuilder(new string[0])
+                .CreateHostBuilder(false, new string[0])
                 .ConfigureLogging(l => l.AddDebug())
                 .ConfigureAppConfiguration((hb, cb) =>
                 {
