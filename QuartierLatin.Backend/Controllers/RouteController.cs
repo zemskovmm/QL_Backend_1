@@ -57,15 +57,14 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/api/route/{lang}/university/{**url}")]
         public async Task<IActionResult> GetUniversity(string lang, string url)
         {
-            var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
 
             var university = await _universityAppService.GetUniversityByUrlWithLanguage(languageId, url);
 
             var urls = university.Item2.ToDictionary(
-                university => _languageRepository.GetLanguageShortNameAsync(university.Key)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult(),
+                university => languageIds[university.Key],
                 university => university.Value.Url);
 
             var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();

@@ -5,6 +5,7 @@ using LinqToDB;
 using LinqToDB.Data;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {
@@ -99,6 +100,41 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             return await _db.ExecAsync(db =>
                 db.UniversityLanguages.Where(university => university.Url == url && university.LanguageId == languageId)
                     .Select(university => university.UniversityId).FirstAsync());
+        }
+
+        public async Task<(int totalPages, List<(University, UniversityLanguage, int cost)>)> GetUniversityPageByFilter(int pageNumber, List<List<int>> commonTraitGroups, int languageId, int skip, int take)
+        {
+            var pageSize = take;
+
+            return await _db.ExecAsync(async db =>
+            {
+                var universities = db.Universities.AsQueryable();
+                if (commonTraitGroups.Any())
+                {
+                    var universitiesWithTraits = db.CommonTraitsToUniversities.AsQueryable();
+                    foreach (var commonTraitGroup in commonTraitGroups)
+                    {
+                        if (commonTraitGroup.Count != 0)
+                            universitiesWithTraits = universitiesWithTraits.Where(t => commonTraitGroup.Contains(t.CommonTraitId));
+                    }
+
+                    var universityIdsWithTraits = universitiesWithTraits.Select(x => x.UniversityId);
+                    universities = universities.Where(u => universityIdsWithTraits.Contains(u.Id));
+                }
+
+                var universitiesWithLanguages = from uni in universities
+                    join lang in db.UniversityLanguages.Where(l => l.LanguageId == languageId) on uni.Id equals lang
+                        .UniversityId
+                    select new {uni, lang};
+
+                var totalCount = await universitiesWithLanguages.CountAsync();
+
+                var pageCount = FilterHelper.PageCount(totalCount, pageSize);
+
+                return (pageCount,
+                    (await universitiesWithLanguages.OrderBy(x => x.uni.Id).Skip(skip).Take(take).ToListAsync())
+                    .Select(x => (x.uni, x.lang, 500)).ToList());
+            });
         }
 
         private static async Task CreateOrUpdateUniversityCore(AppDbContext db, int universityId, int languageId,
