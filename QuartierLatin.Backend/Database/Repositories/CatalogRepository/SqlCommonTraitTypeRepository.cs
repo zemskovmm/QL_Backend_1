@@ -99,17 +99,10 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             return await _db.ExecAsync(db => db.CommonTraitTypes.Where(trait => trait.Identifier != null).ToListAsync());
         }
 
-        public async Task<List<CommonTraitType>> GetTraitTypesWithIndetifierByEntityTypeAsync(EntityType entityType)
-        {
-            var commonTraitsId = await _db.ExecAsync(db =>
-                db.CommonTraitTypesForEntities.Where(trait => trait.EntityType == entityType)
-                    .Select(trait => trait.CommonTraitId).ToListAsync());
-
-            var commonTraitTypesId = await _db.ExecAsync(db =>
-                db.CommonTraits.Where(trait => commonTraitsId.Contains(trait.Id))
-                    .Select(trait => trait.CommonTraitTypeId).Distinct().ToListAsync());
-
-            return await _db.ExecAsync(db => db.CommonTraitTypes.Where(trait => trait.Identifier != null && commonTraitTypesId.Contains(trait.Id)).ToListAsync());
-        }
+        public Task<List<CommonTraitType>> GetTraitTypesWithIndetifierByEntityTypeAsync(EntityType entityType) =>
+            _db.ExecAsync(db => (from traitType in db.CommonTraitTypes
+                join traitToEntity in db.CommonTraitTypesForEntities.Where(e => e.EntityType == entityType)
+                    on traitType.Id equals traitToEntity.CommonTraitId
+                select traitType).Distinct().ToListAsync());
     }
 }

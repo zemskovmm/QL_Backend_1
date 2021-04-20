@@ -16,6 +16,7 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
 
         Task<CommonTrait> GetCommonTraitAsync(int id);
         Task<List<CommonTrait>> GetCommonTraitListByTypeId(int typeId);
+        Task<List<CommonTrait>> GetCommonTraitListByTypeIds(int[] typeId);
         Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndUniversityId(int typeId, int universityId);
     }
 }

@@ -75,11 +75,15 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 db.CommonTraits.Where(trait => trait.CommonTraitTypeId == typeId).ToListAsync());
         }
 
+        public Task<List<CommonTrait>> GetCommonTraitListByTypeIds(int[] typeIds) => _db.ExecAsync(db =>
+            db.CommonTraits.Where(trait => typeIds.Contains(trait.CommonTraitTypeId)).ToListAsync());
+
         public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndUniversityId(int typeId, int universityId)
         {
             var universityTraitsId = await _db.ExecAsync(db =>
                 db.CommonTraitsToUniversities.Where(trait => trait.UniversityId == universityId)
-                    .Select(trait => trait.CommonTraitId).ToListAsync());
+                    .Select(trait => trait.CommonTraitId)
+                    .ToListAsync());
 
             return await _db.ExecAsync(db =>
                 db.CommonTraits
