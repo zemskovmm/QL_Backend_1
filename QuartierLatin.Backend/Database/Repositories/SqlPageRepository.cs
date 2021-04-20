@@ -1,11 +1,10 @@
 ﻿using LinqToDB;
-using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Database.Repositories
 {

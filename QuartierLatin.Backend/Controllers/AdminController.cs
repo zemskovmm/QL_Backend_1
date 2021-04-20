@@ -4,6 +4,7 @@ using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -18,9 +19,6 @@ namespace QuartierLatin.Backend.Controllers
             _pageAppService = pageAppService;
         }
 
-        static int PageCount(int resultCount, int pageSize) =>
-            resultCount / pageSize + (resultCount % pageSize == 0 ? 0 : 1);
-        
         [HttpGet(), ProducesResponseType(typeof(PageListDto), 200)]
         public async Task<IActionResult> GetPageList([FromQuery]int page, [FromQuery]string search)
         {
@@ -29,7 +27,7 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(new PageListDto
             {
-                TotalPages = PageCount(result.Item2.totalResults, pageSize),
+                TotalPages = FilterHelper.PageCount(result.Item2.totalResults, pageSize),
                 Results = result.Item2.results.Select(x => new PageListItemDto
                 {
                     Id = x.id,

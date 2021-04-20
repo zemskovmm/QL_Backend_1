@@ -18,5 +18,6 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId);
         Task<Specialty> GetSpecialtyById(int specialtyId);
         Task<int> GetUniversityIdByUrlAndLanguage(int languageId, string url);
+        Task<(int totalPages, List<(University, UniversityLanguage, int cost)>)> GetUniversityPageByFilter(int pageNumber, List<List<int>> commonTraitGroups, int languageId, int skip, int take);
     }
 }

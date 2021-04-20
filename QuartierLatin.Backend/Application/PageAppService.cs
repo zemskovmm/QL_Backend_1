@@ -48,8 +48,7 @@ namespace QuartierLatin.Backend.Application
 
         public async Task<(Dictionary<int, string>, (int totalResults, List<(int id, List<Page> pages)> results))> GetPageListBySearch(int page, string search, int pageSize)
         {
-            var langs = (await _languageRepository.GetLanguageListAsync()).ToDictionary(x => x.Id,
-                x => x.LanguageShortName);
+            var langs = await _languageRepository.GetLanguageIdWithShortNameAsync();
             var results = await _pageRepository.GetPageRootsWithPagesAsync(search, pageSize * page, pageSize);
 
             return (langs, results);
@@ -64,17 +63,13 @@ namespace QuartierLatin.Backend.Application
             if (pages.Count is 0)
                 return null;
 
-            var urls = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult(), page => page.Url);
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var urls = pages.ToDictionary(page => languageIds[page.LanguageId], page => page.Url);
 
             var titles = urls.ToDictionary(url => url.Key, url => pages.FirstOrDefault(page => page.Url == url.Value).Title);
 
-            var blocks = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult(), page => JObject.Parse(page.PageData));
+            var blocks = pages.ToDictionary(page => languageIds[page.LanguageId], page => JObject.Parse(page.PageData));
 
             var adminPageDto = new AdminPageDto(titles, blocks);
 
@@ -96,14 +91,13 @@ namespace QuartierLatin.Backend.Application
             if (pages.Count is 0)
                 return null;
 
-            var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var langId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
 
             var pageMain = pages.Find(page => page.LanguageId == langId);
 
-            var urls = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult(), page => page.Url);
+            var urls = pages.ToDictionary(page => languageIds[page.LanguageId], page => page.Url);
 
             var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData));
 
