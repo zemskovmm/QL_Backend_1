@@ -10,6 +10,8 @@ namespace QuartierLatin.Backend.Models.CatalogModels
         [PrimaryKey]
         public int SpecialtyId { get; set; }
         [Column]
-        public int Cost { get; set; }
+        public int CostFrom { get; set; }
+        [Column]
+        public int CostTo { get; set; }
     }
 }

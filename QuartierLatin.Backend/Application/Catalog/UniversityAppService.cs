@@ -65,7 +65,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             return await _universityRepository.GetUniversityLanguageInstructionByUniversityId(universityId);
         }
 
-        public async Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityId(int universityId)
+        public async Task<List<(Specialty, int, int)>> GetSpecialtiesUniversityByUniversityId(int universityId)
         {
             return await _universityRepository.GetSpecialtiesUniversityByUniversityIdList(universityId);
         }

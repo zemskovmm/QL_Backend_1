@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
@@ -81,9 +82,9 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .ToListAsync());
         }
 
-        public async Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId)
+        public async Task<List<(Specialty, int, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId)
         {
-            var response = new List<(Specialty, int)>();
+            var response = new List<(Specialty, int, int)>();
 
             var universitySpecialty = await _db.ExecAsync(db =>
                 db.UniversitySpecialties.Where(speciallty => speciallty.UniversityId == universityId).ToListAsync());
@@ -91,7 +92,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             foreach (var specialty in universitySpecialty)
             {
                 var specialtyEntity = await GetSpecialtyById(specialty.SpecialtyId);
-                response.Add((specialtyEntity, specialty.Cost));
+                response.Add((specialtyEntity, specialty.CostFrom, specialty.CostTo));
             }
 
             return response;
@@ -109,7 +110,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .Select(university => university.UniversityId).FirstAsync());
         }
 
-        public async Task<(int totalPages, List<(University, UniversityLanguage, int cost)>)> GetUniversityPageByFilter(int pageNumber, List<List<int>> commonTraitGroups, int languageId, int skip, int take)
+        public async Task<(int totalPages, List<(University, UniversityLanguage, int cost)>)> GetUniversityPageByFilter(List<List<int>> commonTraitGroups, List<int> specialtyCategoriesId, List<int> priceIds, int languageId, int skip, int take)
         {
             var pageSize = take;
 
@@ -125,14 +126,45 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                             universitiesWithTraits = universitiesWithTraits.Where(t => commonTraitGroup.Contains(t.CommonTraitId));
                     }
 
+                    if (specialtyCategoriesId.Any())
+                    {
+                        var universitySpecialtyTable = db.UniversitySpecialties.AsQueryable();
+                        var specialtyTable = db.Specialties.Where(specialtyEntity =>
+                            specialtyCategoriesId.Contains(specialtyEntity.CategoryId)).AsQueryable();
+
+                        var universitiesId = from universitySpecialty in universitySpecialtyTable
+                                             join specialty in specialtyTable on universitySpecialty.SpecialtyId equals specialty.Id
+                            select universitySpecialty.UniversityId;
+                        universitiesWithTraits = universitiesWithTraits.Where(t => universitiesId.Contains(t.UniversityId));
+
+                        if (priceIds.Any())
+                        {
+                            foreach (var priceId in priceIds)
+                            {
+                                universitySpecialtyTable = priceId switch
+                                {
+                                    1 => universitySpecialtyTable.Where(universitySpecialty => universitySpecialty.CostTo <= 10000),
+                                    2 => universitySpecialtyTable.Where(universitySpecialty => universitySpecialty.CostTo <= 20000),
+                                    3 => universitySpecialtyTable.Where(universitySpecialty => universitySpecialty.CostTo <= 30000),
+                                    _ => throw new System.NotImplementedException(),
+                                };
+                            }
+
+                            universitiesId = from universitySpecialty in universitySpecialtyTable
+                                             join specialty in specialtyTable on universitySpecialty.SpecialtyId equals specialty.Id
+                                select universitySpecialty.UniversityId;
+                            universitiesWithTraits = universitiesWithTraits.Where(t => universitiesId.Contains(t.UniversityId));
+                        }
+                    }
+
                     var universityIdsWithTraits = universitiesWithTraits.Select(x => x.UniversityId);
                     universities = universities.Where(u => universityIdsWithTraits.Contains(u.Id));
                 }
 
                 var universitiesWithLanguages = from uni in universities
-                    join lang in db.UniversityLanguages.Where(l => l.LanguageId == languageId) on uni.Id equals lang
-                        .UniversityId
-                    select new {uni, lang};
+                    join lang in db.UniversityLanguages.Where(l => l.LanguageId == languageId) on uni.Id equals lang.UniversityId
+                    join uniSpecialty in db.UniversitySpecialties on uni.Id equals uniSpecialty.UniversityId
+                    select new {uni, lang, uniSpecialty.CostFrom, uniSpecialty.CostTo};
 
                 var totalCount = await universitiesWithLanguages.CountAsync();
 
@@ -140,8 +172,13 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 
                 return (pageCount,
                     (await universitiesWithLanguages.OrderBy(x => x.uni.Id).Skip(skip).Take(take).ToListAsync())
-                    .Select(x => (x.uni, x.lang, 500)).ToList());
+                    .Select(x => (x.uni, x.lang, x.CostFrom)).ToList());
             });
+        }
+
+        public async Task<List<SpecialtyCategory>> GetSpecialtyCategoryList()
+        {
+            return await _db.ExecAsync(db => db.SpecialtyCategories.ToListAsync());
         }
 
         private static async Task CreateOrUpdateUniversityCore(AppDbContext db, int universityId, int languageId,
