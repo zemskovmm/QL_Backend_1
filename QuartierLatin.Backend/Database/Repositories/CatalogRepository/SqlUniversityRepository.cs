@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using LinqToDB;
+﻿using LinqToDB;
 using LinqToDB.Data;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Utils;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Metadata.Ecma335;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {
@@ -135,24 +135,33 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                         var universitiesId = from universitySpecialty in universitySpecialtyTable
                                              join specialty in specialtyTable on universitySpecialty.SpecialtyId equals specialty.Id
                             select universitySpecialty.UniversityId;
+
+                        var test = universitiesId.ToList();
+
                         universitiesWithTraits = universitiesWithTraits.Where(t => universitiesId.Contains(t.UniversityId));
 
                         if (priceIds.Any())
                         {
+                            var universitySpecialtyTableOrBuilder = new OrBuilder<UniversitySpecialty>(universitySpecialtyTable);
                             foreach (var priceId in priceIds)
                             {
-                                universitySpecialtyTable = priceId switch
+                                var _ = priceId switch
                                 {
-                                    1 => universitySpecialtyTable.Where(universitySpecialty => universitySpecialty.CostTo <= 10000),
-                                    2 => universitySpecialtyTable.Where(universitySpecialty => universitySpecialty.CostTo <= 20000),
-                                    3 => universitySpecialtyTable.Where(universitySpecialty => universitySpecialty.CostTo <= 30000),
+                                    1 => universitySpecialtyTableOrBuilder.Or(universitySpecialty => universitySpecialty.CostTo <= 10000),
+                                    2 => universitySpecialtyTableOrBuilder.Or(universitySpecialty => universitySpecialty.CostTo <= 20000),
+                                    3 => universitySpecialtyTableOrBuilder.Or(universitySpecialty => universitySpecialty.CostTo <= 30000),
                                     _ => throw new System.NotImplementedException(),
                                 };
                             }
 
+                            universitySpecialtyTable = universitySpecialtyTableOrBuilder.GetWhereQueryable();
+
                             universitiesId = from universitySpecialty in universitySpecialtyTable
                                              join specialty in specialtyTable on universitySpecialty.SpecialtyId equals specialty.Id
                                 select universitySpecialty.UniversityId;
+
+                            var test1 = universitiesId.ToList();
+
                             universitiesWithTraits = universitiesWithTraits.Where(t => universitiesId.Contains(t.UniversityId));
                         }
                     }
@@ -162,8 +171,9 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 }
 
                 var universitiesWithLanguages = from uni in universities
-                    join lang in db.UniversityLanguages.Where(l => l.LanguageId == languageId) on uni.Id equals lang.UniversityId
+                    join lang in db.UniversityLanguages on uni.Id equals lang.UniversityId
                     join uniSpecialty in db.UniversitySpecialties on uni.Id equals uniSpecialty.UniversityId
+                    where lang.LanguageId == languageId || lang.LanguageId == db.UniversityLanguages.FirstOrDefault(lang => lang.UniversityId == uni.Id).LanguageId
                     select new {uni, lang, uniSpecialty.CostFrom, uniSpecialty.CostTo};
 
                 var totalCount = await universitiesWithLanguages.CountAsync();
