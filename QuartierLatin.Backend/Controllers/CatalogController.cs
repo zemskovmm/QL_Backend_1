@@ -9,15 +9,18 @@ using QuartierLatin.Backend.Models.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.Interfaces;
 
 namespace QuartierLatin.Backend.Controllers
 {
     public class CatalogController : Controller
     {
         private readonly ICatalogAppService _catalogAppService;
-        public CatalogController(ICatalogAppService catalogAppService)
+        private readonly ISpecialtyAppService _specialtyAppService;
+        public CatalogController(ICatalogAppService catalogAppService, ISpecialtyAppService specialtyAppService)
         {
             _catalogAppService = catalogAppService;
+            _specialtyAppService = specialtyAppService;
         }
 
         [AllowAnonymous]
@@ -71,7 +74,7 @@ namespace QuartierLatin.Backend.Controllers
                 }
             });
 
-            var specialCategories = await _catalogAppService.GetSpecialCategoriesList();
+            var specialCategories = await _specialtyAppService.GetSpecialCategoriesList();
 
             filters.Add(new CatalogFilterDto
             {

@@ -65,10 +65,5 @@ namespace QuartierLatin.Backend.Application.Catalog
 
             return await _universityRepository.GetUniversityPageByFilter(commonTraitsIds, specialtyCategoriesId, priceFiltersId, langId, pageSize * pageNumber, pageSize);
         }
-
-        public async Task<List<SpecialtyCategory>> GetSpecialCategoriesList()
-        {
-            return await _universityRepository.GetSpecialtyCategoryList();
-        }
     }
 }

@@ -82,27 +82,6 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .ToListAsync());
         }
 
-        public async Task<List<(Specialty, int, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId)
-        {
-            var response = new List<(Specialty, int, int)>();
-
-            var universitySpecialty = await _db.ExecAsync(db =>
-                db.UniversitySpecialties.Where(speciallty => speciallty.UniversityId == universityId).ToListAsync());
-
-            foreach (var specialty in universitySpecialty)
-            {
-                var specialtyEntity = await GetSpecialtyById(specialty.SpecialtyId);
-                response.Add((specialtyEntity, specialty.CostFrom, specialty.CostTo));
-            }
-
-            return response;
-        }
-
-        public async Task<Specialty> GetSpecialtyById(int specialtyId)
-        {
-            return await _db.ExecAsync(db => db.Specialties.FirstOrDefaultAsync(specialty => specialty.Id == specialtyId));
-        }
-
         public async Task<int> GetUniversityIdByUrlAndLanguage(int languageId, string url)
         {
             return await _db.ExecAsync(db =>
@@ -184,11 +163,6 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     (await universitiesWithLanguages.OrderBy(x => x.uni.Id).Skip(skip).Take(take).ToListAsync())
                     .Select(x => (x.uni, x.lang, x.CostFrom)).ToList());
             });
-        }
-
-        public async Task<List<SpecialtyCategory>> GetSpecialtyCategoryList()
-        {
-            return await _db.ExecAsync(db => db.SpecialtyCategories.ToListAsync());
         }
 
         private static async Task CreateOrUpdateUniversityCore(AppDbContext db, int universityId, int languageId,

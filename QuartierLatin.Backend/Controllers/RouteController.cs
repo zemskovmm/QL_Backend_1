@@ -19,16 +19,18 @@ namespace QuartierLatin.Backend.Controllers
         private readonly IRouteAppService _routeAppService;
         private readonly ICommonTraitTypeAppService _traitTypeAppService;
         private readonly IUniversityAppService _universityAppService;
+        private readonly ISpecialtyAppService _specialtyAppService;
 
         public RouteController(IRouteAppService routeAppService, IUniversityAppService universityAppService,
             ILanguageRepository languageRepository, ICommonTraitAppService commonTraitAppService,
-            ICommonTraitTypeAppService traitTypeAppService)
+            ICommonTraitTypeAppService traitTypeAppService, ISpecialtyAppService specialtyAppService)
         {
             _routeAppService = routeAppService;
             _universityAppService = universityAppService;
             _languageRepository = languageRepository;
             _commonTraitAppService = commonTraitAppService;
             _traitTypeAppService = traitTypeAppService;
+            _specialtyAppService = specialtyAppService;
         }
 
         [HttpGet("/api/route/{lang}/{**route}")]
@@ -85,7 +87,7 @@ namespace QuartierLatin.Backend.Controllers
             }
 
             var specialtiesUniversity =
-                await _universityAppService.GetSpecialtiesUniversityByUniversityId(university.Item1.Id);
+                await _specialtyAppService.GetSpecialtiesUniversityByUniversityId(university.Item1.Id);
 
             var universityTraits = new UniversityModuleTraitsDto
             {

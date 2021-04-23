@@ -10,7 +10,5 @@ namespace QuartierLatin.Backend.Application.Interfaces.Catalog
         Task<List<(CommonTraitType, List<CommonTrait>)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType);
         Task<(int totalPages, List<(University, UniversityLanguage, int cost)>)> GetCatalogPageByFilter(string lang,
             EntityType entityType, Dictionary<CommonTraitType, List<CommonTrait>> commonTraits, int pageNumber, int pageSize);
-
-        Task<List<SpecialtyCategory>> GetSpecialCategoriesList();
     }
 }
