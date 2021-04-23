@@ -1,6 +1,7 @@
 ﻿using QuartierLatin.Backend.Models.CatalogModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.Enums;
 
 namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
 {
@@ -18,5 +19,6 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task<List<CommonTrait>> GetCommonTraitListByTypeId(int typeId);
         Task<List<CommonTrait>> GetCommonTraitListByTypeIds(int[] typeId);
         Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndUniversityId(int typeId, int universityId);
+        Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByUniversityIds(IEnumerable<int> ids);
     }
 }
