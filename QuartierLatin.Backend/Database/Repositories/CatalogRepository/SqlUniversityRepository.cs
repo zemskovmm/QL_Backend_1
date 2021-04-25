@@ -75,13 +75,6 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 db.UniversityLanguages.Where(university => university.Url == url).Select(university => university.UniversityId).FirstAsync());
         }
 
-        public async Task<List<UniversityInstructionLanguage>> GetUniversityLanguageInstructionByUniversityId(int universityId)
-        {
-            return await _db.ExecAsync(db =>
-                db.UniversityInstructionLanguages.Where(instruction => instruction.UniversityId == universityId)
-                    .ToListAsync());
-        }
-        
         public async Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId)
         {
             var response = new List<(Specialty, int)>();
@@ -92,7 +85,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             foreach (var specialty in universitySpecialty)
             {
                 var specialtyEntity = await GetSpecialtyById(specialty.SpecialtyId);
-                response.Add((specialtyEntity, specialty.Cost));
+                response.Add((specialtyEntity, specialty.CostTo));
             }
 
             return response;
