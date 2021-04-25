@@ -30,11 +30,14 @@ namespace QuartierLatin.Backend.Application.Catalog
         {
             var traitTypes = await _commonTraitTypeRepository.GetTraitTypesWithIndetifierByEntityTypeAsync(entityType);
 
+            var traits =
+                (await _commonTraitRepository.GetCommonTraitListByTypeIds(traitTypes.Select(x => x.Id).ToArray()))
+                .GroupBy(x => x.CommonTraitTypeId).ToDictionary(x => x.Key, x => x.ToList());
+
+
             var response =
-                traitTypes.Select(trait => (trait, _commonTraitRepository.GetCommonTraitListByTypeId(trait.Id)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult())).ToList();
+                traitTypes.Select(trait => (trait, list: traits.GetValueOrDefault(trait.Id))).Where(x => x.list != null)
+                    .ToList();
 
             return response;
         }

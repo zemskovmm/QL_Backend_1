@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 
 namespace QuartierLatin.Backend.Application.Catalog
@@ -10,10 +12,13 @@ namespace QuartierLatin.Backend.Application.Catalog
     public class CommonTraitAppService : ICommonTraitAppService
     {
         private readonly ICommonTraitRepository _commonTraitRepository;
+        private readonly ICommonTraitTypeRepository _commonTraitTypeRepository;
 
-        public CommonTraitAppService(ICommonTraitRepository commonTraitRepository)
+        public CommonTraitAppService(ICommonTraitRepository commonTraitRepository, 
+            ICommonTraitTypeRepository commonTraitTypeRepository)
         {
             _commonTraitRepository = commonTraitRepository;
+            _commonTraitTypeRepository = commonTraitTypeRepository;
         }
 
         public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAsync(int typeId)
@@ -40,6 +45,19 @@ namespace QuartierLatin.Backend.Application.Catalog
         public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndUniversityIdAsync(int typeId, int universityId)
         {
             return await _commonTraitRepository.GetCommonTraitListByTypeIdAndUniversityId(typeId, universityId);
+        }
+
+        public async Task<Dictionary<int, Dictionary<CommonTraitType, List<CommonTrait>>>> GetTraitsForEntityIds(
+            EntityType entityType, List<int> ids)
+        {
+            var allTypes = await _commonTraitTypeRepository.GetCommonTraitTypeListAsync();
+            var allTraits = await _commonTraitRepository.GetCommonTraitListByUniversityIds(ids);
+            return ids.ToDictionary(x => x,
+                entityId => allTypes.ToDictionary(traitType => traitType,
+                    traitType =>
+                        allTraits.GetValueOrDefault(entityId)?.Where(trait => trait.CommonTraitTypeId == traitType.Id)
+                            .ToList() ??
+                        new List<CommonTrait>()));
         }
     }
 }

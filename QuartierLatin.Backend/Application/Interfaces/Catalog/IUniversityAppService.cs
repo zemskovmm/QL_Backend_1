@@ -14,6 +14,7 @@ namespace QuartierLatin.Backend.Application.Interfaces.Catalog
         Task<int> CreateUniversityAsync(int? universityFoundationYear, string universityWebsite);
         Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage);
         Task<List<UniversityInstructionLanguage>> GetUniversityLanguageInstructionByUniversityId(int universityId);
+        Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityId(int universityId);
         Task<(University, Dictionary<int, UniversityLanguage>)> GetUniversityByUrlWithLanguage(int languageId, string url);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace QuartierLatin.Backend.Dto
@@ -12,10 +13,17 @@ namespace QuartierLatin.Backend.Dto
         [JsonProperty("module")]
         public T Module { get; protected set; }
 
-        public RouteDto(Dictionary<string, string> urls, T module, string moduleName)
+        public RouteDto(string urlPrefix, Dictionary<string, string> urls, T module, string moduleName)
         {
             ModuleName = moduleName;
-            Urls = urls;
+            Urls = urls.ToDictionary(x => x.Key, x =>
+            {
+                var url = "/" + x.Key + "/";
+                if (urlPrefix != null)
+                    url += urlPrefix + "/";
+                url += x.Value;
+                return url;
+            });
             Module = module;
         }
     }

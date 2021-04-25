@@ -75,7 +75,7 @@ namespace QuartierLatin.Backend.Application
 
             var adminPageModuleDto = new AdminPageModuleDto(adminPageDto, pages.First().PageRootId);
 
-            var response = new RouteDto<AdminPageModuleDto>(urls, adminPageModuleDto, "page");
+            var response = new RouteDto<AdminPageModuleDto>(null, urls, adminPageModuleDto, "page");
 
             return response;
         }
@@ -103,7 +103,7 @@ namespace QuartierLatin.Backend.Application
 
             var pageModuleDto = new PageModuleDto(pageDto);
 
-            var response = new RouteDto<PageModuleDto>(urls, pageModuleDto, "page");
+            var response = new RouteDto<PageModuleDto>(null, urls, pageModuleDto, "page");
 
             return response;
         }

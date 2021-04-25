@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Application.Interfaces;
+using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -17,10 +18,13 @@ namespace QuartierLatin.Backend.Controllers
     {
         private readonly ICatalogAppService _catalogAppService;
         private readonly ISpecialtyAppService _specialtyAppService;
-        public CatalogController(ICatalogAppService catalogAppService, ISpecialtyAppService specialtyAppService)
+        private readonly ICommonTraitAppService _commonTraitAppService;
+
+        public CatalogController(ICatalogAppService catalogAppService, ISpecialtyAppService specialtyAppService, ICommonTraitAppService commonTraitAppService)
         {
             _catalogAppService = catalogAppService;
             _specialtyAppService = specialtyAppService;
+            _commonTraitAppService = commonTraitAppService;
         }
 
         [AllowAnonymous]
@@ -109,14 +113,34 @@ namespace QuartierLatin.Backend.Controllers
                 await _catalogAppService.GetCatalogPageByFilter(lang, entityType, commonTraits,
                     catalogSearchDto.PageNumber, pageSize);
 
-            var universityDtos = catalogPage.Item2.Select(university => new CatalogSearchResponseDtoItem
+            var traitDic = await _commonTraitAppService.GetTraitsForEntityIds(EntityType.University,
+                catalogPage.Item2.Select(x => x.Item1.Id).ToList());
+
+            List<CommonTrait> GetTraits(string identifier, int id)
             {
-                Id = university.Item1.Id,
+                if (!traitDic.TryGetValue(id, out var traits))
+                    return new List<CommonTrait>();
+                return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
+            }
+
+            string GetName(CommonTrait trait, string lang)
+            {
+                return trait.Names.GetValueOrDefault(lang) ??
+                    trait.Names.GetValueOrDefault("en") ?? trait.Names.FirstOrDefault().Value;
+            }
+
+            var universityDtos = catalogPage.Item2.Select(university => new CatalogUniversityDto()
+            {
+                Url = $"/{lang}/university/{university.Item2.Url}",
                 Name = university.Item2.Name,
-                Price = university.cost
+                PriceFrom = university.cost,
+                PriceTo = university.cost,
+                Degrees = GetTraits("degree", university.Item1.Id).Select(x => GetName(x, lang)).ToList(),
+                InstructionLanguages = GetTraits("instruction-language", university.Item1.Id).Select(x => x.Identifier)
+                    .ToList()
             }).ToList();
 
-            var response = new CatalogSearchResponseDtoList
+            var response = new CatalogSearchResponseDtoList<CatalogUniversityDto>
             {
                 Items = universityDtos,
                 TotalPages = catalogPage.totalPages
