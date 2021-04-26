@@ -120,8 +120,8 @@ namespace QuartierLatin.Backend.Controllers
             var entityType = EntityType.University;
             const int pageSize = 10;
             var commonTraits =
-                catalogSearchDto.Filters.ToDictionary(filter => new CommonTraitType {Identifier = filter.Identifier}, filter =>
-                    filter.Values.Select(traits => new CommonTrait{Id = traits}).ToList());
+                catalogSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
+                    filter.Values);
 
             var catalogPage =
                 await _catalogAppService.GetCatalogPageByFilter(lang, entityType, commonTraits,
