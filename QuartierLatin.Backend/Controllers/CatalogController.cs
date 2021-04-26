@@ -27,8 +27,22 @@ namespace QuartierLatin.Backend.Controllers
             _commonTraitAppService = commonTraitAppService;
         }
 
+        // Compatibility with old urls
         [AllowAnonymous]
-        [HttpGet("/api/catalog-filters/university/{lang}")]
+        [HttpGet("/api/catalog-filters/{lang}/university")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public Task<IActionResult> GetCatalogByLangAndEntityTypeCompat(string lang) =>
+            GetCatalogByLangAndEntityType(lang);
+        
+        // Compatibility with old urls
+        [AllowAnonymous]
+        [HttpGet("/api/catalog-filters/{lang}/university/search")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public Task<IActionResult> SearchInCatalogCompat(string lang, [FromBody] CatalogSearchDto catalogSearchDto) =>
+            SearchInCatalog(lang, catalogSearchDto);
+        
+        [AllowAnonymous]
+        [HttpGet("/api/catalog/university/filters/{lang}")]
         public async Task<IActionResult> GetCatalogByLangAndEntityType(string lang)
         {
             var entityType = EntityType.University;
@@ -100,7 +114,7 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("/api/catalog-filters/search/university/{lang}")]
+        [HttpPost("/api/catalog/university/search/{lang}")]
         public async Task<IActionResult> SearchInCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
             var entityType = EntityType.University;

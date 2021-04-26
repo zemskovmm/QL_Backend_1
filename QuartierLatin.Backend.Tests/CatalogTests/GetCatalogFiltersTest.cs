@@ -58,7 +58,7 @@ namespace QuartierLatin.Backend.Tests.CatalogTests
             Assert.Contains(commonTraitCityId, commonTraitUniversityIdList);
             Assert.Contains(commonTraitDegreeId, commonTraitUniversityIdList);
 
-            var catalogFilterResponse = SendAnonRequest<CatalogFilterResponseDto>($"/api/catalog-filters/university/ru", null);
+            var catalogFilterResponse = SendAnonRequest<CatalogFilterResponseDto>($"/api/catalog/filters/university/ru", null);
             
             Assert.NotNull(catalogFilterResponse.Filters
                 .FirstOrDefault(filter => filter.Identifier == cityTraitType["identifier"].ToString()));
