@@ -39,9 +39,9 @@ namespace QuartierLatin.Backend.Application.Catalog
             return (university, universityLanguageDictionary);
         }
 
-        public async Task UpdateUniversityByIdAsync(int id, int? foundationYear, string website)
+        public async Task UpdateUniversityByIdAsync(int id, int? foundationYear)
         {
-            await _universityRepository.UpdateUniversityAsync(id, foundationYear, website);
+            await _universityRepository.UpdateUniversityAsync(id, foundationYear);
         }
 
         public async Task UpdateUniversityLanguageByIdAsync(int id, string description, int languageId, string name,
@@ -50,9 +50,9 @@ namespace QuartierLatin.Backend.Application.Catalog
             await _universityRepository.CreateOrUpdateUniversityLanguageAsync(id, languageId, name, description, url);
         }
 
-        public async Task<int> CreateUniversityAsync(int? universityFoundationYear, string universityWebsite)
+        public async Task<int> CreateUniversityAsync(int? universityFoundationYear)
         {
-            return await _universityRepository.CreateUniversityAsync(universityFoundationYear, universityWebsite);
+            return await _universityRepository.CreateUniversityAsync(universityFoundationYear);
         }
 
         public async Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage)
@@ -60,10 +60,8 @@ namespace QuartierLatin.Backend.Application.Catalog
             await _universityRepository.CreateUniversityLanguageListAsync(universityLanguage);
         }
 
-        public async Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityId(int universityId)
-        {
-            return await _universityRepository.GetSpecialtiesUniversityByUniversityIdList(universityId);
-        }
+        public Task<List<Specialty>> GetSpecialtiesUniversityByUniversityId(int universityId) =>
+            _universityRepository.GetSpecialtiesUniversityByUniversityIdList(universityId);
 
         public async Task<(University, Dictionary<int, UniversityLanguage>)> GetUniversityByUrlWithLanguage(int languageId, string url)
         {

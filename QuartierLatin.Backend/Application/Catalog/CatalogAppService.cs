@@ -42,7 +42,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             return response;
         }
 
-        public async Task<(int totalPages, List<(University, UniversityLanguage, int cost)>)> GetCatalogPageByFilter(
+        public async Task<(int totalItems, List<(University, UniversityLanguage, int costGroup)>)> GetCatalogPageByFilter(
             string lang, EntityType entityType,
             Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize)
         {
@@ -50,7 +50,7 @@ namespace QuartierLatin.Backend.Application.Catalog
                 .ToDictionary(x => string.IsNullOrWhiteSpace(x.Identifier) ? "trait-" + x.Id : x.Identifier);
 
             var commonTraitsIds = commonTraits
-                .Where(trait => trait.Key != "specialty-category" || trait.Key != "price")
+                .Where(trait => trait.Key != "specialty-category" && trait.Key != "price" && trait.Key != "degree")
                 .Select(x => x.Value).ToList();
 
             var specialtyCategoriesId = new List<int>();
@@ -62,6 +62,8 @@ namespace QuartierLatin.Backend.Application.Catalog
             if(specialtyCategories.Value != null)
                 specialtyCategoriesId = specialtyCategories.Value.ToList();
 
+            var degrees = commonTraits.FirstOrDefault(x => x.Key == "degree").Value?.ToList() ?? new List<int>();
+
             var priceFilters = commonTraits
                 .FirstOrDefault(price => price.Key == "price");
 
@@ -70,7 +72,8 @@ namespace QuartierLatin.Backend.Application.Catalog
 
             var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
 
-            return await _universityRepository.GetUniversityPageByFilter(commonTraitsIds, specialtyCategoriesId, priceFiltersId, langId, pageSize * pageNumber, pageSize);
+            return await _universityRepository.GetUniversityPageByFilter(commonTraitsIds, specialtyCategoriesId, degrees,
+                priceFiltersId, langId, pageSize * pageNumber, pageSize);
         }
     }
 }

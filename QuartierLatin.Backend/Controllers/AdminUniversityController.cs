@@ -33,8 +33,8 @@ namespace QuartierLatin.Backend.Controllers
                 {
                     Id = university.Item1.Id,
                     FoundationYear = university.Item1.FoundationYear,
-                    MinimumAge = university.Item1.MinimumAge,
-                    Website = university.Item1.Website,
+                    MinimumAge = 18,
+                    Website = "/",
                     Languages = university.Item2.ToDictionary(university => _languageRepository
                         .GetLanguageShortNameAsync(university.Key)
                         .ConfigureAwait(false)
@@ -55,7 +55,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> CreateUniversity([FromBody] UniversityDto university)
         {
             var universityId =
-                await _universityAppService.CreateUniversityAsync(university.FoundationYear, university.Website);
+                await _universityAppService.CreateUniversityAsync(university.FoundationYear);
 
             var universityLanguage = university.Languages.Select(university => new UniversityLanguage
             {
@@ -83,8 +83,6 @@ namespace QuartierLatin.Backend.Controllers
             var response = new UniversityDto
             {
                 FoundationYear = university.Item1.FoundationYear,
-                Website = university.Item1.Website,
-                MinimumAge = university.Item1.MinimumAge,
                 Languages = university.Item2.ToDictionary(university => _languageRepository
                     .GetLanguageShortNameAsync(university.Key)
                     .ConfigureAwait(false)
@@ -103,8 +101,7 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUniversityById([FromBody] UniversityDto universityDto, int id)
         {
-            await _universityAppService.UpdateUniversityByIdAsync(id, universityDto.FoundationYear,
-                universityDto.Website);
+            await _universityAppService.UpdateUniversityByIdAsync(id, universityDto.FoundationYear);
 
             foreach (var universityLanguage in universityDto.Languages)
             {

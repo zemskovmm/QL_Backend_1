@@ -36,6 +36,8 @@ namespace QuartierLatin.Backend.Database
         public ITable<CommonTraitType> CommonTraitTypes => GetTable<CommonTraitType>();
         public ITable<CommonTraitsToUniversity> CommonTraitsToUniversities => GetTable<CommonTraitsToUniversity>();
         public ITable<CommonTraitTypesForEntity> CommonTraitTypesForEntities => GetTable<CommonTraitTypesForEntity>();
+        public ITable<Degree> Degrees => GetTable<Degree>();
+        public ITable<UniversityDegree> UniversityDegrees => GetTable<UniversityDegree>();
     }
 
     public interface IAppDbConnectionFactory

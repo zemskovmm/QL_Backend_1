@@ -1,7 +1,7 @@
 using System.Text;
 using NickBuhro.Translit;
 
-namespace QuartierLatin.Backend.Utils
+namespace QuartierLatin.Importer.DataModel
 {
     public class Urlizer
     {

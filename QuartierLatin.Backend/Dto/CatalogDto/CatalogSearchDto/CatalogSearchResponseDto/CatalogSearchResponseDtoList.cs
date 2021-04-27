@@ -7,6 +7,7 @@ namespace QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchRes
         public int TotalPages { get; set; }
 
         public List<T> Items { get; set; }
+        public int TotalItems { get; set; }
     }
 
     public class CatalogUniversityDto

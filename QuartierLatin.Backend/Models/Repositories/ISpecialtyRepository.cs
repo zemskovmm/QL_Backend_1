@@ -10,6 +10,6 @@ namespace QuartierLatin.Backend.Models.Repositories
     {
         Task<Specialty> GetSpecialtyById(int specialtyId);
         Task<List<SpecialtyCategory>> GetSpecialtyCategoryList();
-        Task<List<(Specialty, int, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId);
+        Task<List<Specialty>> GetSpecialtiesUniversityByUniversityId(int universityId);
     }
 }

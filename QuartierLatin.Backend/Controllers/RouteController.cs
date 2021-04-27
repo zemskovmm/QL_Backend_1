@@ -9,6 +9,8 @@ using QuartierLatin.Backend.Models.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -20,10 +22,12 @@ namespace QuartierLatin.Backend.Controllers
         private readonly ICommonTraitTypeAppService _traitTypeAppService;
         private readonly IUniversityAppService _universityAppService;
         private readonly ISpecialtyAppService _specialtyAppService;
+        private readonly IDegreeRepository _degreeRepository;
 
         public RouteController(IRouteAppService routeAppService, IUniversityAppService universityAppService,
             ILanguageRepository languageRepository, ICommonTraitAppService commonTraitAppService,
-            ICommonTraitTypeAppService traitTypeAppService, ISpecialtyAppService specialtyAppService)
+            ICommonTraitTypeAppService traitTypeAppService, ISpecialtyAppService specialtyAppService,
+            IDegreeRepository degreeRepository)
         {
             _routeAppService = routeAppService;
             _universityAppService = universityAppService;
@@ -31,6 +35,7 @@ namespace QuartierLatin.Backend.Controllers
             _commonTraitAppService = commonTraitAppService;
             _traitTypeAppService = traitTypeAppService;
             _specialtyAppService = specialtyAppService;
+            _degreeRepository = degreeRepository;
         }
 
         [HttpGet("/api/route/{lang}/{**route}")]
@@ -89,12 +94,20 @@ namespace QuartierLatin.Backend.Controllers
             var specialtiesUniversity =
                 await _specialtyAppService.GetSpecialtiesUniversityByUniversityId(university.Item1.Id);
 
+            var degreesForUniversity = await _degreeRepository.GetDegreesForUniversity(university.Item1.Id);
+            
             var universityTraits = new UniversityModuleTraitsDto
             {
                 NamedTraits = traits,
                 UniversitySpecialties = specialtiesUniversity.Select(specialties => new UniversitySpecialtiesDto
                 {
-                    Name = specialties.Item1.Names[lang], Cost = specialties.Item2
+                    Name = specialties.Names.GetSuitableName(lang)
+                }).ToList(),
+                UniversityDegrees = degreesForUniversity.Select(x=>new UniversityDegreeDto()
+                {
+                    Name = x.degree.Names.GetSuitableName(lang),
+                    CostFrom = CostGroup.GetCostGroup(x.costGroup).from,
+                    CostTo = CostGroup.GetCostGroup(x.costGroup).to
                 }).ToList()
             };
 
@@ -102,6 +115,7 @@ namespace QuartierLatin.Backend.Controllers
             {
                 Title = university.Item2[languageId].Name,
                 DescriptionHtml = university.Item2[languageId].Description,
+                FoundationYear = university.Item1.FoundationYear,
                 Traits = universityTraits
             };
 
