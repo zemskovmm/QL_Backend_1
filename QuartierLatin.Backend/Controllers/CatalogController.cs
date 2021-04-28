@@ -185,6 +185,7 @@ namespace QuartierLatin.Backend.Controllers
             var universityDtos = catalogPage.Item2.Select(university => new CatalogUniversityDto()
             {
                 Url = $"/{lang}/university/{university.Item2.Url}",
+                LanglessUrl = $"/university/{university.Item2.Url}",
                 Name = university.Item2.Name,
                 PriceFrom = CostGroup.GetCostGroup(university.costGroup).from,
                 PriceTo = CostGroup.GetCostGroup(university.costGroup).to,
