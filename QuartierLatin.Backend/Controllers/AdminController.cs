@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
+using QuartierLatin.Backend.Utils;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -27,12 +26,12 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(new PageListDto
             {
-                TotalPages = FilterHelper.PageCount(result.Item2.totalResults, pageSize),
-                Results = result.Item2.results.Select(x => new PageListItemDto
+                TotalPages = FilterHelper.PageCount(result.result.totalResults, pageSize),
+                Results = result.result.results.Select(x => new PageListItemDto
                 {
                     Id = x.id,
-                    Titles = x.pages.ToDictionary(x => result.Item1[x.LanguageId], x => x.Title),
-                    Urls = x.pages.ToDictionary(x => result.Item1[x.LanguageId], x => x.Url)
+                    Titles = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Title),
+                    Urls = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Url)
                 }).ToList()
             });
         }

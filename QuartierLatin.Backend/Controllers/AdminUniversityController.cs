@@ -31,11 +31,11 @@ namespace QuartierLatin.Backend.Controllers
 
             var response = universityList.Select(university => new UniversityListDto
                 {
-                    Id = university.Item1.Id,
-                    FoundationYear = university.Item1.FoundationYear,
-                    MinimumAge = university.Item1.MinimumAge,
-                    Website = university.Item1.Website,
-                    Languages = university.Item2.ToDictionary(university => _languageRepository
+                    Id = university.university.Id,
+                    FoundationYear = university.university.FoundationYear,
+                    MinimumAge = university.university.MinimumAge,
+                    Website = university.university.Website,
+                    Languages = university.universityLanguage.ToDictionary(university => _languageRepository
                         .GetLanguageShortNameAsync(university.Key)
                         .ConfigureAwait(false)
                         .GetAwaiter()
@@ -82,10 +82,10 @@ namespace QuartierLatin.Backend.Controllers
 
             var response = new UniversityDto
             {
-                FoundationYear = university.Item1.FoundationYear,
-                Website = university.Item1.Website,
-                MinimumAge = university.Item1.MinimumAge,
-                Languages = university.Item2.ToDictionary(university => _languageRepository
+                FoundationYear = university.university.FoundationYear,
+                Website = university.university.Website,
+                MinimumAge = university.university.MinimumAge,
+                Languages = university.universityLanguage.ToDictionary(university => _languageRepository
                     .GetLanguageShortNameAsync(university.Key)
                     .ConfigureAwait(false)
                     .GetAwaiter()

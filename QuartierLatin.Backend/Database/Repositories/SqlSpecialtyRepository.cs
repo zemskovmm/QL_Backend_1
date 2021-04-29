@@ -1,10 +1,9 @@
-﻿using System;
+﻿using LinqToDB;
+using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LinqToDB;
-using QuartierLatin.Backend.Models.CatalogModels;
-using QuartierLatin.Backend.Models.Repositories;
 
 namespace QuartierLatin.Backend.Database.Repositories
 {
@@ -27,9 +26,9 @@ namespace QuartierLatin.Backend.Database.Repositories
             return await _db.ExecAsync(db => db.Specialties.FirstOrDefaultAsync(specialty => specialty.Id == specialtyId));
         }
 
-        public async Task<List<(Specialty, int, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId)
+        public async Task<List<(Specialty specialty, int costFrom, int costTo)>> GetSpecialtiesUniversityByUniversityIdList(int universityId)
         {
-            var response = new List<(Specialty, int, int)>();
+            var response = new List<(Specialty specialty, int costFrom, int costTo)>();
 
             var universitySpecialty = await _db.ExecAsync(db =>
                 db.UniversitySpecialties.Where(speciallty => speciallty.UniversityId == universityId).ToListAsync());

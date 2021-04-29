@@ -114,7 +114,7 @@ namespace QuartierLatin.Backend.Controllers
                     catalogSearchDto.PageNumber, pageSize);
 
             var traitDic = await _commonTraitAppService.GetTraitsForEntityIds(EntityType.University,
-                catalogPage.Item2.Select(x => x.Item1.Id).ToList());
+                catalogPage.universities.Select(x => x.university.Id).ToList());
 
             List<CommonTrait> GetTraits(string identifier, int id)
             {
@@ -131,12 +131,12 @@ namespace QuartierLatin.Backend.Controllers
 
             var universityDtos = catalogPage.Item2.Select(university => new CatalogUniversityDto()
             {
-                Url = $"/{lang}/university/{university.Item2.Url}",
+                Url = $"/{lang}/university/{university.universityLanguage.Url}",
                 Name = university.Item2.Name,
                 PriceFrom = university.cost,
                 PriceTo = university.cost,
-                Degrees = GetTraits("degree", university.Item1.Id).Select(x => GetName(x, lang)).ToList(),
-                InstructionLanguages = GetTraits("instruction-language", university.Item1.Id).Select(x => x.Identifier)
+                Degrees = GetTraits("degree", university.university.Id).Select(x => GetName(x, lang)).ToList(),
+                InstructionLanguages = GetTraits("instruction-language", university.university.Id).Select(x => x.Identifier)
                     .ToList()
             }).ToList();
 

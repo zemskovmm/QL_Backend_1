@@ -75,22 +75,6 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 db.UniversityLanguages.Where(university => university.Url == url).Select(university => university.UniversityId).FirstAsync());
         }
 
-        public async Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId)
-        {
-            var response = new List<(Specialty, int)>();
-
-            var universitySpecialty = await _db.ExecAsync(db =>
-                db.UniversitySpecialties.Where(speciallty => speciallty.UniversityId == universityId).ToListAsync());
-
-            foreach (var specialty in universitySpecialty)
-            {
-                var specialtyEntity = await GetSpecialtyById(specialty.SpecialtyId);
-                response.Add((specialtyEntity, specialty.CostTo));
-            }
-
-            return response;
-        }
-
         public async Task<Specialty> GetSpecialtyById(int specialtyId)
         {
             return await _db.ExecAsync(db => db.Specialties.FirstOrDefaultAsync(specialty => specialty.Id == specialtyId));
@@ -103,7 +87,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .Select(university => university.UniversityId).FirstAsync());
         }
 
-        public async Task<(int totalPages, List<(University, UniversityLanguage, int cost)>)> GetUniversityPageByFilter(List<List<int>> commonTraitGroups, List<int> specialtyCategoriesId, List<int> priceIds, int languageId, int skip, int take)
+        public async Task<(int totalPages, List<(University university, UniversityLanguage universityLanguage, int cost)> universities)> GetUniversityPageByFilter(List<List<int>> commonTraitGroups, List<int> specialtyCategoriesId, List<int> priceIds, int languageId, int skip, int take)
         {
             var pageSize = take;
 
@@ -173,9 +157,9 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 
                 var pageCount = FilterHelper.PageCount(totalCount, pageSize);
 
-                return (pageCount,
+                return (totalPages: pageCount, universities:
                     (await universitiesWithLanguages.OrderBy(x => x.uni.Id).Skip(skip).Take(take).ToListAsync())
-                    .Select(x => (x.uni, x.lang, x.CostFrom)).ToList());
+                    .Select(x => (university: x.uni, universityLanguage: x.lang, cost: x.CostFrom)).ToList());
             });
         }
 

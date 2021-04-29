@@ -1,8 +1,6 @@
-﻿using System;
+﻿using QuartierLatin.Backend.Models.CatalogModels;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models.CatalogModels;
 
 namespace QuartierLatin.Backend.Models.Repositories
 {
@@ -10,6 +8,6 @@ namespace QuartierLatin.Backend.Models.Repositories
     {
         Task<Specialty> GetSpecialtyById(int specialtyId);
         Task<List<SpecialtyCategory>> GetSpecialtyCategoryList();
-        Task<List<(Specialty, int, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId);
+        Task<List<(Specialty specialty, int costFrom, int costTo)>> GetSpecialtiesUniversityByUniversityIdList(int universityId);
     }
 }

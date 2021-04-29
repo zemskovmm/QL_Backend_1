@@ -21,7 +21,7 @@ namespace QuartierLatin.Backend.Application.Interfaces
 
         Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData)> languages);
 
-        Task<(Dictionary<int, string>, (int totalResults, List<(int id, List<Page> pages)> results))>
+        Task<(Dictionary<int, string> lang, (int totalResults, List<(int id, List<Page> pages)> results) result)>
             GetPageListBySearch(int page, string search, int pageSize);
     }
 }

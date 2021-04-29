@@ -17,7 +17,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             _universityRepository = universityRepository;
         }
 
-        public async Task<List<(University, Dictionary<int, UniversityLanguage>)>> GetUniversityListAsync()
+        public async Task<List<(University university, Dictionary<int, UniversityLanguage> universityLanguage)>> GetUniversityListAsync()
         {
             var universityIdList = await _universityRepository.GetUniversityIdListAsync();
 
@@ -29,14 +29,14 @@ namespace QuartierLatin.Backend.Application.Catalog
             return response;
         }
 
-        public async Task<(University, Dictionary<int, UniversityLanguage>)> GetUniversityByIdAsync(int id)
+        public async Task<(University university, Dictionary<int, UniversityLanguage> universityLanguage)> GetUniversityByIdAsync(int id)
         {
             var university = await _universityRepository.GetUniversityByIdAsync(id);
 
             var universityLanguageDictionary =
                 await _universityRepository.GetUniversityLanguageByUniversityIdAsync(university.Id);
 
-            return (university, universityLanguageDictionary);
+            return (university : university, universityLanguage: universityLanguageDictionary);
         }
 
         public async Task UpdateUniversityByIdAsync(int id, int? foundationYear, string website)
@@ -60,12 +60,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             await _universityRepository.CreateUniversityLanguageListAsync(universityLanguage);
         }
 
-        public async Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityId(int universityId)
-        {
-            return await _universityRepository.GetSpecialtiesUniversityByUniversityIdList(universityId);
-        }
-
-        public async Task<(University, Dictionary<int, UniversityLanguage>)> GetUniversityByUrlWithLanguage(int languageId, string url)
+        public async Task<(University university, Dictionary<int, UniversityLanguage> universityLanguage)> GetUniversityByUrlWithLanguage(int languageId, string url)
         {
             var id = await _universityRepository.GetUniversityIdByUrlAndLanguage(languageId, url);
 
@@ -73,7 +68,7 @@ namespace QuartierLatin.Backend.Application.Catalog
 
             var universityLanguage = await _universityRepository.GetUniversityLanguageByUniversityIdAsync(id);
 
-            return (university, universityLanguage);
+            return (university: university, universityLanguage: universityLanguage);
         }
     }
 }

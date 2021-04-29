@@ -14,9 +14,8 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task<int> CreateUniversityAsync(int? foundationYear, string website);
         Task UpdateUniversityAsync(int id, int? foundationYear, string website);
         Task<int> GetUniversityIdByUrl(string url);
-        Task<List<(Specialty, int)>> GetSpecialtiesUniversityByUniversityIdList(int universityId);
         Task<Specialty> GetSpecialtyById(int specialtyId);
         Task<int> GetUniversityIdByUrlAndLanguage(int languageId, string url);
-        Task<(int totalPages, List<(University, UniversityLanguage, int cost)>)> GetUniversityPageByFilter(List<List<int>> commonTraitGroups, List<int> specialtyCategoriesId, List<int> priceIds, int languageId, int skip, int take);
+        Task<(int totalPages, List<(University university, UniversityLanguage universityLanguage, int cost)> universities)> GetUniversityPageByFilter(List<List<int>> commonTraitGroups, List<int> specialtyCategoriesId, List<int> priceIds, int languageId, int skip, int take);
     }
 }

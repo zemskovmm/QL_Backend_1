@@ -4,17 +4,19 @@ using QuartierLatin.Backend.Utils;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using QuartierLatin.Backend.Config;
 
 namespace QuartierLatin.Backend.Application
 {
     public class CallRequestAppService : ICallRequestAppService
     {
         private readonly HttpClient _httpClient;
-        public CallRequestAppService()
+        public CallRequestAppService(IOptions<CallRequestConfig> config)
         {
             _httpClient = new HttpClient()
             {
-                BaseAddress = new Uri("https://quartier-latin.bitrix24.ru/rest/1/5pztfbh58cj13oor/crm.lead.add.json")
+                BaseAddress = new Uri(config.Value.RequestUrl)
             };
         }
 

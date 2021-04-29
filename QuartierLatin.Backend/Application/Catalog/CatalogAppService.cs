@@ -26,7 +26,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             _languageRepository = languageRepository;
         }
 
-        public async Task<List<(CommonTraitType, List<CommonTrait>)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType)
+        public async Task<List<(CommonTraitType commonTraitType, List<CommonTrait> commonTraits)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType)
         {
             var traitTypes = await _commonTraitTypeRepository.GetTraitTypesWithIndetifierByEntityTypeAsync(entityType);
 
@@ -36,13 +36,13 @@ namespace QuartierLatin.Backend.Application.Catalog
 
 
             var response =
-                traitTypes.Select(trait => (trait, list: traits.GetValueOrDefault(trait.Id))).Where(x => x.list != null)
+                traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id))).Where(x => x.commonTraits != null)
                     .ToList();
 
             return response;
         }
 
-        public async Task<(int totalPages, List<(University, UniversityLanguage, int cost)>)> GetCatalogPageByFilter(string lang, EntityType entityType,
+        public async Task<(int totalPages, List<(University university, UniversityLanguage universityLanguage, int cost)> universities)> GetCatalogPageByFilter(string lang, EntityType entityType,
             Dictionary<CommonTraitType, List<CommonTrait>> commonTraits, int pageNumber, int pageSize)
         {
             var commonTraitsIds = commonTraits.Where(trait => trait.Key.Identifier != "specialty-category" || trait.Key.Identifier != "price")
