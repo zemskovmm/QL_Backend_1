@@ -238,7 +238,8 @@ namespace QuartierLatin.Backend.Cmdlets
             await db.UniversityDegrees.TruncateAsync();
             await db.Degrees.DeleteAsync();
             
-            await db.ExecuteAsync("SELECT setval('\"Degrees_Id_seq\"', 1)");
+            await db.ExecuteAsync("ALTER SEQUENCE \"Degrees_Id_seq\" RESTART WITH 1;");
+            //await db.ExecuteAsync("SELECT setval('\"Degrees_Id_seq\"', 1)");
             var degreesDic = new Dictionary<ImporterUniversityDegree, int>();
             foreach (var t in new[]
             {
@@ -311,6 +312,17 @@ namespace QuartierLatin.Backend.Cmdlets
                         });
                     }
                 }
+            }
+
+            db.UniversitySpecialties.Truncate();
+            foreach (var uni in import.Universities)
+            {
+                foreach (var spec in uni.Specialties)
+                    db.Insert(new UniversitySpecialty
+                    {
+                        SpecialtyId = specDic[spec],
+                        UniversityId = uni.Id
+                    });
             }
         }
     }

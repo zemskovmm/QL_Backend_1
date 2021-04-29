@@ -166,20 +166,17 @@ namespace QuartierLatin.Backend.Controllers
                 await _catalogAppService.GetCatalogPageByFilter(lang, entityType, commonTraits,
                     catalogSearchDto.PageNumber, pageSize);
 
+            var universityIds = catalogPage.Item2.Select(x => x.Item1.Id).ToList();
             var traitDic = await _commonTraitAppService.GetTraitsForEntityIds(EntityType.University,
-                catalogPage.Item2.Select(x => x.Item1.Id).ToList());
+                universityIds);
+
+            var degreeDic = await _degreeRepository.GetDegreesForUniversities(universityIds);
 
             List<CommonTrait> GetTraits(string identifier, int id)
             {
                 if (!traitDic.TryGetValue(id, out var traits))
                     return new List<CommonTrait>();
                 return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
-            }
-
-            string GetName(CommonTrait trait, string lang)
-            {
-                return trait.Names.GetValueOrDefault(lang) ??
-                    trait.Names.GetValueOrDefault("en") ?? trait.Names.FirstOrDefault().Value;
             }
 
             var universityDtos = catalogPage.Item2.Select(university => new CatalogUniversityDto()
@@ -189,7 +186,8 @@ namespace QuartierLatin.Backend.Controllers
                 Name = university.Item2.Name,
                 PriceFrom = CostGroup.GetCostGroup(university.costGroup).from,
                 PriceTo = CostGroup.GetCostGroup(university.costGroup).to,
-                Degrees = GetTraits("degree", university.Item1.Id).Select(x => GetName(x, lang)).ToList(),
+                Degrees = degreeDic.GetValueOrDefault(university.Item2.UniversityId)
+                    ?.Select(x => x.Names.GetSuitableName(lang)).ToList() ?? new List<string>(),
                 InstructionLanguages = GetTraits("instruction-language", university.Item1.Id).Select(x => x.Identifier)
                     .ToList()
             }).ToList();

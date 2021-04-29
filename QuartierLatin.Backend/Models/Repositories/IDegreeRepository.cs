@@ -8,5 +8,6 @@ namespace QuartierLatin.Backend.Models.Repositories
     {
         Task<List<(Degree degree, int costGroup)>> GetDegreesForUniversity(int universityId);
         Task<List<Degree>> GetAll();
+        Task<Dictionary<int, List<Degree>>> GetDegreesForUniversities(List<int> universityIds);
     }
 }

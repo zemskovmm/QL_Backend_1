@@ -23,5 +23,12 @@ namespace QuartierLatin.Backend.Database.Repositories
                 .Select(x => (x.degree, x.CostGroup)).ToList());
 
         public Task<List<Degree>> GetAll() => _db.ExecAsync(db => db.Degrees.ToListAsync());
+
+        public Task<Dictionary<int, List<Degree>>> GetDegreesForUniversities(List<int> universityIds) =>
+            _db.ExecAsync(async db => ((await (from map in db.UniversityDegrees.Where(x => universityIds.Contains(x.UniversityId))
+                    join degree in db.Degrees on map.DegreeId equals degree.Id
+                    select new {map, degree}).ToListAsync())
+                .GroupBy(x => x.map.UniversityId)
+                .ToDictionary(x => x.Key, x => x.Select(d => d.degree).ToList())));
     }
 }
