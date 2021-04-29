@@ -4,18 +4,22 @@ using QuartierLatin.Backend.Utils;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace QuartierLatin.Backend.Application
 {
     public class CallRequestAppService : ICallRequestAppService
     {
         private readonly HttpClient _httpClient;
-        public CallRequestAppService()
+        private readonly ILogger _logger;
+
+        public CallRequestAppService(ILoggerFactory loggerFactory)
         {
             _httpClient = new HttpClient()
             {
                 BaseAddress = new Uri("https://quartier-latin.bitrix24.ru/rest/1/5pztfbh58cj13oor/crm.lead.add.json")
             };
+            _logger = loggerFactory.CreateLogger(nameof(CallRequestAppService));
         }
 
         public async Task<bool> SendCallRequest(CallRequest requestCall)
@@ -25,7 +29,12 @@ namespace QuartierLatin.Backend.Application
                 requestCall.FirstName, requestCall.LastName, requestCall.Phone, requestCall.Email,
                 requestCall.Comment + "\r\n" + requestCall.Comment);
 
+            var req = await content.ReadAsStringAsync();
+
+            _logger.LogInformation("Sending " + req);
             var response = await _httpClient.PostAsync(_httpClient.BaseAddress, content);
+            _logger.LogInformation("Got response " + await response.Content.ReadAsStringAsync());
+            
 
             return response.IsSuccessStatusCode;
         }
