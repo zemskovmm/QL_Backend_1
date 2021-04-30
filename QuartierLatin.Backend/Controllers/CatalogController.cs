@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.CatalogDto;
@@ -157,7 +158,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> SearchInCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
             var entityType = EntityType.University;
-            const int pageSize = 10;
+            var pageSize = catalogSearchDto.PageSize ?? 1000; 
             var commonTraits =
                 catalogSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
                     filter.Values);
