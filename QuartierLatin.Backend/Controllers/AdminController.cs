@@ -4,6 +4,9 @@ using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Controllers
@@ -13,10 +16,12 @@ namespace QuartierLatin.Backend.Controllers
     public class AdminController : Controller
     {
         private readonly IPageAppService _pageAppService;
+        private readonly ILanguageRepository _languageRepository;
 
-        public AdminController(IPageAppService pageAppService)
+        public AdminController(IPageAppService pageAppService, ILanguageRepository languageRepository)
         {
             _pageAppService = pageAppService;
+            _languageRepository = languageRepository;
         }
 
         [HttpGet(), ProducesResponseType(typeof(PageListDto), 200)]
@@ -53,14 +58,26 @@ namespace QuartierLatin.Backend.Controllers
                 x => (x.Value.Url, x.Value.Title, x.Value.PageData)));
             return Ok(new {id = id});
         }
-        
+
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPage(int id, [FromBody] PageDto createPageDto)
+        public async Task<IActionResult> GetPage(int id)
         {
-            await _pageAppService.UpdatePage(id, createPageDto.Languages.ToDictionary(x => x.Key,
-                x => (x.Value.Url, x.Value.Title, x.Value.PageData)));
-            return Ok(new {id = id});
+            var allLangs = (await _languageRepository.GetLanguageListAsync())
+                .ToDictionary(x => x.Id, x => x.LanguageShortName);
+            var pageLangs = (await _pageAppService.GetPageLanguages(id))
+                .ToDictionary(x => allLangs[x.LanguageId]);
+
+            return Ok(new PageDto
+            {
+                Languages = pageLangs.ToDictionary(x => x.Key,
+                    x => new PageLanguageDto()
+                    {
+                        Url = x.Value.Url,
+                        Title = x.Value.Title,
+                        PageData = JObject.Parse(x.Value.PageData)
+                    })
+            });
         }
-        
+
     }
 }

@@ -122,7 +122,7 @@ namespace QuartierLatin.Backend.Controllers
             filters.Add(new CatalogFilterDto
             {
                 Identifier = "degree",
-                Name = priceLangs.GetSuitableName(lang),
+                Name = degreeLangs.GetSuitableName(lang),
                 Options = degrees.Select(degree =>
                     new CatalogOptionsDto
                     {

@@ -59,6 +59,7 @@ namespace QuartierLatin.Importer
                         .Trim().Replace("\n", " ");
                     while (name.Contains("  "))
                         name = name.Replace("  ", " ");
+                    n.Remove();
                     break;
                 }
             }
@@ -113,6 +114,11 @@ namespace QuartierLatin.Importer
                 }
             }
 
+            foreach (var p in body.Descendants().Where(x => x.Name.ToLowerInvariant() == "p").ToList())
+            {
+                if(p.InnerText.Trim().Length == 0)
+                    p.Remove();
+            }
 
             return new ImporterUniversityLanguage
             {
