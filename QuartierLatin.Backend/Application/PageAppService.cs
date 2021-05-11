@@ -46,12 +46,12 @@ namespace QuartierLatin.Backend.Application
 
         public Task<IList<Page>> GetPageLanguages(int id) => _pageRepository.GetPagesByPageRootIdAsync(id);
 
-        public async Task<(Dictionary<int, string>, (int totalResults, List<(int id, List<Page> pages)> results))> GetPageListBySearch(int page, string search, int pageSize)
+        public async Task<(Dictionary<int, string> lang, (int totalResults, List<(int id, List<Page> pages)> results) result)> GetPageListBySearch(int page, string search, int pageSize)
         {
             var langs = await _languageRepository.GetLanguageIdWithShortNameAsync();
             var results = await _pageRepository.GetPageRootsWithPagesAsync(search, pageSize * page, pageSize);
 
-            return (langs, results);
+            return (lang: langs, result: results);
         }
 
         public async Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url)

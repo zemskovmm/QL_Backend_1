@@ -26,7 +26,7 @@ namespace QuartierLatin.Backend.Application.Catalog
             _languageRepository = languageRepository;
         }
 
-        public async Task<List<(CommonTraitType, List<CommonTrait>)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType)
+        public async Task<List<(CommonTraitType commonTraitType, List<CommonTrait> commonTraits)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType)
         {
             var traitTypes = await _commonTraitTypeRepository.GetTraitTypesWithIndetifierByEntityTypeAsync(entityType);
 
@@ -36,7 +36,7 @@ namespace QuartierLatin.Backend.Application.Catalog
 
 
             var response =
-                traitTypes.Select(trait => (trait, list: traits.GetValueOrDefault(trait.Id))).Where(x => x.list != null)
+                traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id))).Where(x => x.commonTraits != null)
                     .ToList();
 
             return response;

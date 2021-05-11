@@ -92,7 +92,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .Select(university => university.UniversityId).FirstAsync());
         }
 
-        public async Task<(int totalItems, List<(University, UniversityLanguage, int cost)>)> GetUniversityPageByFilter(List<List<int>> commonTraitGroups,
+        public async Task<(int totalItems, List<(University university, UniversityLanguage universityLanguage, int cost)>)> GetUniversityPageByFilter(List<List<int>> commonTraitGroups,
             List<int> specialtyCategoriesId, List<int> degreeIds, List<int> priceIds, int languageId, int skip, int take)
         {
             return await _db.ExecAsync(async db =>
@@ -155,7 +155,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 
                 return (totalCount,
                     (await universitiesWithLanguages.OrderBy(x => x.uni.Id).Skip(skip).Take(take).ToListAsync())
-                    .Select(x => (x.uni, x.lang, x.costGroup)).ToList());
+                    .Select(x => (university: x.uni, universityLanguage: x.lang, cost: x.costGroup)).ToList());
             });
         }
 

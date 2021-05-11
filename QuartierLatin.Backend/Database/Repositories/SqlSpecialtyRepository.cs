@@ -1,10 +1,9 @@
-﻿using System;
+﻿using LinqToDB;
+using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LinqToDB;
-using QuartierLatin.Backend.Models.CatalogModels;
-using QuartierLatin.Backend.Models.Repositories;
 
 namespace QuartierLatin.Backend.Database.Repositories
 {

@@ -1,8 +1,6 @@
-﻿using System;
+﻿using QuartierLatin.Backend.Models.CatalogModels;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models.CatalogModels;
 
 namespace QuartierLatin.Backend.Models.Repositories
 {

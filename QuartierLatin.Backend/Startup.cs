@@ -150,6 +150,8 @@ namespace QuartierLatin.Backend
             else
                 services.AddSingleton<IAzureAdClient, NoopAzureAdClient>();
 
+            services.Configure<CallRequestConfig>(Configuration.GetSection("CallRequest"));
+
             services.AddRazorPages().AddNewtonsoftJson();
         }
 
