@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using QuartierLatin.Backend.Cmdlets;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend
 {
@@ -65,7 +66,7 @@ namespace QuartierLatin.Backend
                     cb.Sources.Clear();
                     cb.AddJsonFile("config.defaults.json")
                         .AddJsonFile("config.local.json", true)
-                        .AddJsonFile("/apps/quartier-admin/wd/quartier-config.json", true)
+                        .AddConfigFromArguments(args)
                         .AddEnvironmentVariables()
                         .AddCommandLine(args);
                 }).UseStartup<Startup>();
