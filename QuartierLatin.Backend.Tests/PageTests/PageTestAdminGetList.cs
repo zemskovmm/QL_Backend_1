@@ -35,9 +35,9 @@ namespace QuartierLatin.Backend.Tests.PageTests
 
             var result = SendAdminRequest<PageListDto>($"/api/admin/pages/?page={page}&search={search}", null);
 
-            id = result.Results.FirstOrDefault(page => page.Titles.ContainsValue(search)).Id;
+            var responseId = result.Results.FirstOrDefault(page => page.Titles.ContainsValue(search)).Id;
 
-            Assert.Equal(pageId, id);
+            Assert.Equal(id, responseId);
         }
 
         public static IEnumerable<object[]> Data()

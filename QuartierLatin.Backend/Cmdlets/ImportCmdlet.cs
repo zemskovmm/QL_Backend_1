@@ -17,6 +17,8 @@ using QuartierLatin.Backend.Database;
 using QuartierLatin.Backend.Database.AppDbContextSeed;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
+using QuartierLatin.Backend.Utils;
+using QuartierLatin.Importer;
 using QuartierLatin.Importer.DataModel;
 
 namespace QuartierLatin.Backend.Cmdlets
@@ -38,50 +40,41 @@ namespace QuartierLatin.Backend.Cmdlets
             _dbConfig = config.GetSection("Database").Get<DatabaseConfig>();
         }
 
-
-
-        static string Urlize(string name)
-        {
-            name = Transliteration.LatinToCyrillic(name, Language.Russian);
-
-            StringBuilder sb = new StringBuilder();
-            var arrayText = name.Normalize(NormalizationForm.FormD).ToCharArray();
-            foreach (char letter in arrayText)
-            {
-                if (
-                    (letter >= 'a' && letter <= 'z')
-                    || (letter >= 'A' && letter <= 'Z')
-                    || (letter >= '0' && letter <= '9')
-                    || letter == '-'
-                )
-                    sb.Append(letter);
-                if (letter == ' ')
-                    sb.Append("-");
-            }
-
-            return sb.ToString();
-        }
-
-
         protected override Task<int> Execute(ImportCmdletOptions args) =>
             _db.ExecAsync(async db =>
             {
                 MigrationRunner.MigrateDb(_dbConfig.ConnectionString, typeof(Startup).Assembly, _dbConfig.Type);
                 AppDbContextSeed.Seed(_db);
 
-                
+
                 var import = JsonConvert.DeserializeObject<ImporterDatabase>(
-                    await File.ReadAllTextAsync(args.Input));
+                    (await File.ReadAllTextAsync(args.Input))
+                    // Some people aren't aware of ISO codes
+                    .Replace("\"ch\"", "\"cn\""));
                 
                 var langs = db.Languages.ToDictionary(x => x.LanguageShortName, x => x.Id);
 
                 await db.UniversityLanguages.TruncateAsync();
-                await db.UniversityInstructionLanguages.TruncateAsync();
                 await db.CommonTraitsToUniversities.TruncateAsync();
                 await db.ExecuteAsync("TRUNCATE TABLE \"Universities\" CASCADE");
 
                 await ImportUniversities(import, db, langs);
-                await ImportCities(db, import);
+                await ImportDegrees(db, import);
+                await ImportNamedTraits(db, "city", import.Cities, import.Universities, u => u.Cities,
+                    new Dictionary<string, string>
+                    {
+                        {"en", "City"}, {"ru", "Город"}, {"esp", "Ciudad"}, {"fr", "Ville"}
+                    });
+                await ImportNamedTraits(db, "accreditation", import.Accreditations, import.Universities, u => u.Accreditations,
+                    new Dictionary<string, string>
+                    {
+                        {"en", "Accreditation"}, {"ru", "Аккредитация"}, {"esp", "Acreditación"}, {"fr", "Accréditation"}
+                    });
+                await ImportNamedTraits(db, "certification", import.Certifications, import.Universities, u => u.Certifications,
+                    new Dictionary<string, string>
+                    {
+                        {"en", "Certification"}, {"ru", "Сертификация"}, {"esp", "Certificación"}, {"fr", "Certification"}
+                    });
                 await ImportSpecialties(db, import);
                 
                 return 0;
@@ -96,7 +89,7 @@ namespace QuartierLatin.Backend.Cmdlets
                 Console.WriteLine($"Adding {identifier} trait type");
                 traitType = new CommonTraitType
                 {
-                    Identifier = "degree",
+                    Identifier = identifier,
                     Names = names,
                 };
                 traitType.Id = await db.InsertWithInt32IdentityAsync(traitType);
@@ -110,68 +103,59 @@ namespace QuartierLatin.Backend.Cmdlets
             return traitType.Id;
         }
 
+        private async Task<int> EnsureTraitWithIdentifier(AppDbContext db, int traitTypeId, string identifier,
+            Dictionary<string, string> names)
+        {
+            var trait = db.CommonTraits.FirstOrDefault(x =>
+                x.CommonTraitTypeId == traitTypeId && x.Identifier == identifier);
+            if (trait != null)
+                return trait.Id;
+            
+            Console.WriteLine("Adding " + identifier);
+            return await db.InsertWithInt32IdentityAsync(new CommonTrait
+            {
+                Identifier = identifier,
+                Names = names,
+                CommonTraitTypeId = traitTypeId
+            });
+        }
+
         private  async Task ImportUniversities(ImporterDatabase import, AppDbContext db, Dictionary<string, int> langs)
         {
-            var degreeTraitType = await EnsureTraitType(db, "degree", new Dictionary<string, string>
+            var languagesToTraits = new Dictionary<string, int>();
+            var languageTraitId = await EnsureTraitType(db, "instruction-language", new Dictionary<string, string>
             {
-                {"en", "Degree"}, {"ru", "Образование"}, {"esp", "Grado"}, {"fr", "Degré"}
+                {"en", "Language"}, {"ru", "Язык обучения"}, {"esp", "Idioma"}, {"fr", "Langue"}
             });
-
-            var degreesToTraits = new Dictionary<ImporterUniversityDegree, int>();
-            foreach (var t in new[]
+            foreach (var lang in new[]
             {
-                (degree: ImporterUniversityDegree.Bachelor, names: new Dictionary<string, string>
-                {
-                    {"en", "Bachelor"}, {"ru", "Бакалавр"}, {"esp", "Soltero"}, {"fr", "Célibataire"}
-                }),
-                (degree: ImporterUniversityDegree.Magistracy, names: new Dictionary<string, string>
-                {
-                    {"en", "Magistracy"}, {"ru", "Магистратура"}, {"esp", "Magistratura"}, {"fr", "Magistrature"}
-                }),
-                (degree: ImporterUniversityDegree.Mba, names: new Dictionary<string, string>
-                {
-                    {"en", "MBA"}, {"ru", "MBA"}, {"esp", "MBA"}, {"fr", "MBA"}
-                }),
-                (degree: ImporterUniversityDegree.Summer, names: new Dictionary<string, string>
-                {
-                    {"en", "Summer courses"}, {"ru", "Летние / краткосрочные программы"}, {"esp", "Cursos de verano"}, {"fr", "Cours d'été"}
-                }),
-                    
-            })
-            {
-                var identifier = t.degree.ToString().ToLowerInvariant();
-                var trait = db.CommonTraits.FirstOrDefault(x =>
-                    x.CommonTraitTypeId == degreeTraitType && x.Identifier == identifier);
-                if (trait != null)
-                    degreesToTraits[t.degree] = trait.Id;
-                else
-                {
-                    Console.WriteLine("Adding degree " + t.degree);
-                    degreesToTraits[t.degree] = await db.InsertWithInt32IdentityAsync(new CommonTrait
-                    {
-                        Identifier = identifier,
-                        Names = t.names,
-                        CommonTraitTypeId = degreeTraitType
-                    });
-                }
-            }
+                (lang: "ru", names: new Dictionary<string, string>
+                    {{"ru", "Русский"}, {"en", "Russian"}, {"esp", "Ruso"}, {"fr", "Russe"}}),
+                (lang: "en", names: new Dictionary<string, string>
+                    {{"ru", "Английский"}, {"en", "English"}, {"esp", "Inglés"}, {"fr", "Anglais"}}),
+                (lang: "esp", names: new Dictionary<string, string>
+                    {{"ru", "Испанский"}, {"en", "Spanish"}, {"esp", "Español"}, {"fr", "Espanol"}}),
+                (lang: "fr", names: new Dictionary<string, string>
+                    {{"ru", "Французский"}, {"en", "French"}, {"esp", "Francés"}, {"fr", "Français"}}),
+                (lang: "fr/en", names: new Dictionary<string, string>
+                    {{"ru", "Французский/Английский"}, {"en", "French/English"}, {"esp", "Francés/Inglés"}, {"fr", "Français/Anglais"}}),
+            }) 
+                languagesToTraits[lang.lang] = await EnsureTraitWithIdentifier(db, languageTraitId, lang.lang, lang.names);
 
-            
+
             foreach (var uni in import.Universities)
             {
                 Console.WriteLine("Importing " + uni.Id);
 
                 await db.Universities
                     .Value(x => x.Id, uni.Id)
-                    .Value(x => x.Website, uni.Website)
                     .Value(x => x.FoundationYear, uni.FoundationYear)
-                    .Value(x => x.MinimumAge, uni.MinumumAge)
                     .InsertAsync();
                 
                 foreach (var lang in uni.Languages)
                     await db.InsertAsync(new UniversityLanguage
                     {
-                        Url = Urlize(lang.Value.Name),
+                        Url = Urlizer.Urlize(lang.Value.Name),
                         Description = lang.Value.HtmlData,
                         Name = lang.Value.Name,
                         LanguageId = langs[lang.Key],
@@ -179,20 +163,13 @@ namespace QuartierLatin.Backend.Cmdlets
                     });
 
                 foreach (var lang in uni.LanguagesOfInstruction)
-                    await db.InsertAsync(new UniversityInstructionLanguage()
-                    {
-                        LanguageId = langs[lang],
-                        UniversityId = uni.Id
-                        
-                    });
-
-                foreach (var degree in uni.Degrees)
+                {
                     await db.InsertAsync(new CommonTraitsToUniversity
                     {
                         UniversityId = uni.Id,
-                        CommonTraitId = degreesToTraits[degree]
+                        CommonTraitId = languagesToTraits[lang]
                     });
-
+                }
             }
 
             await db.ExecuteAsync(
@@ -215,45 +192,92 @@ namespace QuartierLatin.Backend.Cmdlets
             return false;
         }
         
-        private async Task ImportCities(AppDbContext db, ImporterDatabase import)
+        private async Task ImportNamedTraits<TImporter>(AppDbContext db, string identifier, 
+            List<TImporter> list,
+            List<ImporterUniversity> universities,
+            Func<ImporterUniversity, List<int>> idList,
+            Dictionary<string, string> traitNames)
+            where TImporter : ImporterNamedEntityBase
         {
-            var cityTraitType = await EnsureTraitType(db, "city", new Dictionary<string, string>
-            {
-                {"en", "City"}, {"ru", "Город"}, {"esp", "Ciudad"}, {"fr", "Ville"}
-            });
+            var traitType = await EnsureTraitType(db, identifier, traitNames);
 
-            var citiesDic = new Dictionary<int, int>();
-            var dbCities = db.CommonTraits.Where(ct => ct.CommonTraitTypeId == cityTraitType)
+            var itemsDic = new Dictionary<int, int>();
+            var dbTraits = db.CommonTraits.Where(ct => ct.CommonTraitTypeId == traitType)
                 .ToList()
                 .Select(x => new
                     {Id = x.Id, Names = x.Names}).ToList();
 
-            foreach (var city in import.Cities)
+            foreach (var item in list)
             {
-                if (FindDbEntity(dbCities, city.Names, x => x.Names, x => x.Id, out var dbCityId))
-                    citiesDic[city.Id] = dbCityId;
+                if (FindDbEntity(dbTraits, item.Names, x => x.Names, x => x.Id, out var dbCityId))
+                    itemsDic[item.Id] = dbCityId;
                 else
                 {
-                    Console.WriteLine("Adding city " + string.Join(", ", city.Names.Values));
-                    citiesDic[city.Id] = await db.InsertWithInt32IdentityAsync(new CommonTrait()
+                    Console.WriteLine($"Adding {identifier} " + string.Join(", ", item.Names.Values));
+                    itemsDic[item.Id] = await db.InsertWithInt32IdentityAsync(new CommonTrait()
                     {
-                        CommonTraitTypeId = cityTraitType,
-                        Names = city.Names
+                        CommonTraitTypeId = traitType,
+                        Names = item.Names
                     });
                 }
             }
 
-            foreach (var uni in import.Universities)
+            foreach (var uni in universities)
             {
-                foreach (var city in uni.Cities)
+                foreach (var city in idList(uni))
                     await db.InsertAsync(new CommonTraitsToUniversity
                     {
                         UniversityId = uni.Id,
-                        CommonTraitId = citiesDic[city]
+                        CommonTraitId = itemsDic[city]
                     });
             }
         }
 
+        private async Task ImportDegrees(AppDbContext db, ImporterDatabase import)
+        {
+            await db.UniversityDegrees.TruncateAsync();
+            await db.Degrees.DeleteAsync();
+            
+            await db.ExecuteAsync("ALTER SEQUENCE \"Degrees_Id_seq\" RESTART WITH 1;");
+            //await db.ExecuteAsync("SELECT setval('\"Degrees_Id_seq\"', 1)");
+            var degreesDic = new Dictionary<ImporterUniversityDegree, int>();
+            foreach (var t in new[]
+            {
+                (degree: ImporterUniversityDegree.Bachelor, names: new Dictionary<string, string>
+                {
+                    {"en", "Bachelor"}, {"ru", "Бакалавр"}, {"esp", "Soltero"}, {"fr", "Célibataire"}
+                }),
+                (degree: ImporterUniversityDegree.Magistracy, names: new Dictionary<string, string>
+                {
+                    {"en", "Magistracy"}, {"ru", "Магистратура"}, {"esp", "Magistratura"}, {"fr", "Magistrature"}
+                }),
+                (degree: ImporterUniversityDegree.Mba, names: new Dictionary<string, string>
+                {
+                    {"en", "MBA"}, {"ru", "MBA"}, {"esp", "MBA"}, {"fr", "MBA"}
+                }),
+                (degree: ImporterUniversityDegree.Short, names: new Dictionary<string, string>
+                {
+                    {"en", "Summer/short courses"}, {"ru", "Летние / краткосрочные программы"}, {"esp", "Cursos de verano"}, {"fr", "Cours d'été"}
+                }),
+                    
+            })
+            {
+                var id = await db.InsertWithInt32IdentityAsync(new Degree
+                {
+                    Names = t.names
+                });
+                degreesDic[t.degree] = id;
+            }
+            foreach(var uni in import.Universities)
+            foreach (var map in uni.Degrees)
+                await db.InsertAsync(new UniversityDegree
+                {
+                    UniversityId = uni.Id,
+                    DegreeId = degreesDic[map.Key],
+                    CostGroup = map.Value
+                });
+        }
+        
         private async Task ImportSpecialties(AppDbContext db, ImporterDatabase import)
         {
             var dbCategories = db.SpecialtyCategories.ToList();
@@ -288,6 +312,17 @@ namespace QuartierLatin.Backend.Cmdlets
                         });
                     }
                 }
+            }
+
+            db.UniversitySpecialties.Truncate();
+            foreach (var uni in import.Universities)
+            {
+                foreach (var spec in uni.Specialties)
+                    db.Insert(new UniversitySpecialty
+                    {
+                        SpecialtyId = specDic[spec],
+                        UniversityId = uni.Id
+                    });
             }
         }
     }

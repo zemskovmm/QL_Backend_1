@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
+using QuartierLatin.Backend.Utils;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,9 +18,6 @@ namespace QuartierLatin.Backend.Controllers
             _pageAppService = pageAppService;
         }
 
-        static int PageCount(int resultCount, int pageSize) =>
-            resultCount / pageSize + (resultCount % pageSize == 0 ? 0 : 1);
-        
         [HttpGet(), ProducesResponseType(typeof(PageListDto), 200)]
         public async Task<IActionResult> GetPageList([FromQuery]int page, [FromQuery]string search)
         {
@@ -29,12 +26,12 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(new PageListDto
             {
-                TotalPages = PageCount(result.Item2.totalResults, pageSize),
-                Results = result.Item2.results.Select(x => new PageListItemDto
+                TotalPages = FilterHelper.PageCount(result.result.totalResults, pageSize),
+                Results = result.result.results.Select(x => new PageListItemDto
                 {
                     Id = x.id,
-                    Titles = x.pages.ToDictionary(x => result.Item1[x.LanguageId], x => x.Title),
-                    Urls = x.pages.ToDictionary(x => result.Item1[x.LanguageId], x => x.Url)
+                    Titles = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Title),
+                    Urls = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Url)
                 }).ToList()
             });
         }

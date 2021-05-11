@@ -5,6 +5,6 @@ namespace QuartierLatin.Importer.DataModel
         Bachelor,
         Magistracy,
         Mba,
-        Summer
+        Short
     }
 }

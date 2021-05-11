@@ -26,9 +26,14 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
         private static readonly object AppStartLock = new();
         private static readonly string AppUrl = $"http://127.0.0.1:{GetFreePort()}";
         private static string _assetPath;
+        private static string _databaseConnectionString;
 
 
-        protected TestBase() => AppStart();
+        protected TestBase()
+        {
+            AppStart();
+            ClearDatabase();
+        }
 
         protected string RpcUri => AppUrl.TrimEnd('/') + "/tsrpc";
 
@@ -59,8 +64,8 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
             var enviroment = System.Environment.CurrentDirectory;
             _assetPath = Path.Combine(enviroment, "Assets");
 
-            var conns = testConfig["Database"]["ConnectionString"].Value<string>();
-            using (var conn = new NpgsqlConnection(conns))
+            _databaseConnectionString = testConfig["Database"]["ConnectionString"].Value<string>();
+            using (var conn = new NpgsqlConnection(_databaseConnectionString))
             {
                 conn.Open();
                 foreach (var sql in new[] {"drop schema if exists public cascade;", "create schema public;"})
@@ -168,6 +173,39 @@ namespace QuartierLatin.Backend.Tests.Infrastructure
             }
 
             throw new Exception($"Status code {resp.StatusCode}:\n{respString}");
+        }
+
+        private static void ClearDatabase()
+        {
+            using (var conn = new NpgsqlConnection(_databaseConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    foreach (var sql in new[]
+                    {
+                        "TRUNCATE TABLE CommonTraits;",
+                        "TRUNCATE TABLE CommonTraitTypesForEntites;",
+                        "TRUNCATE TABLE CommonTraitTypes;",
+                        "TRUNCATE TABLE CommonTraitsToUniversities;",
+                        "TRUNCATE TABLE UniversitySpecialties;",
+                        "TRUNCATE TABLE Specialties;",
+                        "TRUNCATE TABLE SpecialtyCategories;",
+                        "TRUNCATE TABLE UniversityLanguages;",
+                        "TRUNCATE TABLE Universities;",
+                        "TRUNCATE TABLE Pages;",
+                        "TRUNCATE TABLE PageRoots;",
+                    })
+                    {
+                        using var cmd = conn.CreateCommand();
+                        cmd.CommandText = sql;
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
         }
 
         protected static Dictionary<string, int> LangIds;

@@ -9,7 +9,5 @@ namespace QuartierLatin.Backend.Models.CatalogModels
         public int UniversityId { get; set; }
         [PrimaryKey]
         public int SpecialtyId { get; set; }
-        [Column]
-        public int Cost { get; set; }
     }
 }

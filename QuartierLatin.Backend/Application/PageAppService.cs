@@ -46,13 +46,12 @@ namespace QuartierLatin.Backend.Application
 
         public Task<IList<Page>> GetPageLanguages(int id) => _pageRepository.GetPagesByPageRootIdAsync(id);
 
-        public async Task<(Dictionary<int, string>, (int totalResults, List<(int id, List<Page> pages)> results))> GetPageListBySearch(int page, string search, int pageSize)
+        public async Task<(Dictionary<int, string> lang, (int totalResults, List<(int id, List<Page> pages)> results) result)> GetPageListBySearch(int page, string search, int pageSize)
         {
-            var langs = (await _languageRepository.GetLanguageListAsync()).ToDictionary(x => x.Id,
-                x => x.LanguageShortName);
+            var langs = await _languageRepository.GetLanguageIdWithShortNameAsync();
             var results = await _pageRepository.GetPageRootsWithPagesAsync(search, pageSize * page, pageSize);
 
-            return (langs, results);
+            return (lang: langs, result: results);
         }
 
         public async Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url)
@@ -64,23 +63,19 @@ namespace QuartierLatin.Backend.Application
             if (pages.Count is 0)
                 return null;
 
-            var urls = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult(), page => page.Url);
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var urls = pages.ToDictionary(page => languageIds[page.LanguageId], page => page.Url);
 
             var titles = urls.ToDictionary(url => url.Key, url => pages.FirstOrDefault(page => page.Url == url.Value).Title);
 
-            var blocks = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult(), page => JObject.Parse(page.PageData));
+            var blocks = pages.ToDictionary(page => languageIds[page.LanguageId], page => JObject.Parse(page.PageData));
 
             var adminPageDto = new AdminPageDto(titles, blocks);
 
             var adminPageModuleDto = new AdminPageModuleDto(adminPageDto, pages.First().PageRootId);
 
-            var response = new RouteDto<AdminPageModuleDto>(urls, adminPageModuleDto, "page");
+            var response = new RouteDto<AdminPageModuleDto>(null, urls, adminPageModuleDto, "page");
 
             return response;
         }
@@ -96,20 +91,19 @@ namespace QuartierLatin.Backend.Application
             if (pages.Count is 0)
                 return null;
 
-            var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var langId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
 
             var pageMain = pages.Find(page => page.LanguageId == langId);
 
-            var urls = pages.ToDictionary(page => _languageRepository.GetLanguageShortNameAsync(page.LanguageId)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult(), page => page.Url);
+            var urls = pages.ToDictionary(page => languageIds[page.LanguageId], page => page.Url);
 
             var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData));
 
             var pageModuleDto = new PageModuleDto(pageDto);
 
-            var response = new RouteDto<PageModuleDto>(urls, pageModuleDto, "page");
+            var response = new RouteDto<PageModuleDto>(null, urls, pageModuleDto, "page");
 
             return response;
         }

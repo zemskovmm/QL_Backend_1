@@ -21,5 +21,7 @@ namespace QuartierLatin.Importer
         }
 
         public static int GetInt(this IXLWorksheet sheet, int row, int cell) => GetNInt(sheet, row, cell).Value;
+
+        public static string IfSpace(this string s, string value) => string.IsNullOrWhiteSpace(s) ? value : s;
     }
 }

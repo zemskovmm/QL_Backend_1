@@ -29,7 +29,6 @@ namespace QuartierLatin.Backend.Database
         public ITable<GlobalSetting> GlobalSettings => GetTable<GlobalSetting>();
         public ITable<University> Universities => GetTable<University>();
         public ITable<UniversityLanguage> UniversityLanguages => GetTable<UniversityLanguage>();
-        public ITable<UniversityInstructionLanguage> UniversityInstructionLanguages => GetTable<UniversityInstructionLanguage>();
         public ITable<SpecialtyCategory> SpecialtyCategories => GetTable<SpecialtyCategory>();
         public ITable<Specialty> Specialties => GetTable<Specialty>();
         public ITable<UniversitySpecialty> UniversitySpecialties => GetTable<UniversitySpecialty>();
@@ -37,6 +36,8 @@ namespace QuartierLatin.Backend.Database
         public ITable<CommonTraitType> CommonTraitTypes => GetTable<CommonTraitType>();
         public ITable<CommonTraitsToUniversity> CommonTraitsToUniversities => GetTable<CommonTraitsToUniversity>();
         public ITable<CommonTraitTypesForEntity> CommonTraitTypesForEntities => GetTable<CommonTraitTypesForEntity>();
+        public ITable<Degree> Degrees => GetTable<Degree>();
+        public ITable<UniversityDegree> UniversityDegrees => GetTable<UniversityDegree>();
     }
 
     public interface IAppDbConnectionFactory
