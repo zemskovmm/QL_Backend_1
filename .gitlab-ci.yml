@@ -3,7 +3,6 @@ stages:
 #  - test
   - deploy
 
-
 build:
   stage: build
   tags:
@@ -14,6 +13,12 @@ build:
       - out
   script: 
     - dotnet publish -c Release -o out QuartierLatin.Backend
+
+deploy_dev:
+  stage: deploy
+  only: 
+    - develop
+  trigger: quartier-latin/dev-deployment
 
 #tests:
 #  stage: test
