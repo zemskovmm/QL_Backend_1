@@ -26,20 +26,9 @@ namespace QuartierLatin.Backend.Database.Repositories
             return await _db.ExecAsync(db => db.Specialties.FirstOrDefaultAsync(specialty => specialty.Id == specialtyId));
         }
 
-        public async Task<List<(Specialty specialty, int costFrom, int costTo)>> GetSpecialtiesUniversityByUniversityIdList(int universityId)
-        {
-            var response = new List<(Specialty specialty, int costFrom, int costTo)>();
-
-            var universitySpecialty = await _db.ExecAsync(db =>
-                db.UniversitySpecialties.Where(speciallty => speciallty.UniversityId == universityId).ToListAsync());
-
-            foreach (var specialty in universitySpecialty)
-            {
-                var specialtyEntity = await GetSpecialtyById(specialty.SpecialtyId);
-                response.Add((specialtyEntity, specialty.CostFrom, specialty.CostTo));
-            }
-
-            return response;
-        }
+        public Task<List<Specialty>> GetSpecialtiesUniversityByUniversityId(int universityId) =>
+            _db.ExecAsync(db => (from map in db.UniversitySpecialties.Where(x => x.UniversityId == universityId)
+                join spec in db.Specialties on map.UniversityId equals spec.Id
+                select spec).ToListAsync());
     }
 }

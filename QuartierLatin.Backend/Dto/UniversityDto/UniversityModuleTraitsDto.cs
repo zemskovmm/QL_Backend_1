@@ -8,5 +8,6 @@ namespace QuartierLatin.Backend.Dto.UniversityDto
     {
         public Dictionary<string, List<CommonTraitLanguageDto>> NamedTraits { get; set; }
         public List<UniversitySpecialtiesDto> UniversitySpecialties { get; set; }
+        public List<UniversityDegreeDto> UniversityDegrees { get; set; }
     }
 }

@@ -1,10 +1,12 @@
-﻿using LinqToDB;
+﻿using System;
+using LinqToDB;
 using LinqToDB.Data;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
@@ -50,22 +52,20 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             await _db.ExecAsync(db => db.BulkCopyAsync(universityLanguage));
         }
 
-        public async Task<int> CreateUniversityAsync(int? foundationYear, string website)
+        public async Task<int> CreateUniversityAsync(int? foundationYear)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new University
             {
                 FoundationYear = foundationYear,
-                Website = website
             }));
         }
 
-        public async Task UpdateUniversityAsync(int id, int? foundationYear, string website)
+        public async Task UpdateUniversityAsync(int id, int? foundationYear)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new University
             {
                 Id = id,
-                FoundationYear = foundationYear,
-                Website = website
+                FoundationYear = foundationYear
             }));
         }
 
@@ -74,6 +74,11 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             return await _db.ExecAsync(db =>
                 db.UniversityLanguages.Where(university => university.Url == url).Select(university => university.UniversityId).FirstAsync());
         }
+
+        public Task<List<Specialty>> GetSpecialtiesUniversityByUniversityIdList(int universityId) => _db.Exec(db =>
+            (from map in db.UniversitySpecialties.Where(x => x.UniversityId == universityId)
+                join spec in db.Specialties on map.SpecialtyId equals spec.Id
+                select spec).ToListAsync());
 
         public async Task<Specialty> GetSpecialtyById(int specialtyId)
         {
@@ -87,10 +92,9 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .Select(university => university.UniversityId).FirstAsync());
         }
 
-        public async Task<(int totalPages, List<(University university, UniversityLanguage universityLanguage, int cost)> universities)> GetUniversityPageByFilter(List<List<int>> commonTraitGroups, List<int> specialtyCategoriesId, List<int> priceIds, int languageId, int skip, int take)
+        public async Task<(int totalItems, List<(University university, UniversityLanguage universityLanguage, int cost)>)> GetUniversityPageByFilter(List<List<int>> commonTraitGroups,
+            List<int> specialtyCategoriesId, List<int> degreeIds, List<int> priceIds, int languageId, int skip, int take)
         {
-            var pageSize = take;
-
             return await _db.ExecAsync(async db =>
             {
                 var universities = db.Universities.AsQueryable();
@@ -100,66 +104,58 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     foreach (var commonTraitGroup in commonTraitGroups)
                     {
                         if (commonTraitGroup.Count != 0)
-                            universitiesWithTraits = universitiesWithTraits.Where(t => commonTraitGroup.Contains(t.CommonTraitId));
+                            universitiesWithTraits =
+                                universitiesWithTraits.Where(t => commonTraitGroup.Contains(t.CommonTraitId));
                     }
 
-                    if (specialtyCategoriesId.Any())
-                    {
-                        var universitySpecialtyTable = db.UniversitySpecialties.AsQueryable();
-                        var specialtyTable = db.Specialties.Where(specialtyEntity =>
-                            specialtyCategoriesId.Contains(specialtyEntity.CategoryId)).AsQueryable();
-
-                        var universitiesId = from universitySpecialty in universitySpecialtyTable
-                                             join specialty in specialtyTable on universitySpecialty.SpecialtyId equals specialty.Id
-                            select universitySpecialty.UniversityId;
-
-                        var test = universitiesId.ToList();
-
-                        universitiesWithTraits = universitiesWithTraits.Where(t => universitiesId.Contains(t.UniversityId));
-
-                        if (priceIds.Any())
-                        {
-                            var universitySpecialtyTableOrBuilder = new OrBuilder<UniversitySpecialty>(universitySpecialtyTable);
-                            foreach (var priceId in priceIds)
-                            {
-                                var _ = priceId switch
-                                {
-                                    1 => universitySpecialtyTableOrBuilder.Or(universitySpecialty => universitySpecialty.CostTo <= 10000),
-                                    2 => universitySpecialtyTableOrBuilder.Or(universitySpecialty => universitySpecialty.CostTo <= 20000),
-                                    3 => universitySpecialtyTableOrBuilder.Or(universitySpecialty => universitySpecialty.CostTo <= 30000),
-                                    _ => throw new System.NotImplementedException(),
-                                };
-                            }
-
-                            universitySpecialtyTable = universitySpecialtyTableOrBuilder.GetWhereQueryable();
-
-                            universitiesId = from universitySpecialty in universitySpecialtyTable
-                                             join specialty in specialtyTable on universitySpecialty.SpecialtyId equals specialty.Id
-                                select universitySpecialty.UniversityId;
-
-                            var test1 = universitiesId.ToList();
-
-                            universitiesWithTraits = universitiesWithTraits.Where(t => universitiesId.Contains(t.UniversityId));
-                        }
-                    }
-
-                    var universityIdsWithTraits = universitiesWithTraits.Select(x => x.UniversityId);
-                    universities = universities.Where(u => universityIdsWithTraits.Contains(u.Id));
+                    universities = universities.Where(uni =>
+                        universitiesWithTraits.Select(x => x.UniversityId).Contains(uni.Id));
                 }
 
+                if (specialtyCategoriesId.Any())
+                {
+                    var universitySpecialties = db.UniversitySpecialties.AsQueryable();
+
+
+                    var matchingSpecialties = db.Specialties
+                        .Where(spec => specialtyCategoriesId.Contains(spec.CategoryId)).Select(x => x.Id);
+                    universitySpecialties =
+                        universitySpecialties.Where(spec => matchingSpecialties.Contains(spec.SpecialtyId));
+
+
+                    universities = universities.Where(uni =>
+                        universitySpecialties.Select(x => x.UniversityId).Contains(uni.Id));
+                }
+
+                IQueryable<UniversityDegree> degreeQueryable = db.UniversityDegrees;
+                
+                
+                if (degreeIds.Any()) 
+                    degreeQueryable = degreeQueryable.Where(d => degreeIds.Contains(d.DegreeId));
+                
+                if(priceIds.Any())
+                    degreeQueryable = degreeQueryable.Where(d => priceIds.Contains(d.CostGroup));
+
+                if (priceIds.Any() || degreeIds.Any())
+                    universities =
+                        universities.Where(uni => degreeQueryable.Select(x => x.UniversityId).Contains(uni.Id));
+
                 var universitiesWithLanguages = from uni in universities
-                    join lang in db.UniversityLanguages on uni.Id equals lang.UniversityId
-                    join uniSpecialty in db.UniversitySpecialties on uni.Id equals uniSpecialty.UniversityId
-                    where lang.LanguageId == languageId || lang.LanguageId == db.UniversityLanguages.FirstOrDefault(lang => lang.UniversityId == uni.Id).LanguageId
-                    select new {uni, lang, uniSpecialty.CostFrom, uniSpecialty.CostTo};
+                    join lang in db.UniversityLanguages.Where(l => l.LanguageId == languageId)
+                        on uni.Id equals lang.UniversityId
+                    select new
+                    {
+                        uni,
+                        lang,
+                        costGroup = degreeQueryable.Where(d => d.UniversityId == uni.Id)
+                            .Min(d => d.CostGroup)
+                    };
 
                 var totalCount = await universitiesWithLanguages.CountAsync();
 
-                var pageCount = FilterHelper.PageCount(totalCount, pageSize);
-
-                return (totalPages: pageCount, universities:
+                return (totalCount,
                     (await universitiesWithLanguages.OrderBy(x => x.uni.Id).Skip(skip).Take(take).ToListAsync())
-                    .Select(x => (university: x.uni, universityLanguage: x.lang, cost: x.CostFrom)).ToList());
+                    .Select(x => (university: x.uni, universityLanguage: x.lang, cost: x.costGroup)).ToList());
             });
         }
 

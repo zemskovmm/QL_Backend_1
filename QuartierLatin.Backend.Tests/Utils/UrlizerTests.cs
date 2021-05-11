@@ -1,4 +1,6 @@
 using QuartierLatin.Backend.Utils;
+using QuartierLatin.Importer;
+using QuartierLatin.Importer.DataModel;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.Utils

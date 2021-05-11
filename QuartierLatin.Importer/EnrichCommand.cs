@@ -14,10 +14,8 @@ namespace QuartierLatin.Importer
     class EnrichCommand: ICommandLineCommand
     {
         private ImporterDatabase _db;
-        private List<string> _langs;
-        private Dictionary<string, int> _langIndices;
+        private List<string> _langs = new() {"en", "fr", "ru", "esp", "cn"};
         private Dictionary<int, ImporterUniversity> _unis;
-        private Dictionary<int, ImporterCity> _cities;
         private Dictionary<int, ImporterSpecialty> _specs;
         
         [Option('i', "input", Required = true)] public string InputFile { get; set; }
@@ -26,23 +24,30 @@ namespace QuartierLatin.Importer
         public int Execute()
         {
             _db = JsonConvert.DeserializeObject<ImporterDatabase>(File.ReadAllText(InputFile));
-            _langs = _db.Universities.SelectMany(u => u.Languages.Keys).Distinct().OrderBy(x => x).ToList();
-            _langIndices = _langs.Select((x, i) => (x, i)).ToDictionary(x => x.x, x => x.i);
-            
             
             var doc = new XLWorkbook(ExcelFile);
             IXLWorksheet FindSheet(string name) => doc.Worksheets.First(x => x.Name == name);
             
             _unis = _db.Universities.ToDictionary(x => x.Id);
+            LoadNamedEntities(FindSheet(XlsConstants.Countries), _db.Countries);
             LoadUniversities(FindSheet(XlsConstants.Universities));
+            
             LoadUniversityDegrees(FindSheet(XlsConstants.UniversityDegrees));
-            LoadCities(FindSheet(XlsConstants.Cities));
-            _cities = _db.Cities.ToDictionary(x => x.Id);
-            LoadUniversityCities(FindSheet(XlsConstants.UniversityCities));
+
+            LoadUniversityNamedEntities(FindSheet(XlsConstants.Cities), _db.Cities,
+                FindSheet(XlsConstants.UniversityCities), u => u.Cities);
+
+
+            LoadUniversityNamedEntities(FindSheet(XlsConstants.Certifications), _db.Certifications,
+                FindSheet(XlsConstants.UniversityCertifications), uni => uni.Certifications, true);
+            LoadUniversityNamedEntities(FindSheet(XlsConstants.Accreditations), _db.Accreditations,
+                FindSheet(XlsConstants.UniversityAccreditations), uni => uni.Accreditations, true);
             
             LoadSpecialties(FindSheet(XlsConstants.Specialties));
             _specs = _db.Specialties.SelectMany(x => x.Specialties).ToDictionary(x => x.Id);
-            LoadUniversitySpecialties(FindSheet(XlsConstants.UniversitySpecialties));
+            LoadNamedEntitiesForUniversity(FindSheet(XlsConstants.UniversitySpecialties),
+                _db.Specialties.SelectMany(x => x.Specialties).ToList(),
+                uni => uni.Specialties, true);
             
             File.WriteAllText(OutputFile, JsonConvert.SerializeObject(_db, Formatting.Indented));
             
@@ -57,20 +62,39 @@ namespace QuartierLatin.Importer
         {
             var iId = FindHeader(sheet, "Id");
             var iYear = FindHeader(sheet, "Year");
-            var iWebsite = FindHeader(sheet, "Website");
-            var iMinAge = FindHeader(sheet, "MinAge");
             var iLangs = FindHeader(sheet, "Langs");
+            var iUrl = FindHeader(sheet, "Url");
+            var iCountries = FindHeader(sheet, "Country");
             var row = 2;
+
+            var langs = _langs.ToDictionary(l => l,
+                l => sheet.Row(1).CellsUsed().First(c => c.Value.ToString() == l).Address.ColumnNumber);
+            
             while(sheet.Row(row).CellsUsed().Any())
             {
                 var id = sheet.GetInt(row, iId);
-                
                 var uni = _unis[id];
+
+                foreach (var l in langs)
+                {
+                    var title = sheet.Cell(row, l.Value).Value?.ToString();
+                    if (uni.Languages.TryGetValue(l.Key, out var version)) 
+                        version.Name = title.IfSpace(version.Name);
+                }
+                
+                uni.Url = sheet.GetString(row, iUrl);
+                if (string.IsNullOrWhiteSpace(uni.Url))
+                    uni.Url = Urlizer.Urlize(uni.Languages.OrderBy(x => _langs.IndexOf(x.Key)).First().Value.Name);
+                
                 uni.FoundationYear = sheet.GetNInt(row, iYear);
-                uni.Website =sheet.GetString(row, iWebsite);
-                uni.MinumumAge = sheet.GetNInt(row, iMinAge);
+                
                 uni.LanguagesOfInstruction = (sheet.GetString(row, iLangs) ?? "")
                     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+
+                foreach (var c in sheet.GetString(row, iCountries).Split(',',
+                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                    uni.Countries.Add(GetWithName(_db.Countries, c).Id);
+
                 row++;
             }
         }
@@ -78,7 +102,7 @@ namespace QuartierLatin.Importer
         void LoadUniversityDegrees(IXLWorksheet sheet)
         {
             var indices = new Dictionary<int, ImporterUniversityDegree>();
-            for (var c = 2;; c++)
+            for (var c = 3;; c++)
             {
                 var v = sheet.Cell(1, c).Value?.ToString();
                 if(string.IsNullOrWhiteSpace(v))
@@ -90,24 +114,41 @@ namespace QuartierLatin.Importer
             while (sheet.Row(row).CellsUsed().Any())
             {
                 var id = int.Parse(sheet.Cell(row, 1).Value.ToString().Split(' ')[0]);
-                _unis[id].Degrees = indices.Where(i => sheet.Cell(row, i.Key).Value?.ToString().Trim().Length > 0)
-                    .Select(i => i.Value).ToList();
+                _unis[id].Degrees.Clear();
+                foreach (var idx in indices)
+                {
+                    var v = sheet.Cell(row, idx.Key).Value?.ToString().Trim();
+                    if (!string.IsNullOrWhiteSpace(v))
+                    {
+                        _unis[id].Degrees[idx.Value] = v switch
+                        {
+                            "0-10" => 1,
+                            "11-20" => 2,
+                            "21-30" => 3,
+                            "31-40" => 4,
+                            _ => throw new ImporterException("Unknown price group " + v)
+                        };
+                    }
+                }
+                
                 row++;
             }
         }
-        
-        void LoadCities(IXLWorksheet sheet)
+
+        void LoadNamedEntities<T>(IXLWorksheet sheet, List<T> to, bool noLang = false) where T : ImporterNamedEntityBase, new()
         {
-            _db.Cities = new List<ImporterCity>();
             var langs = ReadLangHeaders(sheet, 1);
             var row = 2;
-            var nextCityId = 1;
+            var nextEntityId = 1;
+            to.Clear();
             while (sheet.Row(row).CellsUsed().Any())
             {
-                _db.Cities.Add(new ImporterCity
+                to.Add(new T
                 {
-                    Id = nextCityId++,
-                    Names = ReadLangs(sheet, langs, row)
+                    Id = nextEntityId++,
+                    Names = noLang
+                        ? _langs.ToDictionary(x => x, _ => sheet.Cell(row, 1).Value.ToString())
+                        : ReadLangs(sheet, langs, row)
                 });
                 row++;
             }
@@ -127,31 +168,62 @@ namespace QuartierLatin.Importer
                         return item;
                 }
             }
-
             return default;
         }
-        
-        void LoadUniversityCities(IXLWorksheet sheet)
+
+        T GetWithName<T>(IList<T> list, string name, bool throwIfNotFound = false) where T:ImporterNamedEntityBase, new()
+        {
+            var entity = FindWithName(list, name, x => x.Names);
+            if (entity == null)
+            {
+                var err = $"entity {name} not found";
+                if (throwIfNotFound)
+                    throw new ImporterException(err);
+
+                Console.WriteLine("Warning: " + err);
+                entity = new T
+                {
+                    Id = list.Max(x => x.Id) + 1,
+                    Names = _langs.ToDictionary(x => x, _ => name)
+                };
+                list.Add(entity);
+            }
+
+            return entity;
+        }
+
+        void LoadNamedEntitiesForUniversity<T>(IXLWorksheet sheet, List<T> entityList, Func<ImporterUniversity, List<int>> getList,
+            bool throwIfNotFound = false)
+            where T : ImporterNamedEntityBase, new()
         {
             var row = 2;
             while (sheet.Row(row).CellsUsed().Any())
             {
                 var id = int.Parse(sheet.Cell(row, 1).Value.ToString().Split(' ')[0]);
                 var uni = _unis[id];
-                uni.Cities.Clear();
-                for (var c = 2;; c++)
+                var list = getList(uni);
+                list.Clear();
+                for (var c = 3;; c++)
                 {
                     var v = sheet.GetString(row, c);
                     if (string.IsNullOrWhiteSpace(v))
                         break;
-                    var city = FindWithName(_db.Cities, v, x => x.Names);
-                    if (city == null)
-                        throw new ImporterException($"City {v} not found", sheet, row, c);
-                    uni.Cities.Add(city.Id);
+                    var entity = GetWithName(entityList, v, throwIfNotFound);
+                    list.Add(entity.Id);
                 }
                 row++;
             }
         }
+
+        void LoadUniversityNamedEntities<T>(IXLWorksheet sourceSheet, List<T> to,
+            IXLWorksheet mappingSheet,
+            Func<ImporterUniversity, List<int>> getList,
+            bool noLang = false) where T : ImporterNamedEntityBase, new()
+        {
+            LoadNamedEntities(sourceSheet, to, noLang);
+            LoadNamedEntitiesForUniversity(mappingSheet, to, getList);
+        }
+
         
         void LoadSpecialties(IXLWorksheet sheet)
         {
@@ -180,31 +252,6 @@ namespace QuartierLatin.Importer
                         Names = ReadLangs(sheet, langs, row)
                     });
 
-                row++;
-            }
-        }
-
-        void LoadUniversitySpecialties(IXLWorksheet sheet)
-        {
-            var row = 2;
-            foreach(var uni in _db.Universities)
-                uni.Specialties.Clear();
-            while (sheet.Row(row).CellsUsed().Any())
-            {
-                var id = int.Parse(sheet.GetString(row, 1).Split(' ')[0]);
-                var uni = _unis[id];
-                
-                var specName = sheet.GetString(row, 2);
-                var spec = FindWithName(_specs.Values, specName, x => x.Names);
-                if (spec == null)
-                    throw new ImporterException("Spec not found " + specName, sheet, row, 2);
-                var cost = sheet.GetInt(row, 3);
-                uni.Specialties.Add(new ImporterUniversitySpecialtyMapping
-                {
-                    SpecialtyId = spec.Id,
-                    Cost = cost
-                });
-                
                 row++;
             }
         }

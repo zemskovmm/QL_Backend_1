@@ -33,8 +33,8 @@ namespace QuartierLatin.Backend.Controllers
                 {
                     Id = university.university.Id,
                     FoundationYear = university.university.FoundationYear,
-                    MinimumAge = university.university.MinimumAge,
-                    Website = university.university.Website,
+                    MinimumAge = 18,
+                    Website = "/",
                     Languages = university.universityLanguage.ToDictionary(university => _languageRepository
                         .GetLanguageShortNameAsync(university.Key)
                         .ConfigureAwait(false)
@@ -55,7 +55,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> CreateUniversity([FromBody] UniversityDto university)
         {
             var universityId =
-                await _universityAppService.CreateUniversityAsync(university.FoundationYear, university.Website);
+                await _universityAppService.CreateUniversityAsync(university.FoundationYear);
 
             var universityLanguage = university.Languages.Select(university => new UniversityLanguage
             {
@@ -83,8 +83,6 @@ namespace QuartierLatin.Backend.Controllers
             var response = new UniversityDto
             {
                 FoundationYear = university.university.FoundationYear,
-                Website = university.university.Website,
-                MinimumAge = university.university.MinimumAge,
                 Languages = university.universityLanguage.ToDictionary(university => _languageRepository
                     .GetLanguageShortNameAsync(university.Key)
                     .ConfigureAwait(false)
@@ -103,8 +101,7 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUniversityById([FromBody] UniversityDto universityDto, int id)
         {
-            await _universityAppService.UpdateUniversityByIdAsync(id, universityDto.FoundationYear,
-                universityDto.Website);
+            await _universityAppService.UpdateUniversityByIdAsync(id, universityDto.FoundationYear);
 
             foreach (var universityLanguage in universityDto.Languages)
             {

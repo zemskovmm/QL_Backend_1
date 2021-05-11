@@ -50,6 +50,7 @@ namespace QuartierLatin.Backend.Application.Catalog
         public async Task<Dictionary<int, Dictionary<CommonTraitType, List<CommonTrait>>>> GetTraitsForEntityIds(
             EntityType entityType, List<int> ids)
         {
+            ids = ids.Distinct().ToList();
             var allTypes = await _commonTraitTypeRepository.GetCommonTraitTypeListAsync();
             var allTraits = await _commonTraitRepository.GetCommonTraitListByUniversityIds(ids);
             return ids.ToDictionary(x => x,

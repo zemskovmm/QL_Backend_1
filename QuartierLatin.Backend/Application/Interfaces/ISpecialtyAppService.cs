@@ -9,7 +9,7 @@ namespace QuartierLatin.Backend.Application.Interfaces
 {
     public interface ISpecialtyAppService
     {
-        Task<List<(Specialty, int, int)>> GetSpecialtiesUniversityByUniversityId(int universityId);
+        Task<List<Specialty>> GetSpecialtiesUniversityByUniversityId(int universityId);
         Task<List<SpecialtyCategory>> GetSpecialCategoriesList();
     }
 }
