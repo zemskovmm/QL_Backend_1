@@ -19,13 +19,12 @@ namespace QuartierLatin.Backend.Tests.CatalogTests
         public async Task Anon_User_Should_Be_Able_To_Get_Catalog_By_Filter_ListAsync(JObject university, string expectedTitle, JObject commonTrait,
             JObject cityTraitType, JObject degreeTraitType, JObject filter)
         {
-            university["website"] = expectedTitle;
             var resp = SendAdminRequest<JObject>("/api/admin/universities", university);
             var id = int.Parse(resp["id"].ToString());
             var repo = GetService<IUniversityRepository>();
 
             var universityEntity = await repo.GetUniversityByIdAsync(id);
-            Assert.Equal(expectedTitle, universityEntity.Website);
+            Assert.Equal(university["foundationYear"], universityEntity.FoundationYear);
 
             var universityLanguageEntity = await repo.GetUniversityLanguageByUniversityIdAsync(id);
 

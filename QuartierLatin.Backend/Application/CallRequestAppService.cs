@@ -5,6 +5,8 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using QuartierLatin.Backend.Config;
 
 namespace QuartierLatin.Backend.Application
 {
@@ -13,7 +15,7 @@ namespace QuartierLatin.Backend.Application
         private readonly HttpClient _httpClient;
         private readonly ILogger _logger;
 
-        public CallRequestAppService(ILoggerFactory loggerFactory)
+        public CallRequestAppService(ILoggerFactory loggerFactory, IOptions<CallRequestConfig> config)
         {
             _httpClient = new HttpClient()
             {
