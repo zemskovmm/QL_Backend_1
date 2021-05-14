@@ -17,7 +17,9 @@ build:
 deploy_dev:
   stage: deploy
   only: 
-    - develop
+    - development
+  variables:
+    env: dev
   trigger: quartier-latin/dev-deployment
 
 #tests:
