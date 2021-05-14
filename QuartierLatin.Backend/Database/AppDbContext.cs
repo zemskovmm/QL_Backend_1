@@ -11,6 +11,7 @@ using LinqToDB.DataProvider.PostgreSQL;
 using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.Options;
 using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.FolderModels;
 
 namespace QuartierLatin.Backend.Database
 {
@@ -38,6 +39,7 @@ namespace QuartierLatin.Backend.Database
         public ITable<CommonTraitTypesForEntity> CommonTraitTypesForEntities => GetTable<CommonTraitTypesForEntity>();
         public ITable<Degree> Degrees => GetTable<Degree>();
         public ITable<UniversityDegree> UniversityDegrees => GetTable<UniversityDegree>();
+        public ITable<StorageFolder> StorageFolders => GetTable<StorageFolder>();
     }
 
     public interface IAppDbConnectionFactory

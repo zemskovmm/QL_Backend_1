@@ -4,7 +4,7 @@ namespace QuartierLatin.Backend.Models.Repositories
 {
     public interface IBlobRepository
     {
-        Task<int> CreateBlobIdAsync(string fileType, string originalFileName);
+        Task<int> CreateBlobIdAsync(string fileType, string originalFileName, int? storageFolderId = null);
         Task DeleteBlobAsync(int id);
 
         Task EditBlobAsync(int id, string fileType);

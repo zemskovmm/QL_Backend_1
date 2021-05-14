@@ -6,7 +6,7 @@ namespace QuartierLatin.Backend.Application.Interfaces
 {
     public interface IFileAppService
     {
-        Task<int> UploadFileAsync(Stream file, string fileName, string fileType, int? dimension = null, int ? id = null);
+        Task<int> UploadFileAsync(Stream file, string fileName, string fileType, int? dimension = null, int? id = null, int? storageFolder = null);
 
         Task<(Stream, string, string)?> GetFileAsync(int id, int? dimension = null);
 
