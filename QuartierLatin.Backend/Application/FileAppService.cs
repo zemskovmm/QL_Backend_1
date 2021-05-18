@@ -17,11 +17,11 @@ namespace QuartierLatin.Backend.Application
             _blobFileStorage = blobFileStorage;
             _blobRepository = blobRepository;
         }
-        public async Task<int> UploadFileAsync(Stream file, string fileName, string fileType, int? dimension = null, int? id = null)
+        public async Task<int> UploadFileAsync(Stream file, string fileName, string fileType, int? dimension = null, int? id = null, int? storageFolder = null)
         {
             if (dimension is null && id is null)
             {
-                var newId = await _blobRepository.CreateBlobIdAsync(fileType, fileName);
+                var newId = await _blobRepository.CreateBlobIdAsync(fileType, fileName, storageFolder);
                 await _blobFileStorage.CreateBlobAsync(newId, file);
 
                 return newId;

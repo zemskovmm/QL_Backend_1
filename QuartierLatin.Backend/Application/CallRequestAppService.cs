@@ -17,28 +17,42 @@ namespace QuartierLatin.Backend.Application
 
         public CallRequestAppService(ILoggerFactory loggerFactory, IOptions<CallRequestConfig> config)
         {
-            _httpClient = new HttpClient()
-            {
-                BaseAddress = new Uri(config.Value.RequestUrl)
-            };
             _logger = loggerFactory.CreateLogger(nameof(CallRequestAppService));
+            try
+            {
+                _httpClient = new HttpClient()
+                {
+                    BaseAddress = new Uri(config.Value.RequestUrl)
+                };
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("Failed init http client: "+ e.ToString());
+            }
         }
 
         public async Task<bool> SendCallRequest(CallRequest requestCall)
         {
-            var content = GetCallRequestContent.GetContent(
-                requestCall.Url + " " + requestCall.FirstName + " " + requestCall.LastName,
-                requestCall.FirstName, requestCall.LastName, requestCall.Phone, requestCall.Email,
-                requestCall.Comment + "\r\n" + requestCall.Comment);
+            try
+            {
+                var content = GetCallRequestContent.GetContent(
+                    requestCall.Url + " " + requestCall.FirstName + " " + requestCall.LastName,
+                    requestCall.FirstName, requestCall.LastName, requestCall.Phone, requestCall.Email,
+                    requestCall.Comment + "\r\n" + requestCall.Comment);
 
-            var req = await content.ReadAsStringAsync();
+                var req = await content.ReadAsStringAsync();
 
-            _logger.LogInformation("Sending " + req);
-            var response = await _httpClient.PostAsync(_httpClient.BaseAddress, content);
-            _logger.LogInformation("Got response " + await response.Content.ReadAsStringAsync());
-            
+                _logger.LogInformation("Sending " + req);
+                var response = await _httpClient.PostAsync(_httpClient.BaseAddress, content);
+                _logger.LogInformation("Got response " + await response.Content.ReadAsStringAsync());
 
-            return response.IsSuccessStatusCode;
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("Error when sending call request: " + e.ToString());
+                return true;
+            }
         }
     }
 }

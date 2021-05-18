@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using QuartierLatin.Backend.Application.Interfaces;
-using QuartierLatin.Backend.Dto.Media;
 using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers
 {
+    [AllowAnonymous]
+    [Route("/media")]
     public class FileController : Controller
     {
         private readonly IFileAppService _fileAppService;
@@ -15,8 +16,8 @@ namespace QuartierLatin.Backend.Controllers
             _fileAppService = fileAppService;
         }
 
-        [AllowAnonymous]
-        [HttpGet("/media/{id}")]
+        
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetMedia(int id)
         {
             var response = await _fileAppService.GetFileAsync(id);
@@ -28,8 +29,7 @@ namespace QuartierLatin.Backend.Controllers
             return File(response.Value.Item1, contentType, response.Value.Item3);
         }
 
-        [AllowAnonymous]
-        [HttpGet("/media/scaled/{id}")]
+        [HttpGet("scaled/{id}")]
         public async Task<IActionResult> GetCompressedMedia(int id, [FromQuery]int dimension)
         {
             var response = await _fileAppService.GetCompressedFileAsync(id, dimension);
@@ -39,15 +39,6 @@ namespace QuartierLatin.Backend.Controllers
             provider.TryGetContentType(response.Value.Item3, out var contentType);
 
             return File(response.Value.Item1, contentType, response.Value.Item3);
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPost("/media/")]
-        public async Task<IActionResult> CreateMedia([FromForm] CreateMediaDto createMediaDto)
-        {
-            var response = await _fileAppService.UploadFileAsync(createMediaDto.UploadedFile.OpenReadStream(), createMediaDto.UploadedFile.FileName, createMediaDto.FileType);
-
-            return Ok(new {id = response});
         }
     }
 }

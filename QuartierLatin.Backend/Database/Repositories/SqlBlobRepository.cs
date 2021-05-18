@@ -15,9 +15,9 @@ namespace QuartierLatin.Backend.Database.Repositories
             _db = db;
         }
 
-        public async Task<int> CreateBlobIdAsync(string fileType, string originalFileName)
+        public async Task<int> CreateBlobIdAsync(string fileType, string originalFileName, int? storageFolderId = null)
         {
-            return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new Blob {FileType = fileType, OriginalFileName = originalFileName}));
+            return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new Blob {FileType = fileType, OriginalFileName = originalFileName, StorageFolderId = storageFolderId}));
         }
 
         public async Task DeleteBlobAsync(int id) =>

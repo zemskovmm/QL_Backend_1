@@ -7,5 +7,7 @@ namespace QuartierLatin.Backend.Dto.Media
         public IFormFile UploadedFile { get; set; }
 
         public string FileType { get; set; }
+
+        public int? StorageFolderId { get; set; }
     }
 }
