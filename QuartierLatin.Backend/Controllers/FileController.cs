@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers
 {
+    [Route("/media")]
     public class FileController : Controller
     {
         private readonly IFileAppService _fileAppService;
@@ -16,7 +17,7 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("/media/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetMedia(int id)
         {
             var response = await _fileAppService.GetFileAsync(id);
@@ -29,7 +30,7 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("/media/scaled/{id}")]
+        [HttpGet("scaled/{id}")]
         public async Task<IActionResult> GetCompressedMedia(int id, [FromQuery]int dimension)
         {
             var response = await _fileAppService.GetCompressedFileAsync(id, dimension);
@@ -42,10 +43,11 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("/media/")]
+        [HttpPost()]
         public async Task<IActionResult> CreateMedia([FromForm] CreateMediaDto createMediaDto)
         {
-            var response = await _fileAppService.UploadFileAsync(createMediaDto.UploadedFile.OpenReadStream(), createMediaDto.UploadedFile.FileName, createMediaDto.FileType);
+            var response = await _fileAppService.UploadFileAsync(createMediaDto.UploadedFile.OpenReadStream(),
+                createMediaDto.UploadedFile.FileName, createMediaDto.FileType, null, null, createMediaDto.StorageFolderId);
 
             return Ok(new {id = response});
         }

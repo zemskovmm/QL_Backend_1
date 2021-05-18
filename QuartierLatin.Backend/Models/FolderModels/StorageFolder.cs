@@ -7,5 +7,6 @@ namespace QuartierLatin.Backend.Models.FolderModels
     {
         [Column] public string FolderName { get; set; }
         [Column] public int? FolderParentId { get; set; }
+        [Column] public bool IsDeleted { get; set; }
     }
 }

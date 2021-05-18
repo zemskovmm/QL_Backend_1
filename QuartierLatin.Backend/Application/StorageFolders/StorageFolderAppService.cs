@@ -30,5 +30,30 @@ namespace QuartierLatin.Backend.Application.StorageFolders
         {
             return await _storageFoldersRepository.GetBlobFromFolderAsync(id);
         }
+
+        public async Task RemoveStorageFolderAsync(int id)
+        {
+            await _storageFoldersRepository.RemoveStorageFolderAsync(id);
+        }
+
+        public async Task<List<Blob>> GetFilesInfoInDefaultFolderAsync()
+        {
+            return await _storageFoldersRepository.GetFilesInfoInDefaultFolderAsync();
+        }
+
+        public async Task<List<StorageFolder>> GetChildFoldersAsync(int storageFolderId)
+        {
+            return await _storageFoldersRepository.GetChildFoldersAsync(storageFolderId);
+        }
+
+        public async Task<List<StorageFolder>> GetDefaultChildFoldersAsync()
+        {
+            return await _storageFoldersRepository.GetDefaultChildFoldersAsync();
+        }
+
+        public async Task UpdateFolderNameAsync(int id, string title)
+        {
+            await _storageFoldersRepository.UpdateFolderNameAsync(id, title);
+        }
     }
 }

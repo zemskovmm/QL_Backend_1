@@ -2,9 +2,9 @@
 
 namespace QuartierLatin.Backend.Dto.StorageFoldersDto
 {
-    public class BlobItemDtoAdmin : BaseDto
+    public class PatchStorageFolderDtoAdmin
     {
         [JsonProperty("title")]
-        public string OriginalFileName { get; set; }
+        public string StorageFolderName { get; set; }
     }
 }

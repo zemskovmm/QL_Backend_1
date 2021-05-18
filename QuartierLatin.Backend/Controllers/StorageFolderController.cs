@@ -8,7 +8,7 @@ using QuartierLatin.Backend.Models.Repositories;
 namespace QuartierLatin.Backend.Controllers
 {
     [Authorize(Roles = "Admin")]
-    [Route("/api/admin/folders")]
+    [Route("/api/media/directories")]
     public class StorageFolderController : Controller
     {
         private readonly IStorageFolderAppService _storageFolderAppService;
@@ -29,22 +29,68 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> GetStorageFolder(int id)
         {
             var storageFolder = await _storageFolderAppService.GetStorageFolderByIdAsync(id);
-
+            var childFolder = await _storageFolderAppService.GetChildFoldersAsync(storageFolder.Id);
             var filesInFolder = await _storageFolderAppService.GetFilesInfoInFolderAsync(storageFolder.Id);
 
             var response = new StorageFolderDtoAdmin
             {
                 FolderName = storageFolder.FolderName,
+                ParentId = storageFolder.FolderParentId,
                 Files = filesInFolder.Select(file =>
                         new BlobItemDtoAdmin
                         {
-                            FileType = file.FileType,
                             Id = file.Id,
                             OriginalFileName = file.OriginalFileName
-                        }).ToList()
+                        }).ToList(),
+                Directories = childFolder.Select(directory => new DirectoryDtoAdmin
+                {
+                    DirectoryName = directory.FolderName,
+                    Id = directory.Id
+                }).ToList()
             };
 
             return Ok(response);
+        }
+
+        [HttpGet()]
+        public async Task<IActionResult> GetDefaultStorageFolder()
+        {
+            var filesInFolder = await _storageFolderAppService.GetFilesInfoInDefaultFolderAsync();
+            var childFolder = await _storageFolderAppService.GetDefaultChildFoldersAsync();
+
+            var response = new StorageFolderDtoAdmin
+            {
+                Files = filesInFolder.Select(file =>
+                    new BlobItemDtoAdmin
+                    {
+                        Id = file.Id,
+                        OriginalFileName = file.OriginalFileName
+                    }).ToList(),
+                Directories = childFolder.Select(directory => new DirectoryDtoAdmin
+                {
+                    DirectoryName = directory.FolderName,
+                    Id = directory.Id
+                }).ToList()
+
+            };
+
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStorageFolder(int id)
+        {
+            await _storageFolderAppService.RemoveStorageFolderAsync(id);
+
+            return Ok();
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdateStorageFolder(int id, [FromBody] PatchStorageFolderDtoAdmin patchDto)
+        {
+            await _storageFolderAppService.UpdateFolderNameAsync(id, patchDto.StorageFolderName);
+
+            return Ok();
         }
     }
 }
