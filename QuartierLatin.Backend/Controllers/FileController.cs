@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace QuartierLatin.Backend.Controllers
 {
     [AllowAnonymous]
-    [Route("/media")]
+    [Route("/api/media")]
     public class FileController : Controller
     {
         private readonly IFileAppService _fileAppService;

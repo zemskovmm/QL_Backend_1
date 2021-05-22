@@ -29,7 +29,7 @@ namespace QuartierLatin.Backend.Tests.FileTests
             multipartContent.Add(new StreamContent(fileStream), "UploadedFile", fileName);
             multipartContent.Add(new StringContent(mediaType), "FileType");
 
-            var resp = SendAdminRequest<JObject>("/media", multipartContent);
+            var resp = SendAdminRequest<JObject>("/api/media", multipartContent);
             var id = int.Parse(resp["id"].ToString());
             var entity = await repo.GetBlobInfoAsync(id);
 
@@ -43,14 +43,14 @@ namespace QuartierLatin.Backend.Tests.FileTests
             imageScaler.Scale(stream, output);
 
             var requestAnswer =
-                SendAnonRequest<string>($"/media/scaled/{id}?dimension={mediaDimension}", null, null, null, true);
+                SendAnonRequest<string>($"/api/media/scaled/{id}?dimension={mediaDimension}", null, null, null, true);
 
             var fileFromHdd = Convert.ToBase64String(output.ToArray());
 
             Assert.Equal(fileFromHdd, requestAnswer);
 
             var secondRequestAnswer =
-                SendAnonRequest<string>($"/media/scaled/{id}?dimension={mediaDimension}", null, null, null, true);
+                SendAnonRequest<string>($"/api/media/scaled/{id}?dimension={mediaDimension}", null, null, null, true);
 
             Assert.Equal(requestAnswer, secondRequestAnswer);
         }

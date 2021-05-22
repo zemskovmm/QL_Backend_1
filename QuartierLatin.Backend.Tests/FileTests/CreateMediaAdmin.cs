@@ -26,7 +26,7 @@ namespace QuartierLatin.Backend.Tests.FileTests
             multipartContent.Add(new StreamContent(fileStream), "UploadedFile", fileName);
             multipartContent.Add(new StringContent(mediaType), "FileType");
 
-            var resp = SendAdminRequest<JObject>("/media", multipartContent);
+            var resp = SendAdminRequest<JObject>("/api/media", multipartContent);
             var id = int.Parse(resp["id"].ToString());
             var entity = await repo.GetBlobInfoAsync(id);
 
