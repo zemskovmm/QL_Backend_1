@@ -73,7 +73,12 @@ namespace QuartierLatin.Importer
             while(sheet.Row(row).CellsUsed().Any())
             {
                 var id = sheet.GetInt(row, iId);
-                var uni = _unis[id];
+                if (!_unis.TryGetValue(id, out var uni))
+                {
+                    Console.WriteLine($"Warning: university #{id} not found, skipping");
+                    row++;
+                    continue;
+                }
 
                 foreach (var l in langs)
                 {
@@ -114,18 +119,26 @@ namespace QuartierLatin.Importer
             while (sheet.Row(row).CellsUsed().Any())
             {
                 var id = int.Parse(sheet.Cell(row, 1).Value.ToString().Split(' ')[0]);
-                _unis[id].Degrees.Clear();
+                if (!_unis.TryGetValue(id, out var uni))
+                {
+                    Console.WriteLine($"Warning: university #{id} not foound, skipping");
+                    row++;
+                    continue;
+                }
+                uni.Degrees.Clear();
                 foreach (var idx in indices)
                 {
                     var v = sheet.Cell(row, idx.Key).Value?.ToString().Trim();
                     if (!string.IsNullOrWhiteSpace(v))
                     {
-                        _unis[id].Degrees[idx.Value] = v switch
+                        uni.Degrees[idx.Value] = v switch
                         {
                             "0-10" => 1,
                             "11-20" => 2,
                             "21-30" => 3,
                             "31-40" => 4,
+                            "41-50" => 5,
+                            "51-60" => 6,
                             _ => throw new ImporterException("Unknown price group " + v)
                         };
                     }
@@ -200,7 +213,12 @@ namespace QuartierLatin.Importer
             while (sheet.Row(row).CellsUsed().Any())
             {
                 var id = int.Parse(sheet.Cell(row, 1).Value.ToString().Split(' ')[0]);
-                var uni = _unis[id];
+                if (!_unis.TryGetValue(id, out var uni))
+                {
+                    Console.WriteLine($"Warning: university #{id} not found, skipping");
+                    row++;
+                    continue;
+                }
                 var list = getList(uni);
                 list.Clear();
                 for (var c = 3;; c++)

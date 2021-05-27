@@ -10,9 +10,11 @@ namespace QuartierLatin.Backend.Models
             2 => (11000, 20000),
             3 => (21000, 30000),
             4 => (31000, 40000),
+            5 => (41000, 50000),
+            6 => (51000, 60000),
             _ => (0, 100000)
         };
 
-        public static IReadOnlyList<int> CostGroups { get; } = new[] {1, 2, 3, 4};
+        public static IReadOnlyList<int> CostGroups { get; } = new[] {1, 2, 3, 4, 5, 6};
     }
 }
