@@ -1,5 +1,4 @@
-﻿using LinqToDB;
-using LinqToDB.Mapping;
+﻿using LinqToDB.Mapping;
 
 namespace QuartierLatin.Backend.Models.CatalogModels
 {
@@ -8,5 +7,6 @@ namespace QuartierLatin.Backend.Models.CatalogModels
     {
         [PrimaryKey, Identity] public virtual int Id { get; set; }
         [Column] public string? Identifier { get; set; }
+        [Column] public int Order { get; set; }
     }
 }

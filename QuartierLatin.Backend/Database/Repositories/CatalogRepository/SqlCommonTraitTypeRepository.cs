@@ -17,22 +17,24 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             _db = db;
         }
 
-        public async Task<int> CreateCommonTraitTypeAsync(Dictionary<string, string> names, string? identifier)
+        public async Task<int> CreateCommonTraitTypeAsync(Dictionary<string, string> names, string? identifier, int order)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new CommonTraitType
             {
                 Names = names,
-                Identifier = identifier
+                Identifier = identifier,
+                Order = order
             }));
         }
 
-        public async Task UpdateCommonTraitTypeAsync(int id, Dictionary<string, string> names, string? identifier)
+        public async Task UpdateCommonTraitTypeAsync(int id, Dictionary<string, string> names, string? identifier, int order)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new CommonTraitType
             {
                 Id = id,
                 Names = names,
-                Identifier = identifier
+                Identifier = identifier,
+                Order = order
             }));
         }
 

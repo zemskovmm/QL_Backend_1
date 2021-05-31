@@ -9,9 +9,9 @@ namespace QuartierLatin.Backend.Application.Interfaces.Catalog
     public interface ICommonTraitTypeAppService
     {
         Task<List<CommonTraitType>> GetTraitTypesAsync();
-        Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names);
+        Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names, int order);
         Task<CommonTraitType> GetTraitTypeByIdAsync(int id);
-        Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names);
+        Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names, int order);
         Task<IEnumerable<int>> GetTraitTypeForEntitiesByEntityTypeAsync(EntityType entityType);
         Task CreateTraitTypeForEntityByEntityTypeAsync(EntityType entityType, int traitTypeId);
         Task DeleteTraitTypeForEntityByEntityTypeAsync(EntityType entityType, int traitTypeId);
