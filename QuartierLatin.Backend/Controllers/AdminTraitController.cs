@@ -43,7 +43,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> CreateTraitTypes([FromBody] TraitTypeDto traitTypeDto)
         {
             var response =
-                await _commonTraitTypeAppService.CreateTraitTypeAsync(traitTypeDto.Identifier, traitTypeDto.Names);
+                await _commonTraitTypeAppService.CreateTraitTypeAsync(traitTypeDto.Identifier, traitTypeDto.Names, traitTypeDto.Order);
 
             return Ok(new {id = response});
         }
@@ -67,7 +67,7 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPut("/api/admin/trait-types/{id}")]
         public async Task<IActionResult> UpdateTraitTypeById([FromBody] TraitTypeDto traitTypeDto, int id)
         {
-            await _commonTraitTypeAppService.UpdateTraitTypeByIdAsync(id, traitTypeDto.Identifier, traitTypeDto.Names);
+            await _commonTraitTypeAppService.UpdateTraitTypeByIdAsync(id, traitTypeDto.Identifier, traitTypeDto.Names, traitTypeDto.Order);
 
             return Ok(new object());
         }

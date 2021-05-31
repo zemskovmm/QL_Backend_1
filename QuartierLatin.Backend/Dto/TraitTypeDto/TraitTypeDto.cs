@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace QuartierLatin.Backend.Dto.TraitTypeDto
 {
@@ -10,5 +9,7 @@ namespace QuartierLatin.Backend.Dto.TraitTypeDto
         public Dictionary<string, string> Names { get; set; }
         [JsonProperty("identifier")]
         public string? Identifier { get; set; }
+        [JsonProperty("order")]
+        public int Order { get; set; }
     }
 }
