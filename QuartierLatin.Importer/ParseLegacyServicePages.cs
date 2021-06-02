@@ -50,11 +50,18 @@ namespace QuartierLatin.Importer
 
                 if(d.NodeType == HtmlNodeType.Text)
                     continue;
-                
-                var classes = string.Join(" ", d.GetAttributeValue("class", "").Split(' ',
-                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                    .Select(c => "legacy-web-" + c));
-                d.SetAttributeValue("class", classes.Length == 0 ? null : classes);
+
+                var classesAttrs = d.GetAttributes().Where(x => x.Name.ToLowerInvariant() == "class")
+                    .ToList();
+                if (classesAttrs.Count != 0)
+                {
+                    var classes = string.Join(" ", d.GetAttributeValue("class", "").Split(' ',
+                            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .Select(c => "legacy-web-" + c));
+                    classesAttrs.ForEach(x => x.Remove());
+                    if (classes.Length != 0)
+                        d.SetAttributeValue("class", classes);
+                }
             }
 
             return node.InnerHtml;
