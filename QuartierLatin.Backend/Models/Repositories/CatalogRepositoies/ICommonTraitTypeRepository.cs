@@ -8,8 +8,8 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
 {
     public interface ICommonTraitTypeRepository
     {
-        Task<int> CreateCommonTraitTypeAsync(Dictionary<string, string> names, string? identifier);
-        Task UpdateCommonTraitTypeAsync(int id, Dictionary<string, string> names, string? identifier);
+        Task<int> CreateCommonTraitTypeAsync(Dictionary<string, string> names, string? identifier, int order);
+        Task UpdateCommonTraitTypeAsync(int id, Dictionary<string, string> names, string? identifier, int order);
         Task CreateOrUpdateCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType);
         Task DeleteCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType);
         Task<CommonTraitType> GetCommonTraitTypeAsync(int id);

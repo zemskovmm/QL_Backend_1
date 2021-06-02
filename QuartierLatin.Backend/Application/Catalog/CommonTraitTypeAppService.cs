@@ -21,9 +21,9 @@ namespace QuartierLatin.Backend.Application.Catalog
             return await _commonTraitTypeRepository.GetCommonTraitTypeListAsync();
         }
 
-        public async Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names)
+        public async Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names, int order)
         {
-            return await _commonTraitTypeRepository.CreateCommonTraitTypeAsync(names, identifier);
+            return await _commonTraitTypeRepository.CreateCommonTraitTypeAsync(names, identifier, order);
         }
 
         public async Task<CommonTraitType> GetTraitTypeByIdAsync(int id)
@@ -31,9 +31,9 @@ namespace QuartierLatin.Backend.Application.Catalog
             return await _commonTraitTypeRepository.GetCommonTraitTypeAsync(id);
         }
 
-        public async Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names)
+        public async Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names, int order)
         {
-            await _commonTraitTypeRepository.UpdateCommonTraitTypeAsync(id, names, identifier);
+            await _commonTraitTypeRepository.UpdateCommonTraitTypeAsync(id, names, identifier, order);
         }
 
         public async Task<IEnumerable<int>> GetTraitTypeForEntitiesByEntityTypeAsync(EntityType entityType)

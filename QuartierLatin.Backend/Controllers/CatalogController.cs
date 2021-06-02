@@ -1,20 +1,18 @@
-﻿using System;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.CatalogDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
+using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
+using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Application.Interfaces;
-using QuartierLatin.Backend.Models;
-using QuartierLatin.Backend.Models.Repositories;
-using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
-using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -95,7 +93,8 @@ namespace QuartierLatin.Backend.Controllers
 
             string FormatPrice(int group) => FormatPriceValue(CostGroup.GetCostGroup(group).to);
 
-            var filters = commonTraits.Select(trait => new CatalogFilterDto
+            var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
+                .Select(trait => new CatalogFilterDto
             {
                 Name = trait.Item1.Names.GetSuitableName(lang),
                 Identifier = trait.Item1.Identifier,
