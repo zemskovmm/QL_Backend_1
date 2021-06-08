@@ -7,5 +7,6 @@ namespace QuartierLatin.Backend.Dto.AdminPageModuleDto
         public int Id { get; set; }
         public Dictionary<string, string> Urls { get; set; }
         public Dictionary<string, string> Titles { get; set; }
+        public Dictionary<string, int?> PreviewImages { get; set; }
     }
 }

@@ -123,5 +123,15 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("/api/route/{lang}/curses/{**url}")]
+        public async Task<IActionResult> GetCurses(string lang, string url)
+        {
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
+
+            return Ok();
+        }
     }
 }

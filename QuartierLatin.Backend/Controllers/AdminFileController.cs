@@ -24,5 +24,13 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(new { id = response });
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> CreateMedia(int id)
+        {
+            await _fileAppService.DeleteFileAsync(id);
+
+            return Ok(new object());
+        }
     }
 }

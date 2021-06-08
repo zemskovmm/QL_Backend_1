@@ -75,10 +75,9 @@ namespace QuartierLatin.Backend.Application
             }
         }
 
-        public async Task DeleteFileAsync(int id, int? dimension = null)
+        public async Task DeleteFileAsync(int id)
         {
             await _blobRepository.DeleteBlobAsync(id);
-            await _blobFileStorage.DeleteBlob(id);
         }
     }
 }

@@ -40,9 +40,12 @@ namespace QuartierLatin.Backend.Database.Repositories.StorageFolders
         { 
             await _db.ExecAsync(async db =>
             {
-                var storage = await db.StorageFolders.FirstOrDefaultAsync(folder => folder.Id == id);
+                var storage = await db.StorageFolders.FirstOrDefaultAsync(folder => folder.Id == id && folder.IsDeleted == false);
                 storage.IsDeleted = true;
                 await db.UpdateAsync(storage);
+
+                await db.Blobs.Where(blob => blob.StorageFolderId == storage.Id)
+                    .ForEachAsync(blob => blob.IsDeleted = true);
             });
         }
 

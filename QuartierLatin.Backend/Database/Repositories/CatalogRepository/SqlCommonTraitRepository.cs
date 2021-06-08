@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using LinqToDB;
+using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LinqToDB;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.CatalogModels;
-using QuartierLatin.Backend.Models.Enums;
-using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {

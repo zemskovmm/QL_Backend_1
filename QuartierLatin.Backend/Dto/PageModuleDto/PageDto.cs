@@ -11,10 +11,14 @@ namespace QuartierLatin.Backend.Dto.PageModuleDto
         [JsonProperty("block")]
         public JObject PageBlockDto { get; set; }
 
-        public PageDto(string title, JObject pageBlockDto)
+        [JsonProperty("previewImageId")]
+        public int? PreviewImageId { get; set; }
+
+        public PageDto(string title, JObject pageBlockDto, int? previewImageId)
         {
             Title = title;
             PageBlockDto = pageBlockDto;
+            PreviewImageId = previewImageId;
         }
     }
 }

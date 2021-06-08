@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Application.Interfaces
@@ -12,6 +11,6 @@ namespace QuartierLatin.Backend.Application.Interfaces
 
         Task<(byte[], string, string)?> GetCompressedFileAsync(int id, int dimension);
 
-        Task DeleteFileAsync(int id, int? dimension = null);
+        Task DeleteFileAsync(int id);
     }
 }

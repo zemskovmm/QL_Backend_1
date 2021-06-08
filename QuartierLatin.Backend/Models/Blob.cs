@@ -12,5 +12,6 @@ namespace QuartierLatin.Backend.Models
         [Column] public string OriginalFileName { get; set; }
 
         [Column] public int? StorageFolderId { get; set; }
+        [Column] public bool IsDeleted { get; set; }
     }
 }

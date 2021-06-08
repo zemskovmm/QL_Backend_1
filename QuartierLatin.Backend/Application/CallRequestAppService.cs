@@ -51,7 +51,7 @@ namespace QuartierLatin.Backend.Application
             catch (Exception e)
             {
                 _logger.LogCritical("Error when sending call request: " + e.ToString());
-                return true;
+                return false;
             }
         }
     }

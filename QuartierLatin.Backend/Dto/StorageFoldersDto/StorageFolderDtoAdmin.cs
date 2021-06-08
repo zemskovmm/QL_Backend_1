@@ -3,8 +3,10 @@ using Newtonsoft.Json;
 
 namespace QuartierLatin.Backend.Dto.StorageFoldersDto
 {
-    public class StorageFolderDtoAdmin : BaseDto
+    public class StorageFolderDtoAdmin
     {
+        public int? Id { get; set; }
+
         [JsonProperty("title")]
         public string FolderName { get; set; }
 

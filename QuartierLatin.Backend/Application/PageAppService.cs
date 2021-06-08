@@ -24,7 +24,7 @@ namespace QuartierLatin.Backend.Application
         }
 
         private async Task<List<Page>> Convert(Dictionary<string, (string url, string title,
-            JObject pageData)> languages)
+            JObject pageData, int? previewImageId)> languages)
         {
             var langs = (await _languageRepository.GetLanguageListAsync()).ToDictionary(x => x.LanguageShortName,
                 x => x.Id);
@@ -33,15 +33,16 @@ namespace QuartierLatin.Backend.Application
                 Url = x.Value.url,
                 Title = x.Value.title,
                 PageData = x.Value.pageData.ToString(),
-                LanguageId = langs[x.Key]
+                LanguageId = langs[x.Key],
+                PreviewImageId = x.Value.previewImageId
             }).ToList();
         }
 
         public async Task<int> CreatePageAsync(Dictionary<string, (string url, string title,
-            JObject pageData)> languages) =>
+            JObject pageData, int? previewImageId)> languages) =>
             await _pageRepository.CreatePages(await Convert(languages));
         
-        public async Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData)> languages) 
+        public async Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, int? previewImageId)> languages) 
             => await _pageRepository.UpdatePages(id, await Convert(languages));
 
         public Task<IList<Page>> GetPageLanguages(int id) => _pageRepository.GetPagesByPageRootIdAsync(id);
@@ -99,7 +100,7 @@ namespace QuartierLatin.Backend.Application
 
             var urls = pages.ToDictionary(page => languageIds[page.LanguageId], page => page.Url);
 
-            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData));
+            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData), pageMain.PreviewImageId);
 
             var pageModuleDto = new PageModuleDto(pageDto);
 

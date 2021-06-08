@@ -35,7 +35,8 @@ namespace QuartierLatin.Backend.Controllers
                 {
                     Id = x.id,
                     Titles = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Title),
-                    Urls = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Url)
+                    Urls = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Url),
+                    PreviewImages = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.PreviewImageId)
                 }).ToList()
             });
         }
@@ -45,7 +46,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> CreatePage([FromBody] PageDto createPageDto)
         {
             var id = await _pageAppService.CreatePageAsync(createPageDto.Languages.ToDictionary(x => x.Key,
-                x => (x.Value.Url, x.Value.Title, x.Value.PageData)));
+                x => (x.Value.Url, x.Value.Title, x.Value.PageData, x.Value.PreviewImageId)));
             return Ok(new {id = id});
         }
         
@@ -53,7 +54,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> UpdatePage(int id, [FromBody] PageDto createPageDto)
         {
             await _pageAppService.UpdatePage(id, createPageDto.Languages.ToDictionary(x => x.Key,
-                x => (x.Value.Url, x.Value.Title, x.Value.PageData)));
+                x => (x.Value.Url, x.Value.Title, x.Value.PageData, x.Value.PreviewImageId)));
             return Ok(new {id = id});
         }
 
@@ -72,7 +73,8 @@ namespace QuartierLatin.Backend.Controllers
                     {
                         Url = x.Value.Url,
                         Title = x.Value.Title,
-                        PageData = JObject.Parse(x.Value.PageData)
+                        PageData = JObject.Parse(x.Value.PageData),
+                        PreviewImageId = x.Value.PreviewImageId
                     })
             });
         }

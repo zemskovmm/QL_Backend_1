@@ -70,5 +70,35 @@ namespace QuartierLatin.Backend.Application.Catalog
         {
             return await _commonTraitTypeRepository.GetTraitTypesWithIndetifierAsync();
         }
+
+        public async Task<List<int>> GetEntityTraitToSchoolIdListAsync(int schoolId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToSchoolIdListAsync(schoolId);
+        }
+
+        public async Task CreateEntityTraitToSchoolAsync(int schoolId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.CreateEntityTraitToSchoolAsync(schoolId, commonTraitId);
+        }
+
+        public async Task DeleteEntityTraitToSchoolAsync(int schoolId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.DeleteEntityTraitToSchoolAsync(schoolId, commonTraitId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToCurseIdListAsync(int curseId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToCurseIdListAsync(curseId);
+        }
+
+        public async Task CreateEntityTraitToCurseAsync(int curseId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.CreateEntityTraitToCurseAsync(curseId, commonTraitId);
+        }
+
+        public async Task DeleteEntityTraitToCurseAsync(int curseId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.DeleteEntityTraitToCurseAsync(curseId, commonTraitId);
+        }
     }
 }

@@ -5,6 +5,8 @@ using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.CurseCatalogModels.CursesModels;
+using QuartierLatin.Backend.Models.CurseCatalogModels.SchoolModels;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {
@@ -106,5 +108,53 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 join traitToEntity in db.CommonTraitTypesForEntities.Where(e => e.EntityType == entityType)
                     on traitType.Id equals traitToEntity.CommonTraitId
                 select traitType).Distinct().ToListAsync());
+
+        public async Task<List<int>> GetEntityTraitToSchoolIdListAsync(int schoolId)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraitToSchools.Where(trait => trait.SchoolId == schoolId)
+                    .Select(trait => trait.CommonTraitId).ToListAsync());
+        }
+
+        public async Task CreateEntityTraitToSchoolAsync(int schoolId, int commonTraitId)
+        {
+            await _db.ExecAsync(db => db.InsertAsync(new CommonTraitToSchool()
+            {
+                CommonTraitId = commonTraitId,
+                SchoolId = schoolId
+            }));
+        }
+
+        public async Task DeleteEntityTraitToSchoolAsync(int schoolId, int commonTraitId)
+        {
+            await _db.ExecAsync(db =>
+                db.CommonTraitToSchools
+                    .Where(trait => trait.SchoolId == schoolId && trait.CommonTraitId == commonTraitId)
+                    .DeleteAsync());
+        }
+
+        public async Task<List<int>> GetEntityTraitToCurseIdListAsync(int curseId)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraitToCurses.Where(trait => trait.CurseId == curseId)
+                    .Select(trait => trait.CommonTraitId).ToListAsync());
+        }
+
+        public async Task CreateEntityTraitToCurseAsync(int curseId, int commonTraitId)
+        {
+            await _db.ExecAsync(db => db.InsertAsync(new CommonTraitToCurse()
+            {
+                CommonTraitId = commonTraitId,
+                CurseId = curseId
+            }));
+        }
+
+        public async Task DeleteEntityTraitToCurseAsync(int curseId, int commonTraitId)
+        {
+            await _db.ExecAsync(db =>
+                db.CommonTraitToCurses
+                    .Where(trait => trait.CurseId == curseId && trait.CommonTraitId == commonTraitId)
+                    .DeleteAsync());
+        }
     }
 }
