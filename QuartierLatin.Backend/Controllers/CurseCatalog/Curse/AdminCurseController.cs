@@ -46,11 +46,12 @@ namespace QuartierLatin.Backend.Controllers.CurseCatalog.Curse
         [HttpPost]
         public async Task<IActionResult> CreateCurse([FromBody] CurseAdminDto curseDto)
         {
-            var schoolId = await _curseAppService.CreateCurseAsync(curseDto.SchoolId);
+            var curseId = await _curseAppService.CreateCurseAsync(curseDto.SchoolId);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var curseLanguage = curseDto.Languages.Select(curse => new CurseLanguage
             {
+                CurseId = curseId,
                 Description = curse.Value.HtmlDescription,
                 Name = curse.Value.Name,
                 Url = curse.Value.Url,
@@ -59,7 +60,7 @@ namespace QuartierLatin.Backend.Controllers.CurseCatalog.Curse
 
             await _curseAppService.CreateCurseLanguageListAsync(curseLanguage);
 
-            return Ok(new { id = schoolId });
+            return Ok(new { id = curseId });
         }
 
         [HttpGet("{id}")]

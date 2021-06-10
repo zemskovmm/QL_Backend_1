@@ -9,7 +9,7 @@ namespace QuartierLatin.Backend.Database.Migrations.CurseCatalog.Curse
         {
             Create.Table("Curses")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
-                .WithColumn("SchoolId").AsInt32().ForeignKey("Schools", "Id").PrimaryKey();
+                .WithColumn("SchoolId").AsInt32().ForeignKey("Schools", "Id");
 
             Create.Table("CurseLanguages")
                 .WithColumn("CurseId").AsInt32().ForeignKey("Curses", "Id").PrimaryKey()

@@ -42,7 +42,7 @@ namespace QuartierLatin.Backend.Application.CurseCatalog.CurseCatalog
 
         public async Task UpdateCurseLanguageByIdAsync(int id, string htmlDescription, int languageId, string name, string url)
         {
-            await _curseCatalogRepository.UpdateCurseLanguageByIdAsync(id, htmlDescription, languageId, name, url);
+            await _curseCatalogRepository.CreateOrUpdateCurseLanguageByIdAsync(id, htmlDescription, languageId, name, url);
         }
     }
 }

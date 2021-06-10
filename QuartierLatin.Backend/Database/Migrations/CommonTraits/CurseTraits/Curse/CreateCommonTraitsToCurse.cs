@@ -2,7 +2,7 @@
 
 namespace QuartierLatin.Backend.Database.Migrations.CommonTraits.CurseTraits.Curse
 {
-    [MigrationDate(2021, 6, 1, 20, 15)]
+    [MigrationDate(2021, 6, 8, 20, 15)]
     public class CreateCommonTraitsToCurse : AutoReversingMigration
     {
         public override void Up()
