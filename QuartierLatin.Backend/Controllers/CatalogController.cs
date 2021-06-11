@@ -13,6 +13,7 @@ using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Dto.CurseCatalogDto.Curse.CatalogDto;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -195,6 +196,77 @@ namespace QuartierLatin.Backend.Controllers
             var response = new CatalogSearchResponseDtoList<CatalogUniversityDto>
             {
                 Items = universityDtos,
+                TotalItems = catalogPage.totalItems,
+                TotalPages = FilterHelper.PageCount(catalogPage.totalItems, pageSize)
+            };
+
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("/api/catalog/curses/filters/{lang}")]
+        public async Task<IActionResult> GetCatalogFiltersToCurseByLangAndEntityType(string lang)
+        {
+            var entityType = EntityType.School;
+
+            var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
+
+            var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
+                .Select(trait => new CatalogFilterDto
+                {
+                    Name = trait.Item1.Names.GetSuitableName(lang),
+                    Identifier = trait.Item1.Identifier,
+                    Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
+                    {
+                        Name = commonTrait.Names.GetSuitableName(lang),
+                        Id = commonTrait.Id
+                    }).ToList()
+                }).ToList();
+
+            var response = new CatalogFilterResponseDto
+            {
+                Filters = filters
+            };
+
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("/api/catalog/curse/search/{lang}")]
+        public async Task<IActionResult> SearchInCurseCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
+        {
+            var entityType = EntityType.University;
+            var pageSize = catalogSearchDto.PageSize ?? 1000;
+            var commonTraits =
+                catalogSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
+                    filter.Values);
+
+            var catalogPage =
+                await _catalogAppService.GetCatalogCursePageByFilterAsync(lang, entityType, commonTraits,
+                    catalogSearchDto.PageNumber, pageSize);
+
+            var curseIds = catalogPage.Item2.Select(x => x.Item1.Id).ToList();
+            var traitDic = await _commonTraitAppService.GetTraitsForEntityIds(EntityType.University,
+                curseIds);
+
+            List<CommonTrait> GetTraits(string identifier, int id)
+            {
+                if (!traitDic.TryGetValue(id, out var traits))
+                    return new List<CommonTrait>();
+                return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
+            }
+
+            var curseDtos = catalogPage.Item2.Select(curse => new CatalogCurseDto()
+            {
+                Url = $"/{lang}/curse/{curse.Item2.Url}",
+                LanglessUrl = $"/curse/{curse.Item2.Url}",
+                Name = curse.Item2.Name,
+                
+            }).ToList();
+
+            var response = new CatalogSearchResponseDtoList<CatalogCurseDto>
+            {
+                Items = curseDtos,
                 TotalItems = catalogPage.totalItems,
                 TotalPages = FilterHelper.PageCount(catalogPage.totalItems, pageSize)
             };

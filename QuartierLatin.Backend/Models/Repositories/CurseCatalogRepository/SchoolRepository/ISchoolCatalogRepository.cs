@@ -12,5 +12,6 @@ namespace QuartierLatin.Backend.Models.Repositories.CurseCatalogRepository.Schoo
         Task<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)> GetSchoolByIdAsync(int id);
         Task UpdateSchoolByIdAsync(int id, int? foundationYear);
         Task CreateOrUpdateSchoolLanguageByIdAsync(int schoolId, string htmlDescription, int languageId, string name, string url);
+        Task<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)> GetSchoolByUrlWithLanguageAsync(int languageId, string url);
     }
 }

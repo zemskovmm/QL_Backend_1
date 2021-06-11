@@ -1,6 +1,5 @@
-﻿using QuartierLatin.Backend.Dto.TraitTypeDto;
+﻿using QuartierLatin.Backend.Dto.CommonTraitDto;
 using System.Collections.Generic;
-using QuartierLatin.Backend.Dto.CommonTraitDto;
 
 namespace QuartierLatin.Backend.Dto.UniversityDto
 {

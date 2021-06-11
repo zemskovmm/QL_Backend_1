@@ -77,5 +77,21 @@ namespace QuartierLatin.Backend.Database.Repositories.CurseCatalogRepository.Sch
                 Url = url
             }));
         }
+
+        public async Task<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)> GetSchoolByUrlWithLanguageAsync(int languageId, string url)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var schoolId =
+                    db.SchoolLanguages.FirstOrDefault(school => school.Url == url && school.LanguageId == languageId).SchoolId;
+
+                var school = await db.Schools.FirstOrDefaultAsync(school => school.Id == schoolId);
+
+                var schoolLanguage = await db.SchoolLanguages.Where(schoolLang => schoolLang.SchoolId == school.Id)
+                    .ToDictionaryAsync(schoolLang => schoolLang.LanguageId, schoolLang => schoolLang);
+
+                return (school: school, schoolLanguage: schoolLanguage);
+            });
+        }
     }
 }

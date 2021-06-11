@@ -5,7 +5,9 @@ using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.CurseCatalogModels.CursesModels;
 using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Models.Repositories.CurseCatalogRepository.CurseRepository;
 
 namespace QuartierLatin.Backend.Application.Catalog
 {
@@ -15,15 +17,17 @@ namespace QuartierLatin.Backend.Application.Catalog
         private readonly ICommonTraitTypeRepository _commonTraitTypeRepository;
         private readonly IUniversityRepository _universityRepository;
         private readonly ILanguageRepository _languageRepository;
+        private readonly ICurseCatalogRepository _curseCatalogRepository;
 
         public CatalogAppService(ICommonTraitRepository commonTraitRepository,
             ICommonTraitTypeRepository commonTraitTypeRepository, IUniversityRepository universityRepository,
-            ILanguageRepository languageRepository)
+            ILanguageRepository languageRepository, ICurseCatalogRepository curseCatalogRepository)
         {
             _commonTraitTypeRepository = commonTraitTypeRepository;
             _commonTraitRepository = commonTraitRepository;
             _universityRepository = universityRepository;
             _languageRepository = languageRepository;
+            _curseCatalogRepository = curseCatalogRepository;
         }
 
         public async Task<List<(CommonTraitType commonTraitType, List<CommonTrait> commonTraits)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType)
@@ -74,6 +78,16 @@ namespace QuartierLatin.Backend.Application.Catalog
 
             return await _universityRepository.GetUniversityPageByFilter(commonTraitsIds, specialtyCategoriesId, degrees,
                 priceFiltersId, langId, pageSize * pageNumber, pageSize);
+        }
+
+        public async Task<(int totalItems, List<(Curse curse, CurseLanguage curseLanguage)>)> GetCatalogCursePageByFilterAsync(string lang, EntityType entityType, Dictionary<string, List<int>> commonTraits, int pageNumber,
+            int pageSize)
+        {
+            var commonTraitsIds = commonTraits
+                .Select(x => x.Value).ToList();
+            var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
+
+            return await _curseCatalogRepository.GetCursePageByFilter(commonTraitsIds, langId, pageSize * pageNumber, pageSize);
         }
     }
 }

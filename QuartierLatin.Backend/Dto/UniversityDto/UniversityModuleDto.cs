@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace QuartierLatin.Backend.Dto.UniversityDto
+﻿namespace QuartierLatin.Backend.Dto.UniversityDto
 {
     public class UniversityModuleDto
     {

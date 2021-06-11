@@ -1,16 +1,19 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
 using QuartierLatin.Backend.Dto.UniversityDto;
+using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Models.Repositories.CurseCatalogRepository.SchoolRepository;
+using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models;
-using QuartierLatin.Backend.Utils;
+using QuartierLatin.Backend.Dto.CurseCatalogDto.Curse.ModuleDto;
+using QuartierLatin.Backend.Dto.CurseCatalogDto.School.ModuleDto;
+using QuartierLatin.Backend.Models.Repositories.CurseCatalogRepository.CurseRepository;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -23,11 +26,14 @@ namespace QuartierLatin.Backend.Controllers
         private readonly IUniversityAppService _universityAppService;
         private readonly ISpecialtyAppService _specialtyAppService;
         private readonly IDegreeRepository _degreeRepository;
+        private readonly ISchoolCatalogRepository _schoolCatalogRepository;
+        private readonly ICurseCatalogRepository _curseCatalogRepository;
 
         public RouteController(IRouteAppService routeAppService, IUniversityAppService universityAppService,
             ILanguageRepository languageRepository, ICommonTraitAppService commonTraitAppService,
             ICommonTraitTypeAppService traitTypeAppService, ISpecialtyAppService specialtyAppService,
-            IDegreeRepository degreeRepository)
+            IDegreeRepository degreeRepository, ISchoolCatalogRepository schoolCatalogRepository,
+            ICurseCatalogRepository curseCatalogRepository)
         {
             _routeAppService = routeAppService;
             _universityAppService = universityAppService;
@@ -36,6 +42,8 @@ namespace QuartierLatin.Backend.Controllers
             _traitTypeAppService = traitTypeAppService;
             _specialtyAppService = specialtyAppService;
             _degreeRepository = degreeRepository;
+            _schoolCatalogRepository = schoolCatalogRepository;
+            _curseCatalogRepository = curseCatalogRepository;
         }
 
         [HttpGet("/api/route/{lang}/{**route}")]
@@ -124,14 +132,100 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/api/route/{lang}/curses/{**url}")]
-        public async Task<IActionResult> GetCurses(string lang, string url)
+        [HttpGet("/api/route/{lang}/school/{**url}")]
+        public async Task<IActionResult> GetSchool(string lang, string url)
         {
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
 
-            return Ok();
+            var school = await _schoolCatalogRepository.GetSchoolByUrlWithLanguageAsync(languageId, url);
+
+            var urls = school.schoolLanguage.ToDictionary(
+                school => languageIds[school.Key],
+                school => school.Value.Url);
+
+            var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();
+
+            var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+            foreach (var traitType in traitsType)
+            {
+                var commonTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndSchoolIdAsync(traitType.Id, school.school.Id);
+
+                traits.Add(traitType.Identifier, commonTraits.Select(trait => new CommonTraitLanguageDto
+                {
+                    Id = trait.Id,
+                    IconBlobId = trait.IconBlobId,
+                    Identifier = trait.Identifier,
+                    Name = trait.Names[lang]
+                }).ToList());
+            }
+
+            var schoolTraits = new SchoolModuleTraitsDto
+            {
+                NamedTraits = traits,
+            };
+
+            var module = new SchoolModuleDto
+            {
+                Title = school.Item2[languageId].Name,
+                DescriptionHtml = school.Item2[languageId].Description,
+                FoundationYear = school.Item1.FoundationYear,
+                Traits = schoolTraits
+            };
+
+            var response = new RouteDto<SchoolModuleDto>("school", urls, module, "school");
+
+            return Ok(response);
+        }
+
+        [HttpGet("/api/route/{lang}/curse/{**url}")]
+        public async Task<IActionResult> GetCurse(string lang, string url)
+        {
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
+
+            var curse = await _curseCatalogRepository.GetCurseByUrlWithLanguageAsync(languageId, url);
+
+            var urls = curse.curseLanguage.ToDictionary(
+                curse => languageIds[curse.Key],
+                curse => curse.Value.Url);
+
+            var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();
+
+            var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+            foreach (var traitType in traitsType)
+            {
+                var commonTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndCurseIdAsync(traitType.Id, curse.curse.Id);
+
+                traits.Add(traitType.Identifier, commonTraits.Select(trait => new CommonTraitLanguageDto
+                {
+                    Id = trait.Id,
+                    IconBlobId = trait.IconBlobId,
+                    Identifier = trait.Identifier,
+                    Name = trait.Names[lang]
+                }).ToList());
+            }
+
+            var curseTraits = new CurseModuleTraitsDto()
+            {
+                NamedTraits = traits,
+            };
+
+            var module = new CurseModuleDto
+            {
+                Title = curse.Item2[languageId].Name,
+                DescriptionHtml = curse.Item2[languageId].Description,
+                SchoolId = curse.Item1.SchoolId,
+                Traits = curseTraits
+            };
+
+            var response = new RouteDto<CurseModuleDto>("curse", urls, module, "curse");
+
+            return Ok(response);
         }
     }
 }

@@ -96,5 +96,31 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     select new {mapping, trait}).ToListAsync())
                 .GroupBy(x => x.mapping.UniversityId)
                 .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
+
+        public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndSchoolIdAsync(int traitTypeId, int schoolId)
+        {
+            var schoolTraitsId = await _db.ExecAsync(db =>
+                db.CommonTraitToSchools.Where(trait => trait.SchoolId == schoolId)
+                    .Select(trait => trait.CommonTraitId)
+                    .ToListAsync());
+
+            return await _db.ExecAsync(db =>
+                db.CommonTraits
+                    .Where(trait => schoolTraitsId.Contains(trait.Id) && trait.CommonTraitTypeId == traitTypeId)
+                    .ToListAsync());
+        }
+
+        public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndCurseIdAsync(int traitTypeId, int curseId)
+        {
+            var curseTraitsId = await _db.ExecAsync(db =>
+                db.CommonTraitToCurses.Where(trait => trait.CurseId == curseId)
+                    .Select(trait => trait.CommonTraitId)
+                    .ToListAsync());
+
+            return await _db.ExecAsync(db =>
+                db.CommonTraits
+                    .Where(trait => curseTraitsId.Contains(trait.Id) && trait.CommonTraitTypeId == traitTypeId)
+                    .ToListAsync());
+        }
     }
 }
