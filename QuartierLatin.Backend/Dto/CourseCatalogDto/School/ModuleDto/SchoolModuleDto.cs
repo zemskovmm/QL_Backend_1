@@ -1,4 +1,4 @@
-﻿namespace QuartierLatin.Backend.Dto.courseCatalogDto.School.ModuleDto
+﻿namespace QuartierLatin.Backend.Dto.CourseCatalogDto.School.ModuleDto
 {
     public class SchoolModuleDto
     {

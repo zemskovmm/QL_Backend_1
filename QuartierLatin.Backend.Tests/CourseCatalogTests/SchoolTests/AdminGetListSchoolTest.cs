@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Dto.courseCatalogDto.School;
 using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
 using QuartierLatin.Backend.Tests.CourseCatalogTests.DataSets;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.School;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.courseCatalogTests.SchoolTests

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces.courseCatalog.SchoolCatalog;
-using QuartierLatin.Backend.Dto.courseCatalogDto.School;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.School;
+using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
 using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
 
 namespace QuartierLatin.Backend.Controllers.courseCatalog.School
 {
