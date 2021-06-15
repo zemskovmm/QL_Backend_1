@@ -36,10 +36,18 @@ namespace QuartierLatin.Backend.Application
 
         public async Task<(Stream, string, string)?> GetFileAsync(int id, int? dimension = null)
         {
+            var fileRecord = await _blobRepository.GetBlobInfoAsync(id);
+
+            if (fileRecord.FileType == "image/svg+xml")
+            {
+                var streamNotScaled = _blobFileStorage.OpenBlob(id);
+
+                return (streamNotScaled, fileRecord.FileType, fileRecord.OriginalFileName);
+            }
+
             if (!_blobFileStorage.CheckIfExist(id, dimension)) return null;
 
             var stream = _blobFileStorage.OpenBlob(id, dimension);
-            var fileRecord = await _blobRepository.GetBlobInfoAsync(id);
 
             return (stream, fileRecord.FileType, fileRecord.OriginalFileName);
 

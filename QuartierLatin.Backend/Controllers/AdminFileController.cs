@@ -20,7 +20,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> CreateMedia([FromForm] CreateMediaDto createMediaDto)
         {
             var response = await _fileAppService.UploadFileAsync(createMediaDto.UploadedFile.OpenReadStream(),
-                createMediaDto.UploadedFile.FileName, createMediaDto.FileType, null, null, createMediaDto.StorageFolderId);
+                createMediaDto.UploadedFile.FileName, createMediaDto.UploadedFile.ContentType, null, null, createMediaDto.StorageFolderId);
 
             return Ok(new { id = response });
         }
