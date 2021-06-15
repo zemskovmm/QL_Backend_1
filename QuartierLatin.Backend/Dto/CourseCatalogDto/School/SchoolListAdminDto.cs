@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace QuartierLatin.Backend.Dto.courseCatalogDto.School
+namespace QuartierLatin.Backend.Dto.CourseCatalogDto.School
 {
     public class SchoolListAdminDto : BaseDto
     {
