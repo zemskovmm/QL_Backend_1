@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.CourseRepository
 {
-    public class SqlcourseCatalogRepository : ICourseCatalogRepository
+    public class SqlCourseCatalogRepository : ICourseCatalogRepository
     {
         private readonly AppDbContextManager _db;
 
-        public SqlcourseCatalogRepository(AppDbContextManager db)
+        public SqlCourseCatalogRepository(AppDbContextManager db)
         {
             _db = db;
         }
