@@ -204,7 +204,7 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("/api/catalog/curses/filters/{lang}")]
+        [HttpGet("/api/catalog/curse/filters/{lang}")]
         public async Task<IActionResult> GetCatalogFiltersToCurseByLangAndEntityType(string lang)
         {
             var entityType = EntityType.School;

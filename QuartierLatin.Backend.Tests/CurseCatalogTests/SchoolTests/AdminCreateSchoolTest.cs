@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Models.Repositories.CurseCatalogRepository.SchoolRepository;
 using QuartierLatin.Backend.Tests.CurseCatalogTests.DataSets;
 using QuartierLatin.Backend.Tests.Infrastructure;

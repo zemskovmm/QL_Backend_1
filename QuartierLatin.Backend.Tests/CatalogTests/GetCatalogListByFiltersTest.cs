@@ -57,8 +57,6 @@ namespace QuartierLatin.Backend.Tests.CatalogTests
             Assert.Contains(commonTraitDegreeId, commonTraitUniversityIdList);
 
             var catalogFilterResponse = SendAnonRequest<CatalogSearchResponseDtoList<CatalogUniversityDto>>($"/api/catalog-filters/search/university/en", filter);
-
-            var test = 1;
         }
 
         public static IEnumerable<object[]> Data()
