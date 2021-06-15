@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Dto.CurseCatalogDto.School;
+using QuartierLatin.Backend.Application.Interfaces.courseCatalog.SchoolCatalog;
+using QuartierLatin.Backend.Dto.courseCatalogDto.School;
 using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Application.Interfaces.CurseCatalog.SchoolCatalog;
-using QuartierLatin.Backend.Models.CurseCatalogModels.SchoolModels;
+using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
 
-namespace QuartierLatin.Backend.Controllers.CurseCatalog.School
+namespace QuartierLatin.Backend.Controllers.courseCatalog.School
 {
     [Authorize(Roles = "Admin")]
     [Route("/api/admin/schools")]

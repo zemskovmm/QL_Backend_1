@@ -21,8 +21,8 @@ namespace QuartierLatin.Backend.Application.Interfaces.Catalog
         Task<List<int>> GetEntityTraitToSchoolIdListAsync(int schoolId);
         Task CreateEntityTraitToSchoolAsync(int schoolId, int commonTraitId);
         Task DeleteEntityTraitToSchoolAsync(int schoolId, int commonTraitId);
-        Task<List<int>> GetEntityTraitToCurseIdListAsync(int curseId);
-        Task CreateEntityTraitToCurseAsync(int curseId, int commonTraitId);
-        Task DeleteEntityTraitToCurseAsync(int curseId, int commonTraitId);
+        Task<List<int>> GetEntityTraitToCourseIdListAsync(int courseId);
+        Task CreateEntityTraitToCourseAsync(int courseId, int commonTraitId);
+        Task DeleteEntityTraitToCourseAsync(int courseId, int commonTraitId);
     }
 }

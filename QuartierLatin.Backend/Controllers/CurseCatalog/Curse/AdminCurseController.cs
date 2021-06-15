@@ -1,38 +1,38 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces.CurseCatalog.CurseCatalog;
-using QuartierLatin.Backend.Dto.CurseCatalogDto.Curse;
-using QuartierLatin.Backend.Models.CurseCatalogModels.CursesModels;
+using QuartierLatin.Backend.Application.Interfaces.CourseCatalog.CourseCatalog;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.Course;
+using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
 using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace QuartierLatin.Backend.Controllers.CurseCatalog.Curse
+namespace QuartierLatin.Backend.Controllers.courseCatalog.course
 {
     [Authorize(Roles = "Admin")]
-    [Route("/api/admin/curses")]
-    public class AdminCurseController : Controller
+    [Route("/api/admin/courses")]
+    public class AdmincourseController : Controller
     {
         private readonly ILanguageRepository _languageRepository;
-        private readonly ICurseAppService _curseAppService;
+        private readonly ICourseAppService _courseAppService;
 
-        public AdminCurseController(ILanguageRepository languageRepository, ICurseAppService curseAppService)
+        public AdmincourseController(ILanguageRepository languageRepository, ICourseAppService courseAppService)
         {
             _languageRepository = languageRepository;
-            _curseAppService = curseAppService;
+            _courseAppService = courseAppService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCurse()
+        public async Task<IActionResult> GetCourse()
         {
-            var curseList = await _curseAppService.GetCurseListAsync();
+            var courseList = await _courseAppService.GetCourseListAsync();
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
-            var response = curseList.Select(curse => new CurseListAdminDto()
+            var response = courseList.Select(course => new CourseListAdminDto()
             {
-                Id = curse.curse.Id,
-                SchoolId = curse.curse.SchoolId,
-                Languages = curse.curseLanguage.ToDictionary(school => language[school.Key],
-                    school => new CurseLanguageAdminDto
+                Id = course.course.Id,
+                SchoolId = course.course.SchoolId,
+                Languages = course.courseLanguage.ToDictionary(school => language[school.Key],
+                    school => new CourseLanguageAdminDto
                     {
                         Name = school.Value.Name,
                         HtmlDescription = school.Value.Description,
@@ -44,40 +44,40 @@ namespace QuartierLatin.Backend.Controllers.CurseCatalog.Curse
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCurse([FromBody] CurseAdminDto curseDto)
+        public async Task<IActionResult> CreateCourse([FromBody] CourseAdminDto courseDto)
         {
-            var curseId = await _curseAppService.CreateCurseAsync(curseDto.SchoolId);
+            var courseId = await _courseAppService.CreateCourseAsync(courseDto.SchoolId);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
-            var curseLanguage = curseDto.Languages.Select(curse => new CurseLanguage
+            var courseLanguage = courseDto.Languages.Select(course => new CourseLanguage
             {
-                CurseId = curseId,
-                Description = curse.Value.HtmlDescription,
-                Name = curse.Value.Name,
-                Url = curse.Value.Url,
-                LanguageId = language.FirstOrDefault(language => language.Value == curse.Key).Key
+                CourseId = courseId,
+                Description = course.Value.HtmlDescription,
+                Name = course.Value.Name,
+                Url = course.Value.Url,
+                LanguageId = language.FirstOrDefault(language => language.Value == course.Key).Key
             }).ToList();
 
-            await _curseAppService.CreateCurseLanguageListAsync(curseLanguage);
+            await _courseAppService.CreateCourseLanguageListAsync(courseLanguage);
 
-            return Ok(new { id = curseId });
+            return Ok(new { id = courseId });
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCurseById(int id)
+        public async Task<IActionResult> GetCourseById(int id)
         {
-            var curse = await _curseAppService.GetCurseByIdAsync(id);
+            var course = await _courseAppService.GetCourseByIdAsync(id);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
-            var response = new CurseAdminDto
+            var response = new CourseAdminDto
             {
-                SchoolId = curse.curse.SchoolId,
-                Languages = curse.schoolLanguage.ToDictionary(curse => language[curse.Key],
-                    curse => new CurseLanguageAdminDto
+                SchoolId = course.course.SchoolId,
+                Languages = course.schoolLanguage.ToDictionary(course => language[course.Key],
+                    course => new CourseLanguageAdminDto
                     {
-                        Name = curse.Value.Name,
-                        HtmlDescription = curse.Value.Description,
-                        Url = curse.Value.Url
+                        Name = course.Value.Name,
+                        HtmlDescription = course.Value.Description,
+                        Url = course.Value.Url
                     })
             };
 
@@ -85,19 +85,19 @@ namespace QuartierLatin.Backend.Controllers.CurseCatalog.Curse
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCurseById([FromBody] CurseAdminDto curseDto, int id)
+        public async Task<IActionResult> UpdateCourseById([FromBody] CourseAdminDto courseDto, int id)
         {
-            await _curseAppService.UpdateCurseByIdAsync(id, curseDto.SchoolId);
+            await _courseAppService.UpdateCourseByIdAsync(id, courseDto.SchoolId);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
-            foreach (var curseLanguage in curseDto.Languages)
+            foreach (var courseLanguage in courseDto.Languages)
             {
-                var languageId = language.FirstOrDefault(language => language.Value == curseLanguage.Key).Key;
-                await _curseAppService.UpdateCurseLanguageByIdAsync(id,
-                    curseLanguage.Value.HtmlDescription,
+                var languageId = language.FirstOrDefault(language => language.Value == courseLanguage.Key).Key;
+                await _courseAppService.UpdateCourseLanguageByIdAsync(id,
+                    courseLanguage.Value.HtmlDescription,
                     languageId,
-                    curseLanguage.Value.Name,
-                    curseLanguage.Value.Url);
+                    courseLanguage.Value.Name,
+                    courseLanguage.Value.Url);
             }
 
             return Ok(new object());

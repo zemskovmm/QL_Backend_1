@@ -3,17 +3,17 @@ using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
+using QuartierLatin.Backend.Dto.courseCatalogDto.School.ModuleDto;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.Course.ModuleDto;
 using QuartierLatin.Backend.Dto.UniversityDto;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.Repositories;
-using QuartierLatin.Backend.Models.Repositories.CurseCatalogRepository.SchoolRepository;
+using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
+using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
 using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Dto.CurseCatalogDto.Curse.ModuleDto;
-using QuartierLatin.Backend.Dto.CurseCatalogDto.School.ModuleDto;
-using QuartierLatin.Backend.Models.Repositories.CurseCatalogRepository.CurseRepository;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -27,13 +27,13 @@ namespace QuartierLatin.Backend.Controllers
         private readonly ISpecialtyAppService _specialtyAppService;
         private readonly IDegreeRepository _degreeRepository;
         private readonly ISchoolCatalogRepository _schoolCatalogRepository;
-        private readonly ICurseCatalogRepository _curseCatalogRepository;
+        private readonly ICourseCatalogRepository _courseCatalogRepository;
 
         public RouteController(IRouteAppService routeAppService, IUniversityAppService universityAppService,
             ILanguageRepository languageRepository, ICommonTraitAppService commonTraitAppService,
             ICommonTraitTypeAppService traitTypeAppService, ISpecialtyAppService specialtyAppService,
             IDegreeRepository degreeRepository, ISchoolCatalogRepository schoolCatalogRepository,
-            ICurseCatalogRepository curseCatalogRepository)
+            ICourseCatalogRepository courseCatalogRepository)
         {
             _routeAppService = routeAppService;
             _universityAppService = universityAppService;
@@ -43,7 +43,7 @@ namespace QuartierLatin.Backend.Controllers
             _specialtyAppService = specialtyAppService;
             _degreeRepository = degreeRepository;
             _schoolCatalogRepository = schoolCatalogRepository;
-            _curseCatalogRepository = curseCatalogRepository;
+            _courseCatalogRepository = courseCatalogRepository;
         }
 
         [HttpGet("/api/route/{lang}/{**route}")]
@@ -180,18 +180,18 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/api/route/{lang}/curse/{**url}")]
-        public async Task<IActionResult> GetCurse(string lang, string url)
+        [HttpGet("/api/route/{lang}/course/{**url}")]
+        public async Task<IActionResult> GetCourse(string lang, string url)
         {
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
 
-            var curse = await _curseCatalogRepository.GetCurseByUrlWithLanguageAsync(languageId, url);
+            var course = await _courseCatalogRepository.GetCourseByUrlWithLanguageAsync(languageId, url);
 
-            var urls = curse.curseLanguage.ToDictionary(
-                curse => languageIds[curse.Key],
-                curse => curse.Value.Url);
+            var urls = course.courseLanguage.ToDictionary(
+                course => languageIds[course.Key],
+                course => course.Value.Url);
 
             var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();
 
@@ -199,7 +199,7 @@ namespace QuartierLatin.Backend.Controllers
 
             foreach (var traitType in traitsType)
             {
-                var commonTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndCurseIdAsync(traitType.Id, curse.curse.Id);
+                var commonTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndCourseIdAsync(traitType.Id, course.course.Id);
 
                 traits.Add(traitType.Identifier, commonTraits.Select(trait => new CommonTraitLanguageDto
                 {
@@ -210,20 +210,20 @@ namespace QuartierLatin.Backend.Controllers
                 }).ToList());
             }
 
-            var curseTraits = new CurseModuleTraitsDto()
+            var courseTraits = new CourseModuleTraitsDto()
             {
                 NamedTraits = traits,
             };
 
-            var module = new CurseModuleDto
+            var module = new CourseModuleDto
             {
-                Title = curse.Item2[languageId].Name,
-                DescriptionHtml = curse.Item2[languageId].Description,
-                SchoolId = curse.Item1.SchoolId,
-                Traits = curseTraits
+                Title = course.Item2[languageId].Name,
+                DescriptionHtml = course.Item2[languageId].Description,
+                SchoolId = course.Item1.SchoolId,
+                Traits = courseTraits
             };
 
-            var response = new RouteDto<CurseModuleDto>("curse", urls, module, "curse");
+            var response = new RouteDto<CourseModuleDto>("course", urls, module, "course");
 
             return Ok(response);
         }

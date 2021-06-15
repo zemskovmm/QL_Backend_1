@@ -86,19 +86,19 @@ namespace QuartierLatin.Backend.Application.Catalog
             await _commonTraitTypeRepository.DeleteEntityTraitToSchoolAsync(schoolId, commonTraitId);
         }
 
-        public async Task<List<int>> GetEntityTraitToCurseIdListAsync(int curseId)
+        public async Task<List<int>> GetEntityTraitToCourseIdListAsync(int courseId)
         {
-            return await _commonTraitTypeRepository.GetEntityTraitToCurseIdListAsync(curseId);
+            return await _commonTraitTypeRepository.GetEntityTraitToCourseIdListAsync(courseId);
         }
 
-        public async Task CreateEntityTraitToCurseAsync(int curseId, int commonTraitId)
+        public async Task CreateEntityTraitToCourseAsync(int courseId, int commonTraitId)
         {
-            await _commonTraitTypeRepository.CreateEntityTraitToCurseAsync(curseId, commonTraitId);
+            await _commonTraitTypeRepository.CreateEntityTraitToCourseAsync(courseId, commonTraitId);
         }
 
-        public async Task DeleteEntityTraitToCurseAsync(int curseId, int commonTraitId)
+        public async Task DeleteEntityTraitToCourseAsync(int courseId, int commonTraitId)
         {
-            await _commonTraitTypeRepository.DeleteEntityTraitToCurseAsync(curseId, commonTraitId);
+            await _commonTraitTypeRepository.DeleteEntityTraitToCourseAsync(courseId, commonTraitId);
         }
     }
 }

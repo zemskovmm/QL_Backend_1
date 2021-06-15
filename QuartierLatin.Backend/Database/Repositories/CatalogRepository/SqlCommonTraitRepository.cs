@@ -110,16 +110,16 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .ToListAsync());
         }
 
-        public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndCurseIdAsync(int traitTypeId, int curseId)
+        public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndCourseIdAsync(int traitTypeId, int courseId)
         {
-            var curseTraitsId = await _db.ExecAsync(db =>
-                db.CommonTraitToCurses.Where(trait => trait.CurseId == curseId)
+            var courseTraitsId = await _db.ExecAsync(db =>
+                db.CommonTraitToCourses.Where(trait => trait.CourseId == courseId)
                     .Select(trait => trait.CommonTraitId)
                     .ToListAsync());
 
             return await _db.ExecAsync(db =>
                 db.CommonTraits
-                    .Where(trait => curseTraitsId.Contains(trait.Id) && trait.CommonTraitTypeId == traitTypeId)
+                    .Where(trait => courseTraitsId.Contains(trait.Id) && trait.CommonTraitTypeId == traitTypeId)
                     .ToListAsync());
         }
     }

@@ -203,26 +203,26 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         
-        [HttpGet("entity-traits-curse/{curseId}")]
-        public async Task<IActionResult> GetEntityTraitToCurse(int curseId)
+        [HttpGet("entity-traits-course/{courseId}")]
+        public async Task<IActionResult> GetEntityTraitToCourse(int courseId)
         {
-            var response = await _commonTraitTypeAppService.GetEntityTraitToCurseIdListAsync(curseId);
+            var response = await _commonTraitTypeAppService.GetEntityTraitToCourseIdListAsync(courseId);
             return Ok(response);
         }
 
         
-        [HttpPost("entity-traits-curse/{curseId}/{commonTraitId}")]
-        public async Task<IActionResult> CreateEntityTraitToCurse(int curseId, int commonTraitId)
+        [HttpPost("entity-traits-course/{courseId}/{commonTraitId}")]
+        public async Task<IActionResult> CreateEntityTraitToCourse(int courseId, int commonTraitId)
         {
-            await _commonTraitTypeAppService.CreateEntityTraitToCurseAsync(curseId, commonTraitId);
+            await _commonTraitTypeAppService.CreateEntityTraitToCourseAsync(courseId, commonTraitId);
             return Ok(new object());
         }
 
         
-        [HttpDelete("entity-traits-curse/{curseId}/{commonTraitId}")]
-        public async Task<IActionResult> DeleteEntityTraitToCurse(int curseId, int commonTraitId)
+        [HttpDelete("entity-traits-course/{courseId}/{commonTraitId}")]
+        public async Task<IActionResult> DeleteEntityTraitToCourse(int courseId, int commonTraitId)
         {
-            await _commonTraitTypeAppService.DeleteEntityTraitToCurseAsync(curseId, commonTraitId);
+            await _commonTraitTypeAppService.DeleteEntityTraitToCourseAsync(courseId, commonTraitId);
             return Ok(new object());
         }
     }

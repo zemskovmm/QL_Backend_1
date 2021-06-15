@@ -1,12 +1,12 @@
 ﻿using LinqToDB;
 using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
+using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models.CurseCatalogModels.CursesModels;
-using QuartierLatin.Backend.Models.CurseCatalogModels.SchoolModels;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {
@@ -133,27 +133,27 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .DeleteAsync());
         }
 
-        public async Task<List<int>> GetEntityTraitToCurseIdListAsync(int curseId)
+        public async Task<List<int>> GetEntityTraitToCourseIdListAsync(int courseId)
         {
             return await _db.ExecAsync(db =>
-                db.CommonTraitToCurses.Where(trait => trait.CurseId == curseId)
+                db.CommonTraitToCourses.Where(trait => trait.CourseId == courseId)
                     .Select(trait => trait.CommonTraitId).ToListAsync());
         }
 
-        public async Task CreateEntityTraitToCurseAsync(int curseId, int commonTraitId)
+        public async Task CreateEntityTraitToCourseAsync(int courseId, int commonTraitId)
         {
-            await _db.ExecAsync(db => db.InsertAsync(new CommonTraitToCurse()
+            await _db.ExecAsync(db => db.InsertAsync(new CommonTraitToCourse()
             {
                 CommonTraitId = commonTraitId,
-                CurseId = curseId
+                CourseId = courseId
             }));
         }
 
-        public async Task DeleteEntityTraitToCurseAsync(int curseId, int commonTraitId)
+        public async Task DeleteEntityTraitToCourseAsync(int courseId, int commonTraitId)
         {
             await _db.ExecAsync(db =>
-                db.CommonTraitToCurses
-                    .Where(trait => trait.CurseId == curseId && trait.CommonTraitId == commonTraitId)
+                db.CommonTraitToCourses
+                    .Where(trait => trait.CourseId == courseId && trait.CommonTraitId == commonTraitId)
                     .DeleteAsync());
         }
     }
