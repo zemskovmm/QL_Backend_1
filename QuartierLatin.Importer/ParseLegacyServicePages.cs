@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -6,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Web;
 using CommandLine;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
@@ -38,6 +40,7 @@ namespace QuartierLatin.Importer
             return doc;
         }
 
+        string GetText(HtmlNode node) => Regex.Replace(HttpUtility.HtmlDecode(node.InnerText).Trim(), @"\s+", " ");
         string GetHtml(HtmlNode node)
         {
             foreach (var d in node.Descendants().ToList())
@@ -47,24 +50,15 @@ namespace QuartierLatin.Importer
                     d.Remove();
                     continue;
                 }
-
                 if(d.NodeType == HtmlNodeType.Text)
                     continue;
-
-                var classesAttrs = d.GetAttributes().Where(x => x.Name.ToLowerInvariant() == "class")
-                    .ToList();
-                if (classesAttrs.Count != 0)
+                if (d.NodeType == HtmlNodeType.Element)
                 {
-                    var classes = string.Join(" ", d.GetAttributeValue("class", "").Split(' ',
-                            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                        .Select(c => "legacy-web-" + c));
-                    classesAttrs.ForEach(x => x.Remove());
-                    if (classes.Length != 0)
-                        d.SetAttributeValue("class", classes);
+                    d.Attributes.RemoveAll();
                 }
             }
 
-            return node.InnerHtml;
+            return node.OuterHtml;
         }
         
         ImporterServicePageLanguage ParseLanguage(string url)
@@ -75,7 +69,7 @@ namespace QuartierLatin.Importer
                 path = path.Substring(3).TrimStart('/');
 
             var doc = GetDocumentFromUrl(url);
-            var title = doc.DocumentNode.SelectSingleNode("//head/title").InnerText.Trim();
+            var title = GetText(doc.DocumentNode.SelectSingleNode("//head/title"));
             var containerDiv = doc.DocumentNode.SelectSingleNode("//body/div[contains(@class, 'remodal-bg')]");
             var containerElements = containerDiv.ChildNodes.Where(c => c.NodeType == HtmlNodeType.Element).ToList();
 
@@ -92,7 +86,8 @@ namespace QuartierLatin.Importer
             {
                 Title = title,
                 TitleImageUrl = imageRegexResult,
-                Url = path
+                Url = path,
+                Blocks = new List<ImporterServicePageBlock>()
             };
                 
             if (contentDiv.Descendants().Any(d => d.GetAttributeValue("class", "").Contains("article_icon")))
@@ -102,12 +97,51 @@ namespace QuartierLatin.Importer
                 var content = elementChildNodes[1];
                 header.Remove();
                 content.Remove();
-                page.CollapseBlockTitle = header.InnerText.Trim();
+                page.CollapseBlockTitle = GetText(header);
                 page.CollapseBlock = GetHtml(content);
             }
 
-            page.MainBlock = GetHtml(contentDiv);
+            ImporterServicePageBlock currentBlock = null;
+            foreach (var ch in contentDiv.ChildNodes)
+            {
+                if (ch.NodeType != HtmlNodeType.Element)
+                    continue;
+                if (ch.Name.ToLowerInvariant() == "h2"
+                    && ch.Descendants().FirstOrDefault(x => x.Name.ToLowerInvariant() == "img") is { } img
+                    && img.GetAttributeValue("src", "").Contains("/uploads/other/article"))
+                {
+                    var src = img.GetAttributeValue("src", "");
+                    var icon = src.Contains("article1") ? ImporterServicePageBlock.IconMedal
+                        : src.Contains("article2") ? ImporterServicePageBlock.IconList
+                        : ImporterServicePageBlock.IconLabel;
 
+                    var a = ch.Descendants().FirstOrDefault(x => x.Name == "a");
+                    string link = null;
+                    if (a != null)
+                    {
+                        link = a.GetAttributeValue("href", "");
+
+                        if (!link.ToLowerInvariant().StartsWith("http"))
+                            link = "https://quartier-latin.com" + link;
+                    }
+
+                    currentBlock = new ImporterServicePageBlock
+                    {
+                        Title = GetText(ch),
+                        Icon = icon,
+                        Link = link
+                    };
+                    page.Blocks.Add(currentBlock);
+                }
+                else if (currentBlock != null)
+                    currentBlock.Content += GetHtml(ch);
+                else
+                    page.CollapseBlock += GetHtml(ch);
+            }
+
+            if (page.Blocks.Count < 2)
+                throw new Exception("Unrecognized page format");
+            
             return page;
         }
         

@@ -16,6 +16,12 @@ namespace QuartierLatin.Importer.DataModel
     {
         public string Title { get; set; }
         public string Content { get; set; }
+        public string Icon { get; set;}
+        public string Link { get; set; }
+
+        public const string IconMedal = "medal";
+        public const string IconList = "list";
+        public const string IconLabel = "label";
     }
     
     public class ImporterServicePageLanguage
@@ -25,6 +31,6 @@ namespace QuartierLatin.Importer.DataModel
         public string TitleImageUrl { get; set; }
         public string CollapseBlockTitle { get; set; }
         public string CollapseBlock { get; set; }
-        public string MainBlock { get; set; }
+        public List<ImporterServicePageBlock> Blocks { get; set; }
     }
 }

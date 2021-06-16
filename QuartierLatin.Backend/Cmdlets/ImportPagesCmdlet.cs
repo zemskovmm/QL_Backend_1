@@ -110,17 +110,10 @@ namespace QuartierLatin.Backend.Cmdlets
 
                     foreach (var lang in page.Languages)
                     {
-                        var html = "";
-                        if (!string.IsNullOrWhiteSpace(lang.Value.Title))
-                            html += $"<h1>{HttpUtility.HtmlEncode(lang.Value.Title)}</h1>";
-                        if (!string.IsNullOrWhiteSpace(lang.Value.CollapseBlockTitle))
-                            html += $"<h2>{HttpUtility.HtmlEncode(lang.Value.CollapseBlockTitle)}</h2>";
-                        html += lang.Value.CollapseBlock;
-                        html += lang.Value.MainBlock;
-
-                        var rows = new JArray()
+                        var rows = new JArray();
+                        void AppendRow(string block, JObject data)
                         {
-                            new JObject
+                            rows.Add(new JObject
                             {
                                 ["maxWidth"] = 1170,
                                 ["blocks"] = new JArray()
@@ -128,34 +121,35 @@ namespace QuartierLatin.Backend.Cmdlets
                                     new JObject
                                     {
                                         ["size"] = 12,
-                                        ["type"] = "basic-html",
-                                        ["data"] = new JObject
-                                        {
-                                            ["html"] = html
-                                        }
-                                    }
-                                }
-                            }
-                        };
-                        
-                        if(!string.IsNullOrWhiteSpace(lang.Value.TitleImageUrl))
-                            rows.Insert(0, new JObject
-                            {
-                                ["maxWidth"] = 1170,
-                                ["blocks"] = new JArray()
-                                {
-                                    new JObject
-                                    {
-                                        ["size"] = 12,
-                                        ["type"] = "imageBlock",
-                                        ["data"] = new JObject
-                                        {
-                                            ["align"] = "justify-center",
-                                            ["image"] = EnsureLegacyImageUrl(lang.Value.TitleImageUrl)
-                                        }
+                                        ["type"] = block,
+                                        ["data"] = data
                                     }
                                 }
                             });
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(lang.Value.TitleImageUrl))
+                            AppendRow("imageBlock", new JObject
+                            {
+                                ["align"] = "justify-center",
+                                ["image"] = EnsureLegacyImageUrl(lang.Value.TitleImageUrl)
+                            });
+                        AppendRow("fixedHeightBlock", new JObject
+                        {
+                            ["text"] = lang.Value.CollapseBlock,
+                            ["header"] = lang.Value.CollapseBlockTitle,
+                            ["height"] = 200
+                        });
+                        foreach (var b in lang.Value.Blocks)
+                            AppendRow("HtmlWithIconBlock", new JObject
+                            {
+                                ["title"] = b.Title,
+                                ["html"] = b.Content,
+                                ["icon"] = b.Icon,
+                                ["link"] = b.Link ?? ""
+                            });
+                        
+                        
                         
                         
                         db.Insert(new Page
