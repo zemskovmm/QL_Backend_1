@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
+using QuartierLatin.Backend.Config;
 using QuartierLatin.Backend.Dto.CatalogDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
@@ -10,41 +15,46 @@ using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Utils;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers
 {
     public class CatalogController : Controller
     {
+        private readonly IOptions<BaseFilterOrderConfig> _baseFilterConfig;
         private readonly ICatalogAppService _catalogAppService;
-        private readonly ISpecialtyAppService _specialtyAppService;
         private readonly ICommonTraitAppService _commonTraitAppService;
         private readonly IDegreeRepository _degreeRepository;
+        private readonly ISpecialtyAppService _specialtyAppService;
 
-        public CatalogController(ICatalogAppService catalogAppService, ISpecialtyAppService specialtyAppService, ICommonTraitAppService commonTraitAppService, IDegreeRepository degreeRepository)
+        public CatalogController(ICatalogAppService catalogAppService, ISpecialtyAppService specialtyAppService,
+            ICommonTraitAppService commonTraitAppService, IDegreeRepository degreeRepository,
+            IOptions<BaseFilterOrderConfig> baseFilterConfig)
         {
             _catalogAppService = catalogAppService;
             _specialtyAppService = specialtyAppService;
             _commonTraitAppService = commonTraitAppService;
             _degreeRepository = degreeRepository;
+            _baseFilterConfig = baseFilterConfig;
         }
 
         // Compatibility with old urls
         [AllowAnonymous]
         [HttpGet("/api/catalog-filters/{lang}/university")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public Task<IActionResult> GetCatalogByLangAndEntityTypeCompat(string lang) =>
-            GetCatalogByLangAndEntityType(lang);
-        
+        public Task<IActionResult> GetCatalogByLangAndEntityTypeCompat(string lang)
+        {
+            return GetCatalogByLangAndEntityType(lang);
+        }
+
         // Compatibility with old urls
         [AllowAnonymous]
         [HttpGet("/api/catalog-filters/{lang}/university/search")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public Task<IActionResult> SearchInCatalogCompat(string lang, [FromBody] CatalogSearchDto catalogSearchDto) =>
-            SearchInCatalog(lang, catalogSearchDto);
-        
+        public Task<IActionResult> SearchInCatalogCompat(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
+        {
+            return SearchInCatalog(lang, catalogSearchDto);
+        }
+
         [AllowAnonymous]
         [HttpGet("/api/catalog/university/filters/{lang}")]
         public async Task<IActionResult> GetCatalogByLangAndEntityType(string lang)
@@ -53,24 +63,15 @@ namespace QuartierLatin.Backend.Controllers
 
             var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
 
-            /*
-            var priceLangVersion = new Dictionary<string, Func<int, (string title, List<)>
-            {
-                {"en", ("Price", "Up to 10000 euros", "Up to 20000 euros", "Up to 30000 euros", "Course")},
-                {"ru", ("Стоимость", "До 10000 евро", "До 20000 евро", "До 30000 евро", "Направление")},
-                {"fr", ("Le coût", "Jusqu'à 10000 euros", "Jusqu'à 20000 euros", "Jusqu'à 30000 euros", "Les cours")}, 
-                {"esp", ("El costo", "Hasta 10000 euros", "Hasta 20000 euros", "Hasta 30000 euros", "Curso")}
-            };*/
-
-            var priceLangs = new Dictionary<string, string>()
+            var priceLangs = new Dictionary<string, string>
             {
                 {"en", "Price"},
                 {"ru", "Стоимость"},
                 {"fr", "Le coût"},
                 {"esp", "El costo"}
             };
-            
-            var specLangs = new Dictionary<string, string>()
+
+            var specLangs = new Dictionary<string, string>
             {
                 {"en", "Course"},
                 {"ru", "Направление"},
@@ -83,67 +84,64 @@ namespace QuartierLatin.Backend.Controllers
                 {"en", "Degree"}, {"ru", "Образование"}, {"esp", "Grado"}, {"fr", "Degré"}
             };
 
-            string FormatPriceValue(int price) => lang == "ru"
-                ? $"До {price} евро"
-                : lang == "fr"
-                    ? $"Jusqu'à {price} euros"
-                    : lang == "esp"
-                        ? $"Hasta {price} euros"
-                        : $"Up to {price} euros";
+            var degrees = await _degreeRepository.GetAll();
+            var specialCategories = await _specialtyAppService.GetSpecialCategoriesList();
 
-            string FormatPrice(int group) => FormatPriceValue(CostGroup.GetCostGroup(group).to);
+            commonTraits.Add((new CommonTraitType
+            {
+                Identifier = "price",
+                Names = priceLangs,
+                Order = _baseFilterConfig.Value.PriceOrder
+            },
+                CostGroup.CostGroups.Select(g =>
+                    new CommonTrait
+                    {
+                        Id = g,
+                        Names = new Dictionary<string, string>
+                        {
+                            [lang] = FormatPrice(g, lang)
+                        }
+                    }).ToList()));
+
+            commonTraits.Add((new CommonTraitType
+            {
+                Identifier = "degree",
+                Names = degreeLangs,
+                Order = _baseFilterConfig.Value.DegreeOrder
+            },
+                degrees.Select(degree =>
+                    new CommonTrait
+                    {
+                        Id = degree.Id,
+                        Names = degree.Names
+                    }).ToList()));
+
+            commonTraits.Add((new CommonTraitType
+            {
+                Identifier = "specialty-category",
+                Names = specLangs,
+                Order = _baseFilterConfig.Value.CourseOrder
+            },
+                specialCategories.Select(category =>
+                    new CommonTrait
+                    {
+                        Id = category.Id,
+                        Names = category.Names
+                    }).ToList()));
+
 
             var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
                 .Select(trait => new CatalogFilterDto
-            {
-                Name = trait.Item1.Names.GetSuitableName(lang),
-                Identifier = trait.Item1.Identifier,
-                Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
                 {
-                    Name = commonTrait.Names.GetSuitableName(lang),
-                    Id = commonTrait.Id
-                }).ToList()
-            }).ToList();
-
-            filters.Add(new CatalogFilterDto
-            {
-                Identifier = "price",
-                Name = priceLangs.GetSuitableName(lang),
-                Options = CostGroup.CostGroups.Select(g =>
-                    new CatalogOptionsDto
+                    Name = trait.Item1.Names.GetSuitableName(lang),
+                    Identifier = trait.Item1.Identifier,
+                    Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
                     {
-                        Id = g,
-                        Name = FormatPrice(g)
+                        Name = commonTrait.Names.GetSuitableName(lang),
+                        Id = commonTrait.Id
                     }).ToList()
-            });
+                }).ToList();
 
-            var degrees = await _degreeRepository.GetAll();
-            filters.Add(new CatalogFilterDto
-            {
-                Identifier = "degree",
-                Name = degreeLangs.GetSuitableName(lang),
-                Options = degrees.Select(degree =>
-                    new CatalogOptionsDto
-                    {
-                        Id = degree.Id,
-                        Name = degree.Names.GetSuitableName(lang)
-                    }).ToList()
-            });
-
-
-            var specialCategories = await _specialtyAppService.GetSpecialCategoriesList();
-
-            filters.Add(new CatalogFilterDto
-            {
-                Identifier = "specialty-category",
-                Name = specLangs.GetSuitableName(lang),
-                Options = specialCategories.Select(category => new CatalogOptionsDto
-                {
-                    Id = category.Id,
-                    Name = category.Names.GetSuitableName(lang)
-                }).ToList()
-            });
-                 
             var response = new CatalogFilterResponseDto
             {
                 Filters = filters
@@ -157,7 +155,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> SearchInCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
             var entityType = EntityType.University;
-            var pageSize = catalogSearchDto.PageSize ?? 1000; 
+            var pageSize = catalogSearchDto.PageSize ?? 1000;
             var commonTraits =
                 catalogSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
                     filter.Values);
@@ -179,7 +177,7 @@ namespace QuartierLatin.Backend.Controllers
                 return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
             }
 
-            var universityDtos = catalogPage.Item2.Select(university => new CatalogUniversityDto()
+            var universityDtos = catalogPage.Item2.Select(university => new CatalogUniversityDto
             {
                 Url = $"/{lang}/university/{university.Item2.Url}",
                 LanglessUrl = $"/university/{university.Item2.Url}",
@@ -200,6 +198,22 @@ namespace QuartierLatin.Backend.Controllers
             };
 
             return Ok(response);
+        }
+
+        private string FormatPriceValue(int price, string lang)
+        {
+            return lang == "ru"
+                ? $"До {price} евро"
+                : lang == "fr"
+                    ? $"Jusqu'à {price} euros"
+                    : lang == "esp"
+                        ? $"Hasta {price} euros"
+                        : $"Up to {price} euros";
+        }
+
+        private string FormatPrice(int group, string lang)
+        {
+            return FormatPriceValue(CostGroup.GetCostGroup(group).to, lang);
         }
     }
 }
