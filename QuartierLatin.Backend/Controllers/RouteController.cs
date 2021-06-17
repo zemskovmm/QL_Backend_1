@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
 using QuartierLatin.Backend.Dto.UniversityDto;
+using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models;
-using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -23,11 +22,12 @@ namespace QuartierLatin.Backend.Controllers
         private readonly IUniversityAppService _universityAppService;
         private readonly ISpecialtyAppService _specialtyAppService;
         private readonly IDegreeRepository _degreeRepository;
+        private readonly IUniversityGalleryAppService _universityGalleryAppService;
 
         public RouteController(IRouteAppService routeAppService, IUniversityAppService universityAppService,
             ILanguageRepository languageRepository, ICommonTraitAppService commonTraitAppService,
             ICommonTraitTypeAppService traitTypeAppService, ISpecialtyAppService specialtyAppService,
-            IDegreeRepository degreeRepository)
+            IDegreeRepository degreeRepository, IUniversityGalleryAppService universityGalleryAppService)
         {
             _routeAppService = routeAppService;
             _universityAppService = universityAppService;
@@ -36,6 +36,7 @@ namespace QuartierLatin.Backend.Controllers
             _traitTypeAppService = traitTypeAppService;
             _specialtyAppService = specialtyAppService;
             _degreeRepository = degreeRepository;
+            _universityGalleryAppService = universityGalleryAppService;
         }
 
         [HttpGet("/api/route/{lang}/{**route}")]
@@ -111,12 +112,17 @@ namespace QuartierLatin.Backend.Controllers
                 }).ToList()
             };
 
+            var gallery = await _universityGalleryAppService.GetGalleryToUniversityAsync(university.university.Id);
+
             var module = new UniversityModuleDto
             {
                 Title = university.Item2[languageId].Name,
                 DescriptionHtml = university.Item2[languageId].Description,
                 FoundationYear = university.Item1.FoundationYear,
-                Traits = universityTraits
+                Traits = universityTraits,
+                LogoId = university.university.LogoId,
+                BannerId = university.university.BannerId,
+                GalleryList = gallery
             };
 
             var response = new RouteDto<UniversityModuleDto>("university", urls, module, "university");
