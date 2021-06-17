@@ -11,8 +11,8 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task<Dictionary<int, UniversityLanguage>> GetUniversityLanguageByUniversityIdAsync(int universityId);
         Task<University> GetUniversityByIdAsync(int id);
         Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage);
-        Task<int> CreateUniversityAsync(int? foundationYear);
-        Task UpdateUniversityAsync(int id, int? foundationYear);
+        Task<int> CreateUniversityAsync(int? foundationYear, int? logoId, int? bannerId);
+        Task UpdateUniversityAsync(int id, int? foundationYear, int? logoId, int? bannerId);
         Task<int> GetUniversityIdByUrl(string url);
         Task<List<Specialty>> GetSpecialtiesUniversityByUniversityIdList(int universityId);
         Task<Specialty> GetSpecialtyById(int specialtyId);

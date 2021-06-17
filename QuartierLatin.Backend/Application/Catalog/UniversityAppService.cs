@@ -39,9 +39,9 @@ namespace QuartierLatin.Backend.Application.Catalog
             return (university : university, universityLanguage: universityLanguageDictionary);
         }
 
-        public async Task UpdateUniversityByIdAsync(int id, int? foundationYear)
+        public async Task UpdateUniversityByIdAsync(int id, int? foundationYear, int? logoId, int? bannerId)
         {
-            await _universityRepository.UpdateUniversityAsync(id, foundationYear);
+            await _universityRepository.UpdateUniversityAsync(id, foundationYear, logoId, bannerId);
         }
 
         public async Task UpdateUniversityLanguageByIdAsync(int id, string description, int languageId, string name,
@@ -50,9 +50,9 @@ namespace QuartierLatin.Backend.Application.Catalog
             await _universityRepository.CreateOrUpdateUniversityLanguageAsync(id, languageId, name, description, url);
         }
 
-        public async Task<int> CreateUniversityAsync(int? universityFoundationYear)
+        public async Task<int> CreateUniversityAsync(int? universityFoundationYear, int? logoId, int? bannerId)
         {
-            return await _universityRepository.CreateUniversityAsync(universityFoundationYear);
+            return await _universityRepository.CreateUniversityAsync(universityFoundationYear, logoId, bannerId);
         }
 
         public async Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage)

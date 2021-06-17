@@ -1,13 +1,10 @@
-﻿using System;
-using LinqToDB;
+﻿using LinqToDB;
 using LinqToDB.Data;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
-using QuartierLatin.Backend.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
@@ -52,20 +49,24 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             await _db.ExecAsync(db => db.BulkCopyAsync(universityLanguage));
         }
 
-        public async Task<int> CreateUniversityAsync(int? foundationYear)
+        public async Task<int> CreateUniversityAsync(int? foundationYear, int? logoId, int? bannerId)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new University
             {
                 FoundationYear = foundationYear,
+                LogoId = logoId,
+                BannerId = bannerId
             }));
         }
 
-        public async Task UpdateUniversityAsync(int id, int? foundationYear)
+        public async Task UpdateUniversityAsync(int id, int? foundationYear, int? logoId, int? bannerId)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new University
             {
                 Id = id,
-                FoundationYear = foundationYear
+                FoundationYear = foundationYear,
+                LogoId = logoId,
+                BannerId = bannerId
             }));
         }
 

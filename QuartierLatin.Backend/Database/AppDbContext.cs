@@ -40,6 +40,7 @@ namespace QuartierLatin.Backend.Database
         public ITable<Degree> Degrees => GetTable<Degree>();
         public ITable<UniversityDegree> UniversityDegrees => GetTable<UniversityDegree>();
         public ITable<StorageFolder> StorageFolders => GetTable<StorageFolder>();
+        public ITable<UniversityGallery> UniversityGalleries => GetTable<UniversityGallery>();
     }
 
     public interface IAppDbConnectionFactory
