@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -25,16 +26,18 @@ namespace QuartierLatin.Backend.Controllers
         private readonly ICommonTraitAppService _commonTraitAppService;
         private readonly IDegreeRepository _degreeRepository;
         private readonly ISpecialtyAppService _specialtyAppService;
+        private readonly IUniversityGalleryAppService _universityGalleryAppService;
 
         public CatalogController(ICatalogAppService catalogAppService, ISpecialtyAppService specialtyAppService,
             ICommonTraitAppService commonTraitAppService, IDegreeRepository degreeRepository,
-            IOptions<BaseFilterOrderConfig> baseFilterConfig)
+            IOptions<BaseFilterOrderConfig> baseFilterConfig, IUniversityGalleryAppService universityGalleryAppService)
         {
             _catalogAppService = catalogAppService;
             _specialtyAppService = specialtyAppService;
             _commonTraitAppService = commonTraitAppService;
             _degreeRepository = degreeRepository;
             _baseFilterConfig = baseFilterConfig;
+            _universityGalleryAppService = universityGalleryAppService;
         }
 
         // Compatibility with old urls
@@ -177,18 +180,28 @@ namespace QuartierLatin.Backend.Controllers
                 return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
             }
 
-            var universityDtos = catalogPage.Item2.Select(university => new CatalogUniversityDto
+            var universityDtos = new List<CatalogUniversityDto>();
+
+            foreach(var university in catalogPage.Item2)
             {
-                Url = $"/{lang}/university/{university.Item2.Url}",
-                LanglessUrl = $"/university/{university.Item2.Url}",
-                Name = university.Item2.Name,
-                PriceFrom = CostGroup.GetCostGroup(university.costGroup).from,
-                PriceTo = CostGroup.GetCostGroup(university.costGroup).to,
-                Degrees = degreeDic.GetValueOrDefault(university.Item2.UniversityId)
-                    ?.Select(x => x.Names.GetSuitableName(lang)).ToList() ?? new List<string>(),
-                InstructionLanguages = GetTraits("instruction-language", university.Item1.Id).Select(x => x.Identifier)
-                    .ToList()
-            }).ToList();
+                var gallery = await _universityGalleryAppService.GetGalleryToUniversityAsync(university.Item1.Id);
+
+                universityDtos.Add(new CatalogUniversityDto
+                {
+                    Url = $"/{lang}/university/{university.Item2.Url}",
+                    LanglessUrl = $"/university/{university.Item2.Url}",
+                    Name = university.Item2.Name,
+                    PriceFrom = CostGroup.GetCostGroup(university.costGroup).from,
+                    PriceTo = CostGroup.GetCostGroup(university.costGroup).to,
+                    Degrees = degreeDic.GetValueOrDefault(university.Item2.UniversityId)
+                        ?.Select(x => x.Names.GetSuitableName(lang)).ToList() ?? new List<string>(),
+                    InstructionLanguages = GetTraits("instruction-language", university.Item1.Id).Select(x => x.Identifier)
+                        .ToList(),
+                    LogoId = university.Item1.LogoId,
+                    BannerId = university.Item1.BannerId,
+                    GalleryList = gallery
+                });
+            }
 
             var response = new CatalogSearchResponseDtoList<CatalogUniversityDto>
             {

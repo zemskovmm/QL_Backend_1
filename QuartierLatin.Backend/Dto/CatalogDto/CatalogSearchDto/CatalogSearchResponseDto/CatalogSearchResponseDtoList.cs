@@ -19,5 +19,8 @@ namespace QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchRes
         public List<string> InstructionLanguages { get; set; }
         public List<string> Degrees { get; set; }
         public string LanglessUrl { get; set; }
+        public int? LogoId { get; set; }
+        public int? BannerId { get; set; }
+        public List<int> GalleryList { get; set; }
     }
 }
