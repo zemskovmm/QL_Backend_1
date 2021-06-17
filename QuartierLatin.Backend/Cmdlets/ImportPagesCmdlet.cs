@@ -129,10 +129,12 @@ namespace QuartierLatin.Backend.Cmdlets
                         }
 
                         if (!string.IsNullOrWhiteSpace(lang.Value.TitleImageUrl))
-                            AppendRow("imageBlock", new JObject
+                            AppendRow("titleAndCallBackBlock", new JObject
                             {
-                                ["align"] = "justify-center",
-                                ["image"] = EnsureLegacyImageUrl(lang.Value.TitleImageUrl)
+                                ["title"] = lang.Value.Title,
+                                ["titleColor"] = "white",
+                                ["titleShadow"] = true,
+                                ["background"] = EnsureLegacyImageUrl(lang.Value.TitleImageUrl)
                             });
                         AppendRow("fixedHeightBlock", new JObject
                         {

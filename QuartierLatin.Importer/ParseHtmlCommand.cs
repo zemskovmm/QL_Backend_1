@@ -120,6 +120,23 @@ namespace QuartierLatin.Importer
                     p.Remove();
             }
 
+            foreach (var font in body.Descendants().Where(x => x.Name.ToLowerInvariant() == "font").ToList())
+            {
+                if (font.ParentNode != null)
+                {
+                    if (font.ChildNodes.Count == 0 && font.FirstChild.Name.ToLowerInvariant() == "font")
+                        font.ParentNode.ReplaceChild(font, font.FirstChild);
+                    else
+                    {
+                        font.Attributes.RemoveAll();
+                        font.Name = "span";
+                    }
+                }
+            }
+            
+            foreach (var b in body.Descendants().Where(x => x.Name.ToLowerInvariant() == "b").ToList()) 
+                b.Name = "h2";
+
             return new ImporterUniversityLanguage
             {
                 Name = name,

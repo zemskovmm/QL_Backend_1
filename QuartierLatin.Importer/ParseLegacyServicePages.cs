@@ -54,7 +54,9 @@ namespace QuartierLatin.Importer
                     continue;
                 if (d.NodeType == HtmlNodeType.Element)
                 {
-                    d.Attributes.RemoveAll();
+                    foreach(var a in d.Attributes.ToList())
+                        if (a.Name.ToLowerInvariant() != "href")
+                            a.Remove();
                 }
             }
 
