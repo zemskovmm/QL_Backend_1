@@ -86,8 +86,9 @@ namespace QuartierLatin.Backend.Cmdlets
                 using (var md5 = MD5.Create())
                     hash = md5.ComputeHash(file);
                 file.Position = 0;
-                var name = Path.GetFileName(path) + "_" +
-                           BitConverter.ToString(hash).ToLowerInvariant().Replace("-", "");
+                var name = Path.GetFileNameWithoutExtension(path) + "_" +
+                           BitConverter.ToString(hash).ToLowerInvariant().Replace("-", "") + "." +
+                           Path.GetExtension(path);
 
                 return EnsureFileWithName(name, dir, () => file);
             });
