@@ -1,12 +1,12 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.UniversityDto;
 using QuartierLatin.Backend.Dto.UniversityDto.GetUniversityListDto;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -16,46 +16,56 @@ namespace QuartierLatin.Backend.Controllers
     {
         private readonly ILanguageRepository _languageRepository;
         private readonly IUniversityAppService _universityAppService;
+        private readonly IUniversityGalleryAppService _universityGalleryAppService;
 
         public AdminUniversityController(IUniversityAppService universityAppService,
-            ILanguageRepository languageRepository)
+            ILanguageRepository languageRepository, IUniversityGalleryAppService universityGalleryAppService)
         {
             _universityAppService = universityAppService;
             _languageRepository = languageRepository;
+            _universityGalleryAppService = universityGalleryAppService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetUniversity()
         {
             var universityList = await _universityAppService.GetUniversityListAsync();
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
-            var response = universityList.Select(university => new UniversityListDto
+            var response = new List<UniversityListDto>();
+
+            foreach (var university in universityList)
+            {
+                var gallery = await _universityGalleryAppService.GetGalleryToUniversityAsync(university.university.Id);
+
+                response.Add(new UniversityListDto
                 {
                     Id = university.university.Id,
                     FoundationYear = university.university.FoundationYear,
                     MinimumAge = 18,
                     Website = "/",
-                    Languages = university.universityLanguage.ToDictionary(university => _languageRepository
-                        .GetLanguageShortNameAsync(university.Key)
-                        .ConfigureAwait(false)
-                        .GetAwaiter()
-                        .GetResult(), university => new UniversityLanguageDto
+                    Languages = university.universityLanguage.ToDictionary(university =>
+                        languageIds.FirstOrDefault(lang => lang.Key == university.Key).Value, university => new UniversityLanguageDto
                     {
                         Name = university.Value.Name,
                         HtmlDescription = university.Value.Description,
                         Url = university.Value.Url
-                    })
-                })
-                .ToList();
+                    }),
+                    LogoId = university.university.LogoId,
+                    BannerId = university.university.BannerId,
+                    GalleryList = gallery
+                });
+            }
 
             return Ok(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUniversity([FromBody] UniversityDto university)
+        public async Task<IActionResult> CreateUniversity([FromBody] CreateUniversityDtoAdmin university)
         {
             var universityId =
-                await _universityAppService.CreateUniversityAsync(university.FoundationYear);
+                await _universityAppService.CreateUniversityAsync(university.FoundationYear, university.LogoId, university.BannerId);
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var universityLanguage = university.Languages.Select(university => new UniversityLanguage
             {
@@ -63,11 +73,7 @@ namespace QuartierLatin.Backend.Controllers
                 Description = university.Value.HtmlDescription,
                 Name = university.Value.Name,
                 Url = university.Value.Url,
-                LanguageId = _languageRepository
-                    .GetLanguageIdByShortNameAsync(university.Key)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult()
+                LanguageId = languageIds.FirstOrDefault(lang => lang.Value == university.Key).Key
             }).ToList();
 
             await _universityAppService.CreateUniversityLanguageListAsync(universityLanguage);
@@ -79,33 +85,38 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> GetUniversityById(int id)
         {
             var university = await _universityAppService.GetUniversityByIdAsync(id);
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+            var gallery = await _universityGalleryAppService.GetGalleryToUniversityAsync(id);
+
 
             var response = new UniversityDto
             {
                 FoundationYear = university.university.FoundationYear,
-                Languages = university.universityLanguage.ToDictionary(university => _languageRepository
-                    .GetLanguageShortNameAsync(university.Key)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult(), university => new UniversityLanguageDto
+                Languages = university.universityLanguage.ToDictionary(university =>
+                        languageIds.FirstOrDefault(lang => lang.Key == university.Key).Value,
+                    university => new UniversityLanguageDto
                 {
                     Name = university.Value.Name,
                     HtmlDescription = university.Value.Description,
                     Url = university.Value.Url
-                })
+                }),
+                LogoId = university.university.LogoId,
+                BannerId = university.university.BannerId,
+                GalleryList = gallery
             };
 
             return Ok(response);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUniversityById([FromBody] UniversityDto universityDto, int id)
+        public async Task<IActionResult> UpdateUniversityById([FromBody] CreateUniversityDtoAdmin universityDto, int id)
         {
-            await _universityAppService.UpdateUniversityByIdAsync(id, universityDto.FoundationYear);
+            await _universityAppService.UpdateUniversityByIdAsync(id, universityDto.FoundationYear, universityDto.LogoId, universityDto.BannerId);
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             foreach (var universityLanguage in universityDto.Languages)
             {
-                var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(universityLanguage.Key);
+                var languageId = languageIds.FirstOrDefault(lang => lang.Value == universityLanguage.Key).Key;
                 await _universityAppService.UpdateUniversityLanguageByIdAsync(id,
                     universityLanguage.Value.HtmlDescription,
                     languageId,
