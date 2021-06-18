@@ -9,6 +9,6 @@
     {
         public string Name { get; set; }
         public int CostFrom { get; set; }
-        public int CostTo { get; set; }
+        public int? CostTo { get; set; }
     }
 }

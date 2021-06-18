@@ -15,7 +15,7 @@ namespace QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchRes
         public string Url { get; set; }
         public string Name { get; set; }
         public decimal PriceFrom { get; set; }
-        public decimal PriceTo { get; set; }
+        public decimal? PriceTo { get; set; }
         public List<string> InstructionLanguages { get; set; }
         public List<string> Degrees { get; set; }
         public string LanglessUrl { get; set; }

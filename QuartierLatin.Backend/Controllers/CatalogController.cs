@@ -213,20 +213,22 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        private string FormatPriceValue(int price, string lang)
+        private string FormatPriceValue(int from, int? to, string lang)
         {
             return lang == "ru"
-                ? $"До {price} евро"
+                ? to is null ? $"От {from} евро" : $"От {from} до {to} евро"
                 : lang == "fr"
-                    ? $"Jusqu'à {price} euros"
+                    ? to is null ? $"De {from} euros" : $"De {from} à {to} euros"
                     : lang == "esp"
-                        ? $"Hasta {price} euros"
-                        : $"Up to {price} euros";
+                        ? to is null ? $"De {from} euros" : $"De {from} a {to} euros"
+                            : lang == "cn"
+                                ? to is null ? $"从 {from} euros" : $"从 {from} 到 {to} euros"
+                                : to is null ? $"From {from} euros" : $"From {from} to {to} euros";
         }
 
         private string FormatPrice(int group, string lang)
         {
-            return FormatPriceValue(CostGroup.GetCostGroup(group).to, lang);
+            return FormatPriceValue(CostGroup.GetCostGroup(group).from, CostGroup.GetCostGroup(group).to, lang);
         }
     }
 }
