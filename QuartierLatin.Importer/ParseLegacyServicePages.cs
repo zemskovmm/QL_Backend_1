@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
 using CommandLine;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using QuartierLatin.Importer.DataModel;
@@ -94,13 +95,12 @@ namespace QuartierLatin.Importer
                 
             if (contentDiv.Descendants().Any(d => d.GetAttributeValue("class", "").Contains("article_icon")))
             {
-                var elementChildNodes = contentDiv.ChildNodes.Where(n => n.NodeType == HtmlNodeType.Element).ToList();
-                var header = elementChildNodes[0];
-                var content = elementChildNodes[1];
-                header.Remove();
-                content.Remove();
-                page.CollapseBlockTitle = GetText(header);
-                page.CollapseBlock = GetHtml(content);
+                var header = contentDiv.ChildNodes.FirstOrDefault(n => n.NodeType == HtmlNodeType.Element);
+                if (header.Name == "h2")
+                {
+                    page.CollapseBlockTitle = GetText(header);
+                    header.Remove();
+                }
             }
 
             ImporterServicePageBlock currentBlock = null;
