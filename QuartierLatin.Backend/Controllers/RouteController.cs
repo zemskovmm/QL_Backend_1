@@ -125,7 +125,7 @@ namespace QuartierLatin.Backend.Controllers
                 GalleryList = gallery
             };
 
-            var response = new RouteDto<UniversityModuleDto>("university", urls, module, "university");
+            var response = new RouteDto<UniversityModuleDto>("university", urls, module, "university", university.Item2[languageId].Name);
 
             return Ok(response);
         }
