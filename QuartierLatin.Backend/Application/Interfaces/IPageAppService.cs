@@ -13,7 +13,7 @@ namespace QuartierLatin.Backend.Application.Interfaces
         Task<RouteDto<PageModuleDto>> GetPagesByRootIdAsync(string lang, string url);
         Task<IList<Page>> GetPagesByRootIdAsync(int id);
 
-        Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url);
+        Task<AdminRouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url);
 
         Task<int> CreatePageAsync(Dictionary<string, (string url, string title, JObject pageData)> languages);
 

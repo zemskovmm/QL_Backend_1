@@ -54,7 +54,7 @@ namespace QuartierLatin.Backend.Application
             return (lang: langs, result: results);
         }
 
-        public async Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url)
+        public async Task<AdminRouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url)
         {
             var clearUrl = RewriteRouteRules.ReWriteRequests(url);
 
@@ -75,7 +75,7 @@ namespace QuartierLatin.Backend.Application
 
             var adminPageModuleDto = new AdminPageModuleDto(adminPageDto, pages.First().PageRootId);
 
-            var response = new RouteDto<AdminPageModuleDto>(null, urls, adminPageModuleDto, "page");
+            var response = new AdminRouteDto<AdminPageModuleDto>(null, urls, adminPageModuleDto, "page", titles);
 
             return response;
         }
@@ -103,7 +103,7 @@ namespace QuartierLatin.Backend.Application
 
             var pageModuleDto = new PageModuleDto(pageDto);
 
-            var response = new RouteDto<PageModuleDto>(null, urls, pageModuleDto, "page");
+            var response = new RouteDto<PageModuleDto>(null, urls, pageModuleDto, "page", pageMain.Title);
 
             return response;
         }

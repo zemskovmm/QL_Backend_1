@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace QuartierLatin.Backend.Dto
 {
-    public class RouteDto<T>
+    public class AdminRouteDto<T>
     {
         [JsonProperty("moduleName")]
         public string ModuleName { get; protected set; }
@@ -13,8 +13,8 @@ namespace QuartierLatin.Backend.Dto
         [JsonProperty("module")]
         public T Module { get; protected set; }
         [JsonProperty("title")]
-        public string Title { get; protected set; }
-        public RouteDto(string urlPrefix, Dictionary<string, string> urls, T module, string moduleName, string title)
+        public Dictionary<string, string> Title { get; protected set; }
+        public AdminRouteDto(string urlPrefix, Dictionary<string, string> urls, T module, string moduleName, Dictionary<string, string> title)
         {
             ModuleName = moduleName;
             Urls = urls.ToDictionary(x => x.Key, x =>
