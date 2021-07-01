@@ -78,15 +78,12 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 
         public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndUniversityId(int typeId, int universityId)
         {
-            var universityTraitsId = await _db.ExecAsync(db =>
-                db.CommonTraitsToUniversities.Where(trait => trait.UniversityId == universityId)
-                    .Select(trait => trait.CommonTraitId)
-                    .ToListAsync());
-
             return await _db.ExecAsync(db =>
-                db.CommonTraits
-                    .Where(trait => universityTraitsId.Contains(trait.Id) && trait.CommonTraitTypeId == typeId)
-                    .ToListAsync());
+                (from courseTraits in db.CommonTraitsToUniversities.Where(trait => trait.UniversityId == universityId)
+                    join trait in db.CommonTraits.Where(trait => trait.CommonTraitTypeId == typeId) on courseTraits
+                        .CommonTraitId equals trait.Id
+                    select trait).ToListAsync()
+            );
         }
 
         public Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByUniversityIds(IEnumerable<int> ids) =>
@@ -99,28 +96,22 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 
         public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndSchoolIdAsync(int traitTypeId, int schoolId)
         {
-            var schoolTraitsId = await _db.ExecAsync(db =>
-                db.CommonTraitToSchools.Where(trait => trait.SchoolId == schoolId)
-                    .Select(trait => trait.CommonTraitId)
-                    .ToListAsync());
-
             return await _db.ExecAsync(db =>
-                db.CommonTraits
-                    .Where(trait => schoolTraitsId.Contains(trait.Id) && trait.CommonTraitTypeId == traitTypeId)
-                    .ToListAsync());
+                (from courseTraits in db.CommonTraitToSchools.Where(trait => trait.SchoolId == schoolId)
+                    join trait in db.CommonTraits.Where(trait => trait.CommonTraitTypeId == traitTypeId) on courseTraits
+                        .CommonTraitId equals trait.Id
+                    select trait).ToListAsync()
+            );
         }
 
         public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndCourseIdAsync(int traitTypeId, int courseId)
         {
-            var courseTraitsId = await _db.ExecAsync(db =>
-                db.CommonTraitToCourses.Where(trait => trait.CourseId == courseId)
-                    .Select(trait => trait.CommonTraitId)
-                    .ToListAsync());
-
             return await _db.ExecAsync(db =>
-                db.CommonTraits
-                    .Where(trait => courseTraitsId.Contains(trait.Id) && trait.CommonTraitTypeId == traitTypeId)
-                    .ToListAsync());
+                (from courseTraits in db.CommonTraitToCourses.Where(trait => trait.CourseId == courseId)
+                    join trait in db.CommonTraits.Where(trait => trait.CommonTraitTypeId == traitTypeId) on courseTraits
+                        .CommonTraitId equals trait.Id
+                    select trait).ToListAsync()
+            );
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
+using Npgsql;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.FolderModels;
 using QuartierLatin.Backend.Models.Repositories.StorageFoldersRepositories;
@@ -40,12 +41,12 @@ namespace QuartierLatin.Backend.Database.Repositories.StorageFolders
         { 
             await _db.ExecAsync(async db =>
             {
-                var storage = await db.StorageFolders.FirstOrDefaultAsync(folder => folder.Id == id && folder.IsDeleted == false);
-                storage.IsDeleted = true;
-                await db.UpdateAsync(storage);
+                using var trx = await (db.Connection as NpgsqlConnection).BeginTransactionAsync();
+                await db.StorageFolders.Where(folder => folder.Id == id && folder.IsDeleted == false).Set(x=> x.IsDeleted, x => true).UpdateAsync();
 
-                await db.Blobs.Where(blob => blob.StorageFolderId == storage.Id)
+                await db.Blobs.Where(blob => blob.StorageFolderId == id)
                     .ForEachAsync(blob => blob.IsDeleted = true);
+                await trx.CommitAsync();
             });
         }
 
