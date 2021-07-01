@@ -8,7 +8,7 @@ namespace QuartierLatin.Backend.Database.Migrations.Page
         public override void Up()
         {
             Alter.Table("Pages")
-                .AlterColumn("Date").AsDateTime().Nullable();
+                .AddColumn("Date").AsDateTime().Nullable();
         }
     }
 }

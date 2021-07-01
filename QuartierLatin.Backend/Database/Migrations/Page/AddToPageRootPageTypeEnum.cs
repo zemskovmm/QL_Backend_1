@@ -9,7 +9,7 @@ namespace QuartierLatin.Backend.Database.Migrations.Page
         public override void Up()
         {
             Alter.Table("PageRoots")
-                .AlterColumn("PageType").AsInt16().WithDefaultValue(PageType.Page);
+                .AddColumn("PageType").AsInt16().WithDefaultValue(0);
         }
     }
 }

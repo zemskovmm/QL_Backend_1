@@ -50,7 +50,12 @@ namespace QuartierLatin.Backend.Application
         {
             if (!standardSizeId.HasValue)
             {
-                if (!_blobFileStorage.CheckIfExist(id, dimension)) return null;
+                if (!_blobFileStorage.CheckIfExist(id, dimension))
+                {
+                    var compressedFile = await CompressAndUploadFile(id, dimension, standardSizeId);
+
+                    return (new MemoryStream(compressedFile.Value.Item1), compressedFile.Value.Item2, compressedFile.Value.Item3);
+                }
 
                 var stream = _blobFileStorage.OpenBlob(id, dimension);
                 var fileRecord = await _blobRepository.GetBlobInfoAsync(id);
@@ -63,9 +68,9 @@ namespace QuartierLatin.Backend.Application
 
             if (!_blobFileStorage.CheckIfExist(id, dimension, standardImageSize.Width, standardImageSize.Height))
             {
-                var compressedFile = await GetCompressedFileAsync(id, dimension, standardSizeId);
+                var compressedFile = await CompressAndUploadFile(id, dimension, standardSizeId);
 
-                return (new MemoryStream(compressedFile.Value.Item1), compressedFile.Value.Item2, compressedFile.Value.Item3) ;
+                return (new MemoryStream(compressedFile.Value.Item1), compressedFile.Value.Item2, compressedFile.Value.Item3);
             }
 
             var streamStandardSize = _blobFileStorage.OpenBlob(id, dimension, standardImageSize.Width, standardImageSize.Height);
@@ -77,38 +82,16 @@ namespace QuartierLatin.Backend.Application
 
         public async Task<(byte[], string, string)?> GetCompressedFileAsync(int id, int? dimension, int? standardSizeId)
         {
-            await using var stream = new MemoryStream();
-
             var responseFromService = await GetFileAsync(id, dimension, standardSizeId);
 
             if (responseFromService is null)
             {
-                responseFromService = await GetFileAsync(id);
-
-                var imageScaler = dimension.HasValue ? new ImageScaler(dimension.Value) : new ImageScaler();
-
-                if (standardSizeId.HasValue)
-                {
-                    var standardImageSize = await
-                        _imageStandardSizeAppService.GetImageStandardSizeByIdAsync(standardSizeId.Value);
-
-                    imageScaler.Scale(responseFromService.Value.Item1, stream, width: standardImageSize.Width, height: standardImageSize.Height);
-                }
-                else
-                {
-                    imageScaler.Scale(responseFromService.Value.Item1, stream);
-                }
-
-                var fileContent = stream.ToArray();
-
-                await using var fileStream = new MemoryStream(fileContent);
-
-                await UploadFileAsync(fileStream, responseFromService.Value.Item3, responseFromService.Value.Item2, dimension, id, standardSizeId: standardSizeId);
-
-                return (fileStream.ToArray(), responseFromService.Value.Item2, responseFromService.Value.Item3);
+                return await CompressAndUploadFile(id, dimension, standardSizeId);
             }
             else
             {
+                await using var stream = new MemoryStream();
+
                 await responseFromService.Value.Item1.CopyToAsync(stream);
 
                 return (stream.ToArray(), responseFromService.Value.Item2, responseFromService.Value.Item3);
@@ -119,6 +102,35 @@ namespace QuartierLatin.Backend.Application
         {
             await _blobRepository.DeleteBlobAsync(id);
             await _blobFileStorage.DeleteBlob(id);
+        }
+
+        private async Task<(byte[], string, string)?> CompressAndUploadFile(int id, int? dimension, int? standardSizeId)
+        {
+            await using var stream = new MemoryStream();
+
+            var file = await GetFileAsync(id);
+
+            var imageScaler = dimension.HasValue ? new ImageScaler(dimension.Value) : new ImageScaler();
+
+            if (standardSizeId.HasValue)
+            {
+                var standardImageSize = await
+                    _imageStandardSizeAppService.GetImageStandardSizeByIdAsync(standardSizeId.Value);
+
+                imageScaler.Scale(file.Value.Item1, stream, width: standardImageSize.Width, height: standardImageSize.Height);
+            }
+            else
+            {
+                imageScaler.Scale(file.Value.Item1, stream);
+            }
+
+            var fileContent = stream.ToArray();
+
+            await using var fileStream = new MemoryStream(fileContent);
+
+            await UploadFileAsync(fileStream, file.Value.Item3, file.Value.Item2, dimension, id, standardSizeId: standardSizeId);
+
+            return (fileStream.ToArray(), file.Value.Item2, file.Value.Item3);
         }
     }
 }
