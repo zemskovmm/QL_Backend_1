@@ -45,7 +45,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> CreatePage([FromBody] PageDto createPageDto)
         {
             var id = await _pageAppService.CreatePageAsync(createPageDto.Languages.ToDictionary(x => x.Key,
-                x => (x.Value.Url, x.Value.Title, x.Value.PageData)));
+                x => (x.Value.Url, x.Value.Title, x.Value.PageData, x.Value.Date)), createPageDto.PageType);
             return Ok(new {id = id});
         }
         
@@ -53,13 +53,14 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> UpdatePage(int id, [FromBody] PageDto createPageDto)
         {
             await _pageAppService.UpdatePage(id, createPageDto.Languages.ToDictionary(x => x.Key,
-                x => (x.Value.Url, x.Value.Title, x.Value.PageData)));
+                x => (x.Value.Url, x.Value.Title, x.Value.PageData, x.Value.Date)), createPageDto.PageType);
             return Ok(new {id = id});
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPage(int id)
         {
+            var page = await _pageAppService.GetPageRootByIdAsync(id);
             var allLangs = (await _languageRepository.GetLanguageListAsync())
                 .ToDictionary(x => x.Id, x => x.LanguageShortName);
             var pageLangs = (await _pageAppService.GetPageLanguages(id))
@@ -67,12 +68,14 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(new PageDto
             {
+                PageType = page.PageType,
                 Languages = pageLangs.ToDictionary(x => x.Key,
                     x => new PageLanguageDto()
                     {
                         Url = x.Value.Url,
                         Title = x.Value.Title,
-                        PageData = JObject.Parse(x.Value.PageData)
+                        PageData = JObject.Parse(x.Value.PageData),
+                        Date = x.Value.Date
                     })
             });
         }

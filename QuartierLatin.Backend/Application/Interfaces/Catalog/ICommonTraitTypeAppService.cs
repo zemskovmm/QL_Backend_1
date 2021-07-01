@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using QuartierLatin.Backend.Models.CatalogModels;
+﻿using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,5 +18,8 @@ namespace QuartierLatin.Backend.Application.Interfaces.Catalog
         Task CreateEntityTraitToUniversityAsync(int universityId, int commonTraitId);
         Task DeleteEntityTraitToUniversityAsync(int universityId, int commonTraitId);
         Task<List<CommonTraitType>> GetTraitTypesWithIndetifierAsync();
+        Task<List<int>> GetEntityTraitToPageIdListAsync(int pageId);
+        Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId);
+        Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId);
     }
 }

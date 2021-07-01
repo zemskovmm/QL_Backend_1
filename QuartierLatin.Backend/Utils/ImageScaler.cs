@@ -11,12 +11,22 @@ namespace QuartierLatin.Backend.Utils
 
         public ImageScaler(int maxDim = MaximumDimension) => _maxDim = maxDim;
 
-        public void Scale(Stream input, Stream output, bool squareShape = false)
+        public void Scale(Stream input, Stream output, bool squareShape = false, int? width = null, int? height = null)
         {
             using var bitmap = SKBitmap.Decode(input);
-            var dimensions = Scale(bitmap.Width, bitmap.Height, squareShape);
-            var newBitmap = bitmap.Resize(dimensions, SKFilterQuality.High);
-            newBitmap.Encode(output, SKEncodedImageFormat.Jpeg, 70);
+
+            if (width.HasValue && height.HasValue)
+            {
+                var dimensionsWithWidthAndHeight = new SKSizeI(width.Value, height.Value);
+                var newBitmapWithWidthAndHeight = bitmap.Resize(dimensionsWithWidthAndHeight, SKFilterQuality.High);
+                newBitmapWithWidthAndHeight.Encode(output, SKEncodedImageFormat.Jpeg, 70);
+            }
+            else
+            {
+                var dimensions = Scale(bitmap.Width, bitmap.Height, squareShape);
+                var newBitmap = bitmap.Resize(dimensions, SKFilterQuality.High);
+                newBitmap.Encode(output, SKEncodedImageFormat.Jpeg, 70);
+            }
         }
 
         private SKSizeI Scale(int w, int h, bool squareShape) =>

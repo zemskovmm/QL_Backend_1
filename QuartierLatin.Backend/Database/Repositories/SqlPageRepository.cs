@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.Enums;
 
 namespace QuartierLatin.Backend.Database.Repositories
 {
@@ -17,17 +18,17 @@ namespace QuartierLatin.Backend.Database.Repositories
             _db = db;
         }
 
-        public Task UpdatePages(int rootId, IList<Page> pages) => CreateOrUpdatePageCore(rootId, pages);
+        public Task UpdatePages(int rootId, IList<Page> pages, PageType pageType) => CreateOrUpdatePageCore(rootId, pages, pageType);
 
-        public Task<int> CreatePages(IList<Page> pagesWithoutRoot)
+        public Task<int> CreatePages(IList<Page> pagesWithoutRoot, PageType pageType)
         {
-            return CreateOrUpdatePageCore(null, pagesWithoutRoot);
+            return CreateOrUpdatePageCore(null, pagesWithoutRoot, pageType);
         }
 
-        private Task<int> CreateOrUpdatePageCore(int? pageRootId, IList<Page> pages) =>
+        private Task<int> CreateOrUpdatePageCore(int? pageRootId, IList<Page> pages, PageType pageType) =>
             _db.ExecAsync(db => db.InTransaction(async () =>
             {
-                var rootId = pageRootId ?? await db.InsertWithInt32IdentityAsync(new PageRoot());
+                var rootId = pageRootId ?? await db.InsertWithInt32IdentityAsync(new PageRoot{PageType = pageType});
                 if (pageRootId.HasValue)
                     await db.Pages.DeleteAsync(x => x.PageRootId == rootId);
                 foreach (var p in pages)
@@ -86,6 +87,11 @@ namespace QuartierLatin.Backend.Database.Repositories
         public async Task<int> RemovePageAsync(int pageId)
         {
             return await _db.ExecAsync(db => db.Pages.Where(page => page.PageRootId == pageId).DeleteAsync());
+        }
+
+        public async Task<PageRoot> GetPageRootByIdAsync(int id)
+        {
+            return await _db.ExecAsync(db => db.PageRoots.FirstOrDefaultAsync(pageRoot => pageRoot.Id == id));
         }
     }
 }

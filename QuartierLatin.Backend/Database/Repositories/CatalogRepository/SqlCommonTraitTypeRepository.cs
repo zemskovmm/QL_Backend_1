@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {
@@ -104,5 +105,29 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 join traitToEntity in db.CommonTraitTypesForEntities.Where(e => e.EntityType == entityType)
                     on traitType.Id equals traitToEntity.CommonTraitId
                 select traitType).Distinct().ToListAsync());
+
+        public async Task<List<int>> GetEntityTraitToPageIdListAsync(int pageId)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraitsToPages.Where(trait => trait.PageId == pageId)
+                    .Select(trait => trait.CommonTraitId).ToListAsync());
+        }
+
+        public async Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId)
+        {
+            await _db.ExecAsync(db => db.InsertAsync(new CommonTraitsToPage
+            {
+                CommonTraitId = commonTraitId,
+                PageId = pageId
+            }));
+        }
+
+        public async Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId)
+        {
+            await _db.ExecAsync(db =>
+                db.CommonTraitsToPages
+                    .Where(trait => trait.PageId == pageId && trait.CommonTraitId == commonTraitId)
+                    .DeleteAsync());
+        }
     }
 }
