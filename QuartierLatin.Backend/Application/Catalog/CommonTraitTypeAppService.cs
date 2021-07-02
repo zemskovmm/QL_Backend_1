@@ -70,5 +70,20 @@ namespace QuartierLatin.Backend.Application.Catalog
         {
             return await _commonTraitTypeRepository.GetTraitTypesWithIndetifierAsync();
         }
+
+        public async Task<List<int>> GetEntityTraitToPageIdListAsync(int pageId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToPageIdListAsync(pageId);
+        }
+
+        public async Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.CreateEntityTraitToPageAsync(pageId, commonTraitId);
+        }
+
+        public async Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.DeleteEntityTraitToPageAsync(pageId, commonTraitId);
+        }
     }
 }

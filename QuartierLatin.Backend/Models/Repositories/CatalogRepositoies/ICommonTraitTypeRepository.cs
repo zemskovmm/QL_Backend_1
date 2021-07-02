@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.CatalogModels;
+﻿using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
 {
@@ -20,5 +19,8 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task DeleteEntityTraitToUniversityAsync(int universityId, int commonTraitId);
         Task<List<CommonTraitType>> GetTraitTypesWithIndetifierAsync();
         Task<List<CommonTraitType>> GetTraitTypesWithIndetifierByEntityTypeAsync(EntityType entityType);
+        Task<List<int>> GetEntityTraitToPageIdListAsync(int pageId);
+        Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId);
+        Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId);
     }
 }

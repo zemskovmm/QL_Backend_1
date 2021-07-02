@@ -12,6 +12,7 @@ using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.Options;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.FolderModels;
+using QuartierLatin.Backend.Models.ImageStandardSizeModels;
 
 namespace QuartierLatin.Backend.Database
 {
@@ -40,6 +41,8 @@ namespace QuartierLatin.Backend.Database
         public ITable<Degree> Degrees => GetTable<Degree>();
         public ITable<UniversityDegree> UniversityDegrees => GetTable<UniversityDegree>();
         public ITable<StorageFolder> StorageFolders => GetTable<StorageFolder>();
+        public ITable<CommonTraitsToPage> CommonTraitsToPages => GetTable<CommonTraitsToPage>();
+        public ITable<ImageStandardSize> ImageStandardSizes => GetTable<ImageStandardSize>();
     }
 
     public interface IAppDbConnectionFactory

@@ -16,15 +16,19 @@ namespace QuartierLatin.Backend.Storages
             _blobsPath = blobsPath;
         }
 
-        public async Task CreateBlobAsync(int id, Stream s, int? dimension = null)
+        public async Task CreateBlobAsync(int id, Stream s, int? dimension = null, int? width = null, int? height = null)
         {
-            if (CheckIfExist(id, dimension)) return;
+            if (CheckIfExist(id, dimension, width, height)) return;
 
             var key = "";
 
             if (dimension is null)
             {
                 key = id.ToString();
+            }
+            else if (width.HasValue && height.HasValue)
+            {
+                key = id.ToString() + "_" + width.Value.ToString() +"x"+ height.Value.ToString();
             }
             else
             {
@@ -39,12 +43,7 @@ namespace QuartierLatin.Backend.Storages
             {
                 if (!CheckIfExist(id, dimension))
                 {
-                    var path = "";
-
-                    if (dimension is null)
-                        path = GetPath(id, true);
-                    else
-                        path = GetPath(id, true, dimension);
+                    var path = GetPath(id, true, dimension, width, height);
 
                     await using var f = File.Create(path);
                     await s.CopyToAsync(f);
@@ -57,48 +56,30 @@ namespace QuartierLatin.Backend.Storages
             return;
         }
 
-        public Stream OpenBlob(int id, int? dimension = null)
+        public Stream OpenBlob(int id, int? dimension = null, int? width = null, int? height = null)
         {
-            var path = "";
+            var path = GetPath(id, true, dimension, width, height);
 
-            if (dimension is null)
-                path = GetPath(id, false);
-            else
-                path = GetPath(id, false, dimension);
-
-            if (dimension is null)
-                return File.OpenRead(path);
-            else
-                return File.OpenRead(path);
+            return File.OpenRead(path);
         }
 
-        public async Task DeleteBlob(int id, int? dimension = null)
+        public async Task DeleteBlob(int id, int? dimension = null, int? width = null, int? height = null)
         {
-            var path = "";
-
-            if (dimension is null)
-                path = GetPath(id, false);
-            else
-                path = GetPath(id, false, dimension);
+            var path = GetPath(id, true, dimension, width, height);
 
             if (!File.Exists(path)) return;
             File.Delete(path);
             await Task.Yield();
         }
 
-        public bool CheckIfExist(int id, int? dimension = null)
+        public bool CheckIfExist(int id, int? dimension = null, int? width = null, int? height = null)
         {
-            var path = "";
-
-            if (dimension is null)
-                path = GetPath(id, false);
-            else
-                path = GetPath(id, false, dimension);
+            var path = GetPath(id, true, dimension, width, height);
 
             return File.Exists(path);
         }
 
-        private string GetPath(int id, bool create, int? dimension = null)
+        private string GetPath(int id, bool create, int? dimension = null, int? width = null, int? height = null)
         {
             var s = id.ToString();
             if (s.Length == 0)
@@ -111,10 +92,12 @@ namespace QuartierLatin.Backend.Storages
 
             var path = Path.Combine(dir, s.Last() + ".bin");
 
-            if (dimension is null)
-                return path;
+            if (dimension.HasValue)
+                return Path.Combine(dir, s.Last() + "_" + dimension.ToString() + ".bin");
+            else if (width.HasValue && height.HasValue)
+                return Path.Combine(dir, s.Last() + "_" + width.Value.ToString() + "x" + height.Value.ToString() + ".bin");
             else
-                return Path.Combine(dir, s.Last() + "_" + dimension.ToString()  + ".bin");
+                return path;
         }
     }
 }
