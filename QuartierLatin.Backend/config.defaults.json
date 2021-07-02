@@ -29,8 +29,8 @@
     "RequestUrl": "https://b24-tn82ud.bitrix24.by/rest/1/xlgwyorvwi7njjqo/crm.lead.add.json"
   },
   "BaseFilterOrder": {
-    "PriceOrder": -10,
-    "DegreeOrder": 0,
-    "CourseOrder": 10
+    "PriceOrder": 3,
+    "DegreeOrder": -10,
+    "CourseOrder": 0
   } 
 }
