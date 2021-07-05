@@ -100,5 +100,23 @@ namespace QuartierLatin.Backend.Application.Catalog
         {
             await _commonTraitTypeRepository.DeleteEntityTraitToCourseAsync(courseId, commonTraitId);
         }
+
+        public async Task<List<int>> GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(int universityId, int commonTraitTypeId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(universityId,
+                commonTraitTypeId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(int schoolId, int commonTraitTypeId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(schoolId,
+                commonTraitTypeId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(int courseId, int commonTraitTypeId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(courseId,
+                commonTraitTypeId);
+        }
     }
 }

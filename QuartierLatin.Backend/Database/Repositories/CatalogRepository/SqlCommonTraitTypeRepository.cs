@@ -156,5 +156,27 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     .Where(trait => trait.CourseId == courseId && trait.CommonTraitId == commonTraitId)
                     .DeleteAsync());
         }
+
+        public async Task<List<int>> GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(int universityId,
+            int commonTraitTypeId) => await 
+            _db.ExecAsync(db => (from universityTrait in db.CommonTraitsToUniversities.Where(university =>
+                        university.UniversityId == universityId)
+                    join commonTrait in db.CommonTraits on universityTrait.CommonTraitId equals commonTrait.Id
+                    where commonTrait.CommonTraitTypeId == commonTraitTypeId
+                    select commonTrait.Id).ToListAsync());
+
+        public async Task<List<int>> GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(int schoolId, int commonTraitTypeId) => await
+            _db.ExecAsync(db => (from schoolTrait in db.CommonTraitToSchools.Where(school =>
+                    school.SchoolId == schoolId)
+                join commonTrait in db.CommonTraits on schoolTrait.CommonTraitId equals commonTrait.Id
+                where commonTrait.CommonTraitTypeId == commonTraitTypeId
+                select commonTrait.Id).ToListAsync());
+
+        public async Task<List<int>> GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(int courseId, int commonTraitTypeId) => await
+            _db.ExecAsync(db => (from courseTrait in db.CommonTraitToCourses.Where(course =>
+                    course.CourseId == courseId)
+                join commonTrait in db.CommonTraits on courseTrait.CommonTraitId equals commonTrait.Id
+                where commonTrait.CommonTraitTypeId == commonTraitTypeId
+                select commonTrait.Id).ToListAsync());
     }
 }

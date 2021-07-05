@@ -11,7 +11,7 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
     public class SqlSchoolCatalogRepository : ISchoolCatalogRepository
     {
         private readonly AppDbContextManager _db;
-
+        private (School school, Dictionary<int, SchoolLanguages> schoolLanguage) _test3 { get; set; }
         public SqlSchoolCatalogRepository(AppDbContextManager db)
         {
             _db = db;
@@ -21,11 +21,11 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
         {
             return await _db.ExecAsync(async db =>
             {
-                var schoolLanguageEntity = await SchoolWithLanguages(db)
-                    .ToDictionaryAsync(x => x.Key, x => x.Select(i => i.schoolLanguage));
+                var entity = SchoolWithLanguages(db).ToList();
 
-                return schoolLanguageEntity.Select(school =>
-                    (school.Key, school.Value.ToDictionary(schoolLang => schoolLang.LanguageId, schoolLang => schoolLang))).ToList();
+                var response = entity.Select(resp => (resp.School, resp.SchoolLanguage)).ToList();
+
+                return response;
             });
         }
 
@@ -46,13 +46,9 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
         {
             return await _db.ExecAsync(async db =>
             {
-                var courseLanguageEntity = await SchoolWithLanguages(db)
-                    .Where(x => x.Key.Id == id)
-                    .ToDictionaryAsync(x => x.Key, x => x.Select(i => i.schoolLanguage));
+                var entity = await SchoolWithLanguages(db).FirstOrDefaultAsync(school => school.School.Id == id);
 
-                var (school, schoolLanguage) = courseLanguageEntity.First();
-
-                return (course: school, schoolLanguage: schoolLanguage.ToDictionary(x => x.LanguageId, x => x));
+                return (school: entity.School, schoolLanguage: entity.SchoolLanguage);
             });
         }
 
@@ -82,19 +78,36 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
         {
             return await _db.ExecAsync(async db =>
             {
-                var schoolLanguageEntity = await SchoolWithLanguages(db)
-                    .Where(x => x.Key.Id == x.FirstOrDefault(school => school.schoolLanguage.LanguageId == languageId && school.schoolLanguage.Url == url).school.Id)
-                    .ToDictionaryAsync(x => x.Key, x => x.Select(i => i.schoolLanguage));
+                var entity = await SchoolWithLanguages(db).FirstOrDefaultAsync(school =>
+                    school.SchoolLanguage.Any(schoolLang =>
+                        schoolLang.Key == languageId && schoolLang.Value.Url == url));
 
-                var (school, schoolLanguage) = schoolLanguageEntity.First();
-
-                return (school: school, schoolLanguage: schoolLanguage.ToDictionary(x => x.LanguageId, x => x));
+                return (school: entity.School, schoolLanguage: entity.SchoolLanguage);
             });
         }
 
-        private IQueryable<IGrouping<School, (School school, SchoolLanguages schoolLanguage)>> SchoolWithLanguages(AppDbContext db) =>
-            (from school in db.Schools
-                join schoolLanguage in db.SchoolLanguages on school.Id equals schoolLanguage.SchoolId
-                select (school, schoolLanguage)).GroupBy(x => x.school);
+        private record SchoolAndLanguageTuple
+        {
+            public School School { get; set; }
+            public Dictionary<int, SchoolLanguages> SchoolLanguage { get; set; }
+
+            public void Deconstruct(out School school, out Dictionary<int, SchoolLanguages> schoolLanguages)
+            {
+                school = School;
+                schoolLanguages = SchoolLanguage;
+            }
+        }
+
+        private IQueryable<SchoolAndLanguageTuple> SchoolWithLanguages(AppDbContext db)
+        {
+            var response = db.Schools.Select(school => new SchoolAndLanguageTuple
+            {
+                School = school,
+                SchoolLanguage = db.SchoolLanguages.Where(schoolLang => schoolLang.SchoolId == school.Id)
+                    .ToDictionary(schoolLanguage => schoolLanguage.LanguageId, schoolLanguage => schoolLanguage)
+            });
+
+            return response;
+        }
     }
 }

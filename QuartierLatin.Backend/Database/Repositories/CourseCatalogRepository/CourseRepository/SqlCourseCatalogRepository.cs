@@ -21,12 +21,11 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
         {
             return await _db.ExecAsync(async db =>
             {
-                var courses = await db.Courses.Select(course => GetCourseByIdAsync(course.Id)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult()).ToListAsync();
+                var entity = CourseWithLanguages(db).ToList();
 
-                return courses;
+                var response = entity.Select(resp => (resp.Course, resp.CourseLanguage)).ToList();
+
+                return response;
             });
         }
 
@@ -47,13 +46,9 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
         {
             return await _db.ExecAsync(async db =>
             {
-                var courseLanguageEntity = await CourseWithLanguages(db)
-                    .Where(x => x.Key.Id == id)
-                    .ToDictionaryAsync(x => x.Key, x => x.Select(i => i.courseLanguage));
+                var entity = await CourseWithLanguages(db).FirstOrDefaultAsync(course => course.Course.Id == id);
 
-                var (course, courseLanguage) = courseLanguageEntity.First();
-
-                return (course: course, courseLanguage: courseLanguage.ToDictionary(x => x.LanguageId, x => x));
+                return (course: entity.Course, courseLanguage: entity.CourseLanguage);
             });
         }
 
@@ -82,12 +77,11 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
         {
             return await _db.ExecAsync(async db =>
             {
-                var courseLanguageEntity = await CourseWithLanguages(db)
-                    .ToDictionaryAsync(x => x.Key, x => x.Select(i => i.courseLanguage));
+                var entity = await CourseWithLanguages(db).FirstOrDefaultAsync(course =>
+                    course.CourseLanguage.Any(courseLang =>
+                        courseLang.Key == languageId && courseLang.Value.Url == url));
 
-                var (course, courseLanguage) = courseLanguageEntity.First();
-
-                return (course: course, courseLanguage: courseLanguage.ToDictionary(x => x.LanguageId, x => x));
+                return (course: entity.Course, courseLanguage: entity.CourseLanguage);
             });
         }
 
@@ -138,9 +132,29 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
             });
         }
 
-        private IQueryable<IGrouping<Course, (Course course, CourseLanguage courseLanguage)>> CourseWithLanguages(AppDbContext db) => 
-            (from course in db.Courses
-                join courseLanguage in db.CourseLanguages on course.Id equals courseLanguage.CourseId 
-                select (course, courseLanguage)).GroupBy(x => x.course);
+        private record CourseAndLanguageTuple
+        {
+            public Course Course { get; set; }
+            public Dictionary<int, CourseLanguage> CourseLanguage { get; set; }
+
+            public void Deconstruct(out Course course, out Dictionary<int, CourseLanguage> courseLanguage)
+            {
+                course = Course;
+                courseLanguage = CourseLanguage;
+            }
+        }
+
+        private IQueryable<CourseAndLanguageTuple> CourseWithLanguages(AppDbContext db)
+        {
+
+            var response = db.Courses.Select(course => new CourseAndLanguageTuple
+            {
+                Course = course,
+                CourseLanguage = db.CourseLanguages.Where(courseLang => courseLang.CourseId == course.Id)
+                    .ToDictionary(courseLanguage => courseLanguage.LanguageId, courseLanguage => courseLanguage)
+            });
+
+            return response;
+        }
     }
 }

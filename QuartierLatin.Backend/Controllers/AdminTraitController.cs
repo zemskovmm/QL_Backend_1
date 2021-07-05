@@ -162,7 +162,13 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        
+        [HttpGet("entity-traits-university/{universityId}/by-type/{commonTraitTypeId}")]
+        public async Task<IActionResult> GetEntityTraitByTypeToUniversity(int universityId, int commonTraitTypeId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(universityId, commonTraitTypeId);
+            return Ok(response);
+        }
+
         [HttpPost("entity-traits-university/{universityId}/{commonTraitId}")]
         public async Task<IActionResult> CreateEntityTraitToUniversity(int universityId, int commonTraitId)
         {
@@ -186,7 +192,13 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        
+        [HttpGet("entity-traits-school/{schoolId}/by-type/{commonTraitTypeId}")]
+        public async Task<IActionResult> GetEntityTraitByTypeToSchool(int schoolId, int commonTraitTypeId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(schoolId, commonTraitTypeId);
+            return Ok(response);
+        }
+
         [HttpPost("entity-traits-school/{schoolId}/{commonTraitId}")]
         public async Task<IActionResult> CreateEntityTraitToSchool(int schoolId, int commonTraitId)
         {
@@ -210,7 +222,13 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        
+        [HttpGet("entity-traits-course/{courseId}/by-type/{commonTraitTypeId}")]
+        public async Task<IActionResult> GetEntityTraitByTypeToCourse(int courseId, int commonTraitTypeId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(courseId, commonTraitTypeId);
+            return Ok(response);
+        }
+
         [HttpPost("entity-traits-course/{courseId}/{commonTraitId}")]
         public async Task<IActionResult> CreateEntityTraitToCourse(int courseId, int commonTraitId)
         {
