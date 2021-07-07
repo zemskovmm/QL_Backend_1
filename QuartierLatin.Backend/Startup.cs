@@ -22,6 +22,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Utils;
+using X.Web.Sitemap;
 
 namespace QuartierLatin.Backend
 {
@@ -82,8 +84,9 @@ namespace QuartierLatin.Backend
             services.AddControllers();
             AutoRegisterByTypeName(services);
             services.AddSingleton<UserAuthManager>();
-
-
+            services.AddSingleton<ISitemapGenerator, SitemapGenerator>();
+            services.AddSingleton<ISitemapIndexGenerator, SitemapIndexGenerator>();
+            services.AddSingleton<SitemapGeneratorForLinks>();
             services.AddSingleton<GlobalSettingsCache<JObject>>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -178,6 +181,12 @@ namespace QuartierLatin.Backend
                         {FileProvider = new PhysicalFileProvider(dist), RequestPath = ""});
                 }
 
+                var sitemapDirectory = "\\sitemaps\\";
+                if (!Directory.Exists(sitemapDirectory))
+                    Directory.CreateDirectory(sitemapDirectory);
+                app.UseStaticFiles(new StaticFileOptions
+                    { FileProvider = new PhysicalFileProvider(sitemapDirectory), RequestPath = "/sitemaps" });
+
                 app.UseStaticFiles(); // for wwwroot
             }
             
@@ -204,6 +213,7 @@ namespace QuartierLatin.Backend
                     c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "QuartierLatin API");
                 });
             });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
