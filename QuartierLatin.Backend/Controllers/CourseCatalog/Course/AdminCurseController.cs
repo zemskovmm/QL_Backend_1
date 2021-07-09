@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
 using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Controllers.courseCatalog.course
 {
@@ -32,11 +33,12 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
                 Id = course.course.Id,
                 SchoolId = course.course.SchoolId,
                 Languages = course.courseLanguage.ToDictionary(school => language[school.Key],
-                    school => new CourseLanguageAdminDto
+                    course => new CourseLanguageAdminDto
                     {
-                        Name = school.Value.Name,
-                        HtmlDescription = school.Value.Description,
-                        Url = school.Value.Url
+                        Name = course.Value.Name,
+                        HtmlDescription = course.Value.Description,
+                        Url = course.Value.Url,
+                        Metadata = course.Value.Metadata is null ? null : JObject.Parse(course.Value.Metadata)
                     })
             }).ToList();
 
@@ -55,7 +57,8 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
                 Description = course.Value.HtmlDescription,
                 Name = course.Value.Name,
                 Url = course.Value.Url,
-                LanguageId = language.FirstOrDefault(language => language.Value == course.Key).Key
+                LanguageId = language.FirstOrDefault(language => language.Value == course.Key).Key,
+                Metadata = course.Value.Metadata is null ? null : course.Value.Metadata.ToString() 
             }).ToList();
 
             await _courseAppService.CreateCourseLanguageListAsync(courseLanguage);
@@ -77,7 +80,8 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
                     {
                         Name = course.Value.Name,
                         HtmlDescription = course.Value.Description,
-                        Url = course.Value.Url
+                        Url = course.Value.Url,
+                        Metadata = course.Value.Metadata is null ? null : JObject.Parse(course.Value.Metadata)
                     })
             };
 
@@ -97,7 +101,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
                     courseLanguage.Value.HtmlDescription,
                     languageId,
                     courseLanguage.Value.Name,
-                    courseLanguage.Value.Url);
+                    courseLanguage.Value.Url, courseLanguage.Value.Metadata);
             }
 
             return Ok(new object());

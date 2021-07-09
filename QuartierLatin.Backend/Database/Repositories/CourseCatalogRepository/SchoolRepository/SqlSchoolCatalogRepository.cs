@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRe
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.SchoolRepository
 {
@@ -62,7 +63,7 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
         }
 
         public async Task CreateOrUpdateSchoolLanguageByIdAsync(int schoolId, string htmlDescription, int languageId, string name,
-            string url)
+            string url, JObject? metadata)
         {
             await _db.ExecAsync(db => db.InsertOrReplaceAsync(new SchoolLanguages
             {
@@ -70,7 +71,8 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
                 LanguageId = languageId,
                 Description = htmlDescription,
                 Name = name,
-                Url = url
+                Url = url,
+                Metadata = metadata?.ToString()
             }));
         }
 

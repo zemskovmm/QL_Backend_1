@@ -15,11 +15,11 @@ namespace QuartierLatin.Backend.Application.Interfaces
 
         Task<RouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url);
 
-        Task<int> CreatePageAsync(Dictionary<string, (string url, string title, JObject pageData, int? previewImageId)> languages);
+        Task<int> CreatePageAsync(Dictionary<string, (string url, string title, JObject pageData, int? previewImageId, JObject? metadata)> languages);
 
         Task<IList<Page>> GetPageLanguages(int id);
 
-        Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, int? previewImageId)> languages);
+        Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, int? previewImageId, JObject? metadata)> languages);
 
         Task<(Dictionary<int, string> lang, (int totalResults, List<(int id, List<Page> pages)> results) result)>
             GetPageListBySearch(int page, string search, int pageSize);

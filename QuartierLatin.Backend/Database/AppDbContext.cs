@@ -7,6 +7,7 @@ using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.Options;
 using QuartierLatin.Backend.Config;
 using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Models.AppStateModels;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
 using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
@@ -48,6 +49,7 @@ namespace QuartierLatin.Backend.Database
         public ITable<SchoolLanguages> SchoolLanguages => GetTable<SchoolLanguages>();
         public ITable<Course> Courses => GetTable<Course>();
         public ITable<CourseLanguage> CourseLanguages => GetTable<CourseLanguage>();
+        public ITable<AppStateEntry> AppStateEntries => GetTable<AppStateEntry>();
     }
 
     public interface IAppDbConnectionFactory

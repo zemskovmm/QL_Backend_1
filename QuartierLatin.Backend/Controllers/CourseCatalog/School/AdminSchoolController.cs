@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
 using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Controllers.courseCatalog.School
 {
@@ -36,7 +37,8 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
                     {
                         Name = school.Value.Name,
                         HtmlDescription = school.Value.Description,
-                        Url = school.Value.Url
+                        Url = school.Value.Url,
+                        Metadata = school.Value.Metadata is null ? null : JObject.Parse(school.Value.Metadata)
                     })
             }).ToList();
 
@@ -55,7 +57,8 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
                 Description = school.Value.HtmlDescription,
                 Name = school.Value.Name,
                 Url = school.Value.Url,
-                LanguageId = language.FirstOrDefault(language => language.Value == school.Key).Key
+                LanguageId = language.FirstOrDefault(language => language.Value == school.Key).Key,
+                Metadata = school.Value.Metadata is null ? null : school.Value.Metadata.ToString()
             }).ToList();
 
             await _schoolAppService.CreateSchoolLanguageListAsync(schoolLanguage);
@@ -77,7 +80,8 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
                     {
                         Name = school.Value.Name,
                         HtmlDescription = school.Value.Description,
-                        Url = school.Value.Url
+                        Url = school.Value.Url,
+                        Metadata = school.Value.Metadata is null ? null : JObject.Parse(school.Value.Metadata)
                     })
             };
 
@@ -97,7 +101,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
                     schoolLanguage.Value.HtmlDescription,
                     languageId,
                     schoolLanguage.Value.Name,
-                    schoolLanguage.Value.Url);
+                    schoolLanguage.Value.Url, schoolLanguage.Value.Metadata);
             }
 
             return Ok(new object());

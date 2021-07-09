@@ -1,5 +1,6 @@
 ﻿using LinqToDB;
 using LinqToDB.Data;
+using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using System;
@@ -19,10 +20,10 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
         }
 
         public async Task CreateOrUpdateUniversityLanguageAsync(int universityId, int languageId, string name,
-            string description, string url)
+            string description, string url, JObject? metadata)
         {
             await _db.ExecAsync(
-                db => CreateOrUpdateUniversityCore(db, universityId, languageId, name, description, url));
+                db => CreateOrUpdateUniversityCore(db, universityId, languageId, name, description, url, metadata));
         }
 
         public async Task<List<int>> GetUniversityIdListAsync()
@@ -157,7 +158,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
         }
 
         private static async Task CreateOrUpdateUniversityCore(AppDbContext db, int universityId, int languageId,
-            string name, string description, string url)
+            string name, string description, string url, JObject? metadata)
         {
             await db.InsertOrReplaceAsync(new UniversityLanguage
             {
@@ -165,7 +166,8 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 LanguageId = languageId,
                 Name = name,
                 Description = description,
-                Url = url
+                Url = url,
+                Metadata = metadata?.ToString()
             });
         }
     }

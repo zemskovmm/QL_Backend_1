@@ -9,6 +9,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
 using QuartierLatin.Backend.Utils;
+using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
 
 namespace QuartierLatin.Backend.Application
 {
@@ -16,15 +17,18 @@ namespace QuartierLatin.Backend.Application
     {
         private readonly IPageRepository _pageRepository;
         private readonly ILanguageRepository _languageRepository;
+        private readonly IAppStateEntryRepository _appStateEntryRepository;
 
-        public PageAppService(IPageRepository pageRepository, ILanguageRepository languageRepository)
+        public PageAppService(IPageRepository pageRepository, ILanguageRepository languageRepository,
+            IAppStateEntryRepository appStateEntryRepository)
         {
             _pageRepository = pageRepository;
             _languageRepository = languageRepository;
+            _appStateEntryRepository = appStateEntryRepository;
         }
 
         private async Task<List<Page>> Convert(Dictionary<string, (string url, string title,
-            JObject pageData, int? previewImageId)> languages)
+            JObject pageData, int? previewImageId, JObject? metadata)> languages)
         {
             var langs = (await _languageRepository.GetLanguageListAsync()).ToDictionary(x => x.LanguageShortName,
                 x => x.Id);
@@ -34,16 +38,24 @@ namespace QuartierLatin.Backend.Application
                 Title = x.Value.title,
                 PageData = x.Value.pageData.ToString(),
                 LanguageId = langs[x.Key],
-                PreviewImageId = x.Value.previewImageId
+                PreviewImageId = x.Value.previewImageId,
+                Metadata = x.Value.metadata?.ToString()
             }).ToList();
         }
 
         public async Task<int> CreatePageAsync(Dictionary<string, (string url, string title,
-            JObject pageData, int? previewImageId)> languages) =>
-            await _pageRepository.CreatePages(await Convert(languages));
-        
-        public async Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, int? previewImageId)> languages) 
-            => await _pageRepository.UpdatePages(id, await Convert(languages));
+            JObject pageData, int? previewImageId, JObject? metadata)> languages)
+        {
+            var id = await _pageRepository.CreatePages(await Convert(languages));
+            await _appStateEntryRepository.UpdateLastChangeTimeAsync();
+            return id;
+        }
+
+        public async Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, int? previewImageId, JObject? metadata)> languages)
+        {
+            await _pageRepository.UpdatePages(id, await Convert(languages));
+            await _appStateEntryRepository.UpdateLastChangeTimeAsync();
+        }
 
         public Task<IList<Page>> GetPageLanguages(int id) => _pageRepository.GetPagesByPageRootIdAsync(id);
 

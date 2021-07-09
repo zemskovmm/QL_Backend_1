@@ -12,5 +12,6 @@ namespace QuartierLatin.Backend.Models
         [Column] [PrimaryKey] public int LanguageId { get; set; }
         [Column] [PrimaryKey] public int PageRootId { get; set; }
         [Column] public int? PreviewImageId { get; set; }
+        [Column(DataType = DataType.BinaryJson)] public string? Metadata { get; set; }
     }
 }

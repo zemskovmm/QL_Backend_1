@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRe
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.CourseRepository
 {
@@ -61,7 +62,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
             }));
         }
 
-        public async Task CreateOrUpdateCourseLanguageByIdAsync(int id, string htmlDescription, int languageId, string name, string url)
+        public async Task CreateOrUpdateCourseLanguageByIdAsync(int id, string htmlDescription, int languageId, string name, string url, JObject? metadata)
         {
             await _db.ExecAsync(db => db.InsertOrReplaceAsync(new CourseLanguage
             {
@@ -69,7 +70,8 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
                 LanguageId = languageId,
                 Description = htmlDescription,
                 Name = name,
-                Url = url
+                Url = url,
+                Metadata = metadata?.ToString()
             }));
         }
 

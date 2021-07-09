@@ -6,6 +6,7 @@ using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -42,8 +43,9 @@ namespace QuartierLatin.Backend.Controllers
                     {
                         Name = university.Value.Name,
                         HtmlDescription = university.Value.Description,
-                        Url = university.Value.Url
-                    })
+                        Url = university.Value.Url,
+                        Metadata = university.Value.Metadata is null ? null : JObject.Parse(university.Value.Metadata)
+                        })
                 })
                 .ToList();
 
@@ -62,6 +64,7 @@ namespace QuartierLatin.Backend.Controllers
                 Description = university.Value.HtmlDescription,
                 Name = university.Value.Name,
                 Url = university.Value.Url,
+                Metadata = university.Value.Metadata is null ? null : university.Value.Metadata.ToString(),
                 LanguageId = _languageRepository
                     .GetLanguageIdByShortNameAsync(university.Key)
                     .ConfigureAwait(false)
@@ -90,8 +93,9 @@ namespace QuartierLatin.Backend.Controllers
                 {
                     Name = university.Value.Name,
                     HtmlDescription = university.Value.Description,
-                    Url = university.Value.Url
-                })
+                    Url = university.Value.Url,
+                    Metadata = university.Value.Metadata is null ? null : JObject.Parse(university.Value.Metadata)
+                    })
             };
 
             return Ok(response);
@@ -109,7 +113,7 @@ namespace QuartierLatin.Backend.Controllers
                     universityLanguage.Value.HtmlDescription,
                     languageId,
                     universityLanguage.Value.Name,
-                    universityLanguage.Value.Url);
+                    universityLanguage.Value.Url, universityLanguage.Value.Metadata);
             }
 
             return Ok(new object());

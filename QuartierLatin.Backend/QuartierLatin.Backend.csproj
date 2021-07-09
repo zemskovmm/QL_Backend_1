@@ -55,6 +55,5 @@
 
     <ItemGroup>
       <Folder Include="Database\Migrations\Language\" />
-      <Folder Include="Database\AppDbContextSeed\" />
     </ItemGroup>
 </Project>

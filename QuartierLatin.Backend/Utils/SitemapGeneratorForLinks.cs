@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LinqToDB;
 using QuartierLatin.Backend.Database;
 using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
 using X.Web.Sitemap;
 
 namespace QuartierLatin.Backend.Utils
@@ -16,14 +17,17 @@ namespace QuartierLatin.Backend.Utils
         private readonly ISitemapGenerator _sitemapGenerator;
         private readonly ISitemapIndexGenerator _sitemapIndexGenerator;
         private readonly ILanguageRepository _languageRepository;
+        private readonly IAppStateEntryRepository _appStateEntryRepository;
         private const string _domainName = "https://quartier-latin.com/";
         public SitemapGeneratorForLinks(AppDbContextManager db, ISitemapGenerator sitemapGenerator,
-            ISitemapIndexGenerator sitemapIndexGenerator, ILanguageRepository languageRepository)
+            ISitemapIndexGenerator sitemapIndexGenerator, ILanguageRepository languageRepository,
+            IAppStateEntryRepository appStateEntryRepository)
         {
             _sitemapGenerator = sitemapGenerator;
             _sitemapIndexGenerator = sitemapIndexGenerator;
             _db = db;
             _languageRepository = languageRepository;
+            _appStateEntryRepository = appStateEntryRepository;
         }
 
         public async void GenerateSitemaps()
@@ -31,12 +35,14 @@ namespace QuartierLatin.Backend.Utils
             var universityPageUrlStrings = await GetUniversityUrls();
             var coursePageUrlStrings = await GetCourseUrls();
             var schoolPageUrlStrings = await GetSchoolsUrls();
+            var pageUrlStrings = await GetPagesUrls();
 
             var allUrls = new List<Url>();
 
             allUrls.AddRange(GetUrlFromStringList(universityPageUrlStrings));
             allUrls.AddRange(GetUrlFromStringList(coursePageUrlStrings));
             allUrls.AddRange(GetUrlFromStringList(schoolPageUrlStrings));
+            allUrls.AddRange(GetUrlFromStringList(pageUrlStrings));
 
             var targetSitemapDirectory = new DirectoryInfo("\\sitemaps\\");
 
@@ -56,6 +62,8 @@ namespace QuartierLatin.Backend.Utils
             }
 
             _sitemapIndexGenerator.GenerateSitemapIndex(sitemapInfos, targetSitemapDirectory, "sitemap-index.xml");
+
+            await _appStateEntryRepository.UpdateValueAsync("LastUpdate", DateTime.Now.ToString());
         }
 
         private async Task<List<string>> GetUniversityUrls()
@@ -76,7 +84,14 @@ namespace QuartierLatin.Backend.Utils
         {
             var language = await GetLanguages();
 
-            return await _db.ExecAsync(db => db.UniversityLanguages.Select(university => _domainName + language[university.LanguageId] + "/school/" + university.Url).ToListAsync());
+            return await _db.ExecAsync(db => db.SchoolLanguages.Select(university => _domainName + language[university.LanguageId] + "/school/" + university.Url).ToListAsync());
+        }
+
+        private async Task<List<string>> GetPagesUrls()
+        {
+            var language = await GetLanguages();
+
+            return await _db.ExecAsync(db => db.Pages.Select(page => _domainName + language[page.LanguageId] + "/" + page.Url).ToListAsync());
         }
 
         private async Task<Dictionary<int, string>> GetLanguages() =>
@@ -86,7 +101,7 @@ namespace QuartierLatin.Backend.Utils
             urls.Select(url => new Url
             {
                 Location = url,
-                ChangeFrequency = ChangeFrequency.Monthly,
+                ChangeFrequency = ChangeFrequency.Daily,
                 TimeStamp = DateTime.UtcNow,
                 Priority = .9
             });

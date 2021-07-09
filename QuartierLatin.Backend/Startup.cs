@@ -24,6 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Utils;
 using X.Web.Sitemap;
+using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
 
 namespace QuartierLatin.Backend
 {
@@ -244,6 +245,22 @@ namespace QuartierLatin.Backend
             AppDbContextSeed.Seed(app.ApplicationServices.GetRequiredService<AppDbContextManager>());
             
             AppServices = app.ApplicationServices;
+
+            void StartUpdater() => Task.Run(async () => {
+                var appStateRepo = AppServices.GetService<IAppStateEntryRepository>();
+                var sitemapUpdater = AppServices.GetService<SitemapGeneratorForLinks>();
+                while (true)
+                {
+                    var dates = await appStateRepo.GetLastUpdateAndLastChangeDatesAsync();
+
+                    if (dates.lastUpdate < dates.lastChange)
+                        sitemapUpdater.GenerateSitemaps();
+                    await Task.Delay(TimeSpan.FromMinutes(1));
+                }
+
+            });
+
+            StartUpdater();
         }
     }
 }

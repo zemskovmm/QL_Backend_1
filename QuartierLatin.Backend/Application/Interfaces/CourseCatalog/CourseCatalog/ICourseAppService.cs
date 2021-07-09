@@ -1,6 +1,7 @@
 ﻿using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Application.Interfaces.CourseCatalog.CourseCatalog
 {
@@ -11,6 +12,6 @@ namespace QuartierLatin.Backend.Application.Interfaces.CourseCatalog.CourseCatal
         Task CreateCourseLanguageListAsync(List<CourseLanguage> courseLanguage);
         Task<(Course course, Dictionary<int, CourseLanguage> schoolLanguage)> GetCourseByIdAsync(int id);
         Task UpdateCourseByIdAsync(int id, int schoolId);
-        Task UpdateCourseLanguageByIdAsync(int id, string htmlDescription, int languageId, string name, string url);
+        Task UpdateCourseLanguageByIdAsync(int id, string htmlDescription, int languageId, string name, string url, JObject? metadata);
     }
 }
