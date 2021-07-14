@@ -14,6 +14,7 @@ using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -121,10 +122,11 @@ namespace QuartierLatin.Backend.Controllers
 
             var module = new UniversityModuleDto
             {
-                Title = university.Item2[languageId].Name,
-                DescriptionHtml = university.Item2[languageId].Description,
-                FoundationYear = university.Item1.FoundationYear,
-                Traits = universityTraits
+                Title = university.universityLanguage[languageId].Name,
+                DescriptionHtml = university.universityLanguage[languageId].Description,
+                FoundationYear = university.university.FoundationYear,
+                Traits = universityTraits,
+                Metadata = university.universityLanguage[languageId].Metadata is null ? null : JObject.Parse(university.universityLanguage[languageId].Metadata)
             };
 
             var response = new RouteDto<UniversityModuleDto>("university", urls, module, "university");
@@ -169,10 +171,11 @@ namespace QuartierLatin.Backend.Controllers
 
             var module = new SchoolModuleDto
             {
-                Title = school.Item2[languageId].Name,
-                DescriptionHtml = school.Item2[languageId].Description,
-                FoundationYear = school.Item1.FoundationYear,
-                Traits = schoolTraits
+                Title = school.schoolLanguage[languageId].Name,
+                DescriptionHtml = school.schoolLanguage[languageId].Description,
+                FoundationYear = school.school.FoundationYear,
+                Traits = schoolTraits,
+                Metadata = school.schoolLanguage[languageId].Metadata is null ? null : JObject.Parse(school.schoolLanguage[languageId].Metadata)
             };
 
             var response = new RouteDto<SchoolModuleDto>("school", urls, module, "school");
@@ -217,10 +220,11 @@ namespace QuartierLatin.Backend.Controllers
 
             var module = new CourseModuleDto
             {
-                Title = course.Item2[languageId].Name,
-                DescriptionHtml = course.Item2[languageId].Description,
-                SchoolId = course.Item1.SchoolId,
-                Traits = courseTraits
+                Title = course.courseLanguage[languageId].Name,
+                DescriptionHtml = course.courseLanguage[languageId].Description,
+                SchoolId = course.course.SchoolId,
+                Traits = courseTraits,
+                Metadata = course.courseLanguage[languageId].Metadata is null ? null : JObject.Parse(course.courseLanguage[languageId].Metadata)
             };
 
             var response = new RouteDto<CourseModuleDto>("course", urls, module, "course");

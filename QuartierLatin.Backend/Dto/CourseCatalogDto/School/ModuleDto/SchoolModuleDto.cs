@@ -1,4 +1,6 @@
-﻿namespace QuartierLatin.Backend.Dto.CourseCatalogDto.School.ModuleDto
+﻿using Newtonsoft.Json.Linq;
+
+namespace QuartierLatin.Backend.Dto.CourseCatalogDto.School.ModuleDto
 {
     public class SchoolModuleDto
     {
@@ -9,5 +11,7 @@
         public int? FoundationYear { get; set; }
 
         public SchoolModuleTraitsDto Traits { get; set; }
+
+        public JObject? Metadata { get; set; }
     }
 }
