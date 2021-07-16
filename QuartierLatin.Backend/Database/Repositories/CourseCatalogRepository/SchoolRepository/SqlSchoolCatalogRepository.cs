@@ -1,9 +1,11 @@
-﻿using LinqToDB;
+﻿using System;
+using LinqToDB;
 using LinqToDB.Data;
 using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
 using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.SchoolRepository
@@ -46,7 +48,7 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
         {
             return await _db.ExecAsync(async db =>
             {
-                var entity = await SchoolWithLanguages(db).FirstOrDefaultAsync(school => school.School.Id == id);
+                var entity = SchoolWithLanguages(db, school => school.Id == id).First();
 
                 return (school: entity.School, schoolLanguage: entity.SchoolLanguage);
             });
@@ -78,9 +80,8 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
         {
             return await _db.ExecAsync(async db =>
             {
-                var entity = await SchoolWithLanguages(db).FirstOrDefaultAsync(school =>
-                    school.SchoolLanguage.Any(schoolLang =>
-                        schoolLang.Key == languageId && schoolLang.Value.Url == url));
+                var entity = SchoolWithLanguages(db,
+                    schoolLanguageFilter: schoolLang => schoolLang.LanguageId == languageId && schoolLang.Url == url).First();
 
                 return (school: entity.School, schoolLanguage: entity.SchoolLanguage);
             });
@@ -98,16 +99,26 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
             }
         }
 
-        private IQueryable<SchoolAndLanguageTuple> SchoolWithLanguages(AppDbContext db)
+        private List<SchoolAndLanguageTuple> SchoolWithLanguages(AppDbContext db, Expression<Func<School, bool>> schoolFilter = null, Expression<Func<SchoolLanguages, bool>> schoolLanguageFilter = null)
         {
-            var response = db.Schools.Select(school => new SchoolAndLanguageTuple
-            {
-                School = school,
-                SchoolLanguage = db.SchoolLanguages.Where(schoolLang => schoolLang.SchoolId == school.Id)
-                    .ToDictionary(schoolLanguage => schoolLanguage.LanguageId, schoolLanguage => schoolLanguage)
-            });
+            var schoolQuery = db.Schools.AsQueryable();
+            var schoolLanguageQuery = db.SchoolLanguages.AsQueryable();
 
-            return response;
+            if (schoolFilter is not null)
+                schoolQuery = schoolQuery.Where(schoolFilter);
+
+            if (schoolLanguageFilter is not null)
+                schoolLanguageQuery = schoolLanguageQuery.Where(schoolLanguageFilter);
+
+            var query = from c in schoolQuery
+                    join l in schoolLanguageQuery on c.Id equals l.SchoolId
+                    select new { c, l };
+
+            return query.AsEnumerable().GroupBy(x => x.c).Select(x => new SchoolAndLanguageTuple
+            {
+                School = x.First().c,
+                SchoolLanguage = x.ToDictionary(schoolLang => schoolLang.l.LanguageId, schoolLang => schoolLang.l)
+            }).ToList();
         }
     }
 }
