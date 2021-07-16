@@ -2,8 +2,10 @@
 using LinqToDB.Data;
 using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
 using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
@@ -47,7 +49,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
         {
             return await _db.ExecAsync(async db =>
             {
-                var entity = await CourseWithLanguages(db).FirstOrDefaultAsync(course => course.Course.Id == id);
+                var entity = CourseWithLanguages(db, course => course.Id == id).First();
 
                 return (course: entity.Course, courseLanguage: entity.CourseLanguage);
             });
@@ -79,9 +81,8 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
         {
             return await _db.ExecAsync(async db =>
             {
-                var entity = await CourseWithLanguages(db).FirstOrDefaultAsync(course =>
-                    course.CourseLanguage.Any(courseLang =>
-                        courseLang.Key == languageId && courseLang.Value.Url == url));
+                var entity = CourseWithLanguages(db,
+                    languageFilter: courseLang => courseLang.LanguageId == languageId && courseLang.Url == url).First();
 
                 return (course: entity.Course, courseLanguage: entity.CourseLanguage);
             });
@@ -146,17 +147,28 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
             }
         }
 
-        private IQueryable<CourseAndLanguageTuple> CourseWithLanguages(AppDbContext db)
+        private List<CourseAndLanguageTuple> CourseWithLanguages(AppDbContext db, Expression <Func<Course, bool>> courseFilter = null, Expression<Func<CourseLanguage, bool>> languageFilter = null)
         {
 
-            var response = db.Courses.Select(course => new CourseAndLanguageTuple
-            {
-                Course = course,
-                CourseLanguage = db.CourseLanguages.Where(courseLang => courseLang.CourseId == course.Id)
-                    .ToDictionary(courseLanguage => courseLanguage.LanguageId, courseLanguage => courseLanguage)
-            });
+            var courseQuery = db.Courses.AsQueryable();
+            var languageQuery = db.CourseLanguages.AsQueryable();
 
-            return response;
+            if (courseFilter is not null)
+                courseQuery = courseQuery.Where(courseFilter);
+
+            if (languageFilter is not null)
+                languageQuery = languageQuery.Where(languageFilter);
+
+            var q = from c in courseQuery
+                join l in languageQuery on c.Id equals l.CourseId
+                select new {c, l};
+
+
+            return q.AsEnumerable().GroupBy(x => x.c).Select(x => new CourseAndLanguageTuple
+            {
+                Course = x.First().c,
+                CourseLanguage = x.ToDictionary(courseLang => courseLang.l.LanguageId, courseLang => courseLang.l)
+            }).ToList();
         }
     }
 }
