@@ -113,10 +113,26 @@ namespace QuartierLatin.Backend.Application.Catalog
                 commonTraitTypeId);
         }
 
-        public async Task<List<int>> GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(int courseId, int commonTraitTypeId)
+        public async Task<List<int>> GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(int courseId,
+            int commonTraitTypeId)
         {
             return await _commonTraitTypeRepository.GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(courseId,
                 commonTraitTypeId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToPageIdListAsync(int pageId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToPageIdListAsync(pageId);
+        }
+
+        public async Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.CreateEntityTraitToPageAsync(pageId, commonTraitId);
+        }
+
+        public async Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.DeleteEntityTraitToPageAsync(pageId, commonTraitId);
         }
     }
 }
