@@ -14,6 +14,7 @@ using QuartierLatin.Backend.Models.FolderModels;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.ImageStandardSizeModels;
 
 namespace QuartierLatin.Backend.Database
 {
@@ -48,6 +49,8 @@ namespace QuartierLatin.Backend.Database
         public ITable<SchoolLanguages> SchoolLanguages => GetTable<SchoolLanguages>();
         public ITable<Course> Courses => GetTable<Course>();
         public ITable<CourseLanguage> CourseLanguages => GetTable<CourseLanguage>();
+        public ITable<CommonTraitsToPage> CommonTraitsToPages => GetTable<CommonTraitsToPage>();
+        public ITable<ImageStandardSize> ImageStandardSizes => GetTable<ImageStandardSize>();
     }
 
     public interface IAppDbConnectionFactory

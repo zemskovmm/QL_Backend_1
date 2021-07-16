@@ -38,7 +38,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        
         [HttpPost("trait-types")]
         public async Task<IActionResult> CreateTraitTypes([FromBody] TraitTypeDto traitTypeDto)
         {
@@ -48,7 +47,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new {id = response});
         }
 
-        
         [HttpGet("trait-types/{id}")]
         public async Task<IActionResult> GetTraitTypeById(int id)
         {
@@ -63,7 +61,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        
         [HttpPut("trait-types/{id}")]
         public async Task<IActionResult> UpdateTraitTypeById([FromBody] TraitTypeDto traitTypeDto, int id)
         {
@@ -72,7 +69,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        
         [HttpGet("entity-trait-types/{entityType}")]
         public async Task<IActionResult> GetTraitTypeForEntityByEntityType(EntityType entityType)
         {
@@ -81,7 +77,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(traitTypeForEntitiesByEntityType);
         }
 
-        
         [HttpPost("entity-trait-types/{entityType}/{commonTraitId}")]
         public async Task<IActionResult> CreateTraitTypeForEntityByEntityType(EntityType entityType, int commonTraitId)
         {
@@ -89,7 +84,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        
         [HttpDelete("entity-trait-types/{entityType}/{commonTraitId}")]
         public async Task<IActionResult> DeleteTraitTypeForEntityByEntityType(EntityType entityType, int commonTraitId)
         {
@@ -97,7 +91,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        
         [HttpGet("traits/of-type/{typeId}")]
         public async Task<IActionResult> GetTraitOfTypeByTypeId(int typeId)
         {
@@ -116,7 +109,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        
         [HttpPost("traits/of-type/{typeId}")]
         public async Task<IActionResult> CreateTraitOfTypeByTypeId([FromBody] CreateCommonTraitDto createCommonTraitDto,
             int typeId)
@@ -126,7 +118,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new {id = response});
         }
 
-        
         [HttpGet("traits/{id}")]
         public async Task<IActionResult> GetTraitById(int id)
         {
@@ -144,7 +135,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        
         [HttpPut("traits/{id}")]
         public async Task<IActionResult> UpdateTraitById([FromBody] CommonTraitDto commonTraitDto, int id)
         {
@@ -154,7 +144,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        
         [HttpGet("entity-traits-university/{universityId}")]
         public async Task<IActionResult> GetEntityTraitToUniversity(int universityId)
         {
@@ -176,7 +165,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        
         [HttpDelete("entity-traits-university/{universityId}/{commonTraitId}")]
         public async Task<IActionResult> DeleteEntityTraitToUniversity(int universityId, int commonTraitId)
         {
@@ -184,7 +172,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        
         [HttpGet("entity-traits-school/{schoolId}")]
         public async Task<IActionResult> GetEntityTraitToSchool(int schoolId)
         {
@@ -206,7 +193,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        
         [HttpDelete("entity-traits-school/{schoolId}/{commonTraitId}")]
         public async Task<IActionResult> DeleteEntityTraitToSchool(int schoolId, int commonTraitId)
         {
@@ -214,7 +200,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        
         [HttpGet("entity-traits-course/{courseId}")]
         public async Task<IActionResult> GetEntityTraitToCourse(int courseId)
         {
@@ -236,11 +221,31 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        
         [HttpDelete("entity-traits-course/{courseId}/{commonTraitId}")]
         public async Task<IActionResult> DeleteEntityTraitToCourse(int courseId, int commonTraitId)
         {
             await _commonTraitTypeAppService.DeleteEntityTraitToCourseAsync(courseId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpGet("entity-traits-page/{pageId}")]
+        public async Task<IActionResult> GetEntityTraitToPage(int pageId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToPageIdListAsync(pageId);
+            return Ok(response);
+        }
+
+        [HttpPost("entity-traits-page/{pageId}/{commonTraitId}")]
+        public async Task<IActionResult> CreateEntityTraitToPage(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.CreateEntityTraitToPageAsync(pageId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpDelete("entity-traits-page/{pageId}/{commonTraitId}")]
+        public async Task<IActionResult> DeleteEntityTraitToPage(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.DeleteEntityTraitToPageAsync(pageId, commonTraitId);
             return Ok(new object());
         }
     }
