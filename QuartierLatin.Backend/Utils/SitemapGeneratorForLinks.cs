@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
+using QuartierLatin.Backend.Config;
 using QuartierLatin.Backend.Database;
 using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
@@ -18,16 +21,20 @@ namespace QuartierLatin.Backend.Utils
         private readonly ISitemapIndexGenerator _sitemapIndexGenerator;
         private readonly ILanguageRepository _languageRepository;
         private readonly IAppStateEntryRepository _appStateEntryRepository;
-        private const string _domainName = "https://quartier-latin.com/";
+        private readonly string _domainName;
+        private readonly string _directory;
         public SitemapGeneratorForLinks(AppDbContextManager db, ISitemapGenerator sitemapGenerator,
             ISitemapIndexGenerator sitemapIndexGenerator, ILanguageRepository languageRepository,
-            IAppStateEntryRepository appStateEntryRepository)
+            IAppStateEntryRepository appStateEntryRepository, IOptions<SitemapConfig> config,
+            IWebHostEnvironment env)
         {
             _sitemapGenerator = sitemapGenerator;
             _sitemapIndexGenerator = sitemapIndexGenerator;
             _db = db;
             _languageRepository = languageRepository;
             _appStateEntryRepository = appStateEntryRepository;
+            _domainName = config.Value.DomainName;
+            _directory = Path.Combine(env.ContentRootPath, config.Value.Directory);
         }
 
         public async void GenerateSitemaps()
@@ -44,7 +51,7 @@ namespace QuartierLatin.Backend.Utils
             allUrls.AddRange(GetUrlFromStringList(schoolPageUrlStrings));
             allUrls.AddRange(GetUrlFromStringList(pageUrlStrings));
 
-            var targetSitemapDirectory = new DirectoryInfo("\\sitemaps\\");
+            var targetSitemapDirectory = new DirectoryInfo(_directory);
 
             if (!Directory.Exists(targetSitemapDirectory.FullName))
                 Directory.CreateDirectory(targetSitemapDirectory.FullName);

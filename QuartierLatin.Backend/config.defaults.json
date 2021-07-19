@@ -27,5 +27,9 @@
   },
   "CallRequest": {
     "RequestUrl": "https://b24-tn82ud.bitrix24.by/rest/1/xlgwyorvwi7njjqo/crm.lead.add.json"
+  },
+  "Sitemap": {
+    "DomainName": "https://quartier-latin.com/",
+    "Directory": "sitemaps"
   } 
 }

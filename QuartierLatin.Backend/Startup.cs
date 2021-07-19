@@ -41,6 +41,7 @@ namespace QuartierLatin.Backend
         public static bool IntegrationTestMode { get; set; }
 
         private DatabaseConfig DatabaseConfig => Configuration.GetSection("Database").Get<DatabaseConfig>();
+        private SitemapConfig SitemapConfig => Configuration.GetSection("Sitemap").Get<SitemapConfig>();
 
         private void AutoRegisterByTypeName(IServiceCollection services)
         {
@@ -155,6 +156,7 @@ namespace QuartierLatin.Backend
                 services.AddSingleton<IAzureAdClient, NoopAzureAdClient>();
 
             services.Configure<CallRequestConfig>(Configuration.GetSection("CallRequest"));
+            services.Configure<SitemapConfig>(Configuration.GetSection("Sitemap"));
 
             services.AddRazorPages().AddNewtonsoftJson();
         }
@@ -182,9 +184,12 @@ namespace QuartierLatin.Backend
                         {FileProvider = new PhysicalFileProvider(dist), RequestPath = ""});
                 }
 
-                var sitemapDirectory = "\\sitemaps\\";
+                var contentRoot = env.ContentRootPath;
+                var sitemapDirectory = Path.Combine(contentRoot, SitemapConfig.Directory);
+                
                 if (!Directory.Exists(sitemapDirectory))
                     Directory.CreateDirectory(sitemapDirectory);
+
                 app.UseStaticFiles(new StaticFileOptions
                     { FileProvider = new PhysicalFileProvider(sitemapDirectory), RequestPath = "/sitemaps" });
 
