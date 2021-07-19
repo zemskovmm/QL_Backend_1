@@ -2,7 +2,7 @@
 
 namespace QuartierLatin.Backend.Database.Migrations.Blobs
 {
-    [MigrationDate(2021, 6, 1, 16, 10)]
+    [MigrationDate(2021, 5, 10, 16, 10)]
     public class AddFoldersToBlob : AutoReversingMigration
     {
         public override void Up()
