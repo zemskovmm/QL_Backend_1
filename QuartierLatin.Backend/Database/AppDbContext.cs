@@ -1,8 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using QuartierLatin.Backend.Config;
-using QuartierLatin.Backend.Models;
 using FluentMigrator.Exceptions;
 using LinqToDB;
 using LinqToDB.Data;
@@ -10,8 +5,17 @@ using LinqToDB.DataProvider;
 using LinqToDB.DataProvider.PostgreSQL;
 using LinqToDB.DataProvider.SqlServer;
 using Microsoft.Extensions.Options;
+using QuartierLatin.Backend.Config;
+using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Models.AppStateModels;
 using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
+using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
 using QuartierLatin.Backend.Models.FolderModels;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.ImageStandardSizeModels;
 
 namespace QuartierLatin.Backend.Database
 {
@@ -41,6 +45,15 @@ namespace QuartierLatin.Backend.Database
         public ITable<UniversityDegree> UniversityDegrees => GetTable<UniversityDegree>();
         public ITable<StorageFolder> StorageFolders => GetTable<StorageFolder>();
         public ITable<UniversityGallery> UniversityGalleries => GetTable<UniversityGallery>();
+        public ITable<CommonTraitToSchool> CommonTraitToSchools => GetTable<CommonTraitToSchool>();
+        public ITable<CommonTraitToCourse> CommonTraitToCourses => GetTable<CommonTraitToCourse>();
+        public ITable<School> Schools => GetTable<School>();
+        public ITable<SchoolLanguages> SchoolLanguages => GetTable<SchoolLanguages>();
+        public ITable<Course> Courses => GetTable<Course>();
+        public ITable<CourseLanguage> CourseLanguages => GetTable<CourseLanguage>();
+        public ITable<AppStateEntry> AppStateEntries => GetTable<AppStateEntry>();
+        public ITable<CommonTraitsToPage> CommonTraitsToPages => GetTable<CommonTraitsToPage>();
+        public ITable<ImageStandardSize> ImageStandardSizes => GetTable<ImageStandardSize>();
     }
 
     public interface IAppDbConnectionFactory

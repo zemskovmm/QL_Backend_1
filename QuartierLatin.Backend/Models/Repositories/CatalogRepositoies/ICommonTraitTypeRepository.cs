@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.CatalogModels;
+﻿using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
 {
@@ -20,5 +19,17 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task DeleteEntityTraitToUniversityAsync(int universityId, int commonTraitId);
         Task<List<CommonTraitType>> GetTraitTypesWithIndetifierAsync();
         Task<List<CommonTraitType>> GetTraitTypesWithIndetifierByEntityTypeAsync(EntityType entityType);
+        Task<List<int>> GetEntityTraitToSchoolIdListAsync(int schoolId);
+        Task CreateEntityTraitToSchoolAsync(int schoolId, int commonTraitId);
+        Task DeleteEntityTraitToSchoolAsync(int schoolId, int commonTraitId);
+        Task<List<int>> GetEntityTraitToCourseIdListAsync(int courseId);
+        Task CreateEntityTraitToCourseAsync(int courseId, int commonTraitId);
+        Task DeleteEntityTraitToCourseAsync(int courseId, int commonTraitId);
+        Task<List<int>> GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(int universityId, int commonTraitTypeId);
+        Task<List<int>> GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(int schoolId, int commonTraitTypeId);
+        Task<List<int>> GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(int courseId, int commonTraitTypeId);
+        Task<List<int>> GetEntityTraitToPageIdListAsync(int pageId);
+        Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId);
+        Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId);
     }
 }

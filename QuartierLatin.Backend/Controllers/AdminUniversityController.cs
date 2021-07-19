@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.UniversityDto;
 using QuartierLatin.Backend.Dto.UniversityDto.GetUniversityListDto;
@@ -7,6 +6,8 @@ using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -49,14 +50,14 @@ namespace QuartierLatin.Backend.Controllers
                     {
                         Name = university.Value.Name,
                         HtmlDescription = university.Value.Description,
-                        Url = university.Value.Url
+                        Url = university.Value.Url,
+                        Metadata = university.Value.Metadata is null ? null : JObject.Parse(university.Value.Metadata)
                     }),
                     LogoId = university.university.LogoId,
                     BannerId = university.university.BannerId,
                     GalleryList = gallery
                 });
             }
-
             return Ok(response);
         }
 
@@ -73,7 +74,12 @@ namespace QuartierLatin.Backend.Controllers
                 Description = university.Value.HtmlDescription,
                 Name = university.Value.Name,
                 Url = university.Value.Url,
-                LanguageId = languageIds.FirstOrDefault(lang => lang.Value == university.Key).Key
+                Metadata = university.Value.Metadata is null ? null : university.Value.Metadata.ToString(),
+                LanguageId = _languageRepository
+                    .GetLanguageIdByShortNameAsync(university.Key)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult()
             }).ToList();
 
             await _universityAppService.CreateUniversityLanguageListAsync(universityLanguage);
@@ -98,6 +104,7 @@ namespace QuartierLatin.Backend.Controllers
                 {
                     Name = university.Value.Name,
                     HtmlDescription = university.Value.Description,
+                    Metadata = university.Value.Metadata is null ? null : JObject.Parse(university.Value.Metadata),
                     Url = university.Value.Url
                 }),
                 LogoId = university.university.LogoId,
@@ -121,7 +128,7 @@ namespace QuartierLatin.Backend.Controllers
                     universityLanguage.Value.HtmlDescription,
                     languageId,
                     universityLanguage.Value.Name,
-                    universityLanguage.Value.Url);
+                    universityLanguage.Value.Url, universityLanguage.Value.Metadata);
             }
 
             return Ok(new object());

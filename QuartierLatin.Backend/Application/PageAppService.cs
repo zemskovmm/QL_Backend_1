@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Dto;
@@ -8,7 +9,9 @@ using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
+using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Utils;
+using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
 
 namespace QuartierLatin.Backend.Application
 {
@@ -16,15 +19,18 @@ namespace QuartierLatin.Backend.Application
     {
         private readonly IPageRepository _pageRepository;
         private readonly ILanguageRepository _languageRepository;
+        private readonly IAppStateEntryRepository _appStateEntryRepository;
 
-        public PageAppService(IPageRepository pageRepository, ILanguageRepository languageRepository)
+        public PageAppService(IPageRepository pageRepository, ILanguageRepository languageRepository,
+            IAppStateEntryRepository appStateEntryRepository)
         {
             _pageRepository = pageRepository;
             _languageRepository = languageRepository;
+            _appStateEntryRepository = appStateEntryRepository;
         }
 
         private async Task<List<Page>> Convert(Dictionary<string, (string url, string title,
-            JObject pageData)> languages)
+            JObject pageData, DateTime? date, int? previewImageId, JObject? metadata)> languages)
         {
             var langs = (await _languageRepository.GetLanguageListAsync()).ToDictionary(x => x.LanguageShortName,
                 x => x.Id);
@@ -33,16 +39,19 @@ namespace QuartierLatin.Backend.Application
                 Url = x.Value.url,
                 Title = x.Value.title,
                 PageData = x.Value.pageData.ToString(),
-                LanguageId = langs[x.Key]
+                LanguageId = langs[x.Key],
+                PreviewImageId = x.Value.previewImageId,
+                Metadata = x.Value.metadata?.ToString(),
+                Date = x.Value.date
             }).ToList();
         }
 
         public async Task<int> CreatePageAsync(Dictionary<string, (string url, string title,
-            JObject pageData)> languages) =>
-            await _pageRepository.CreatePages(await Convert(languages));
+            JObject pageData, DateTime? date, int? previewImageId, JObject? metadata)> languages, PageType pageType) =>
+            await _pageRepository.CreatePages(await Convert(languages), pageType);
         
-        public async Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData)> languages) 
-            => await _pageRepository.UpdatePages(id, await Convert(languages));
+        public async Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, DateTime? date, int? previewImageId, JObject? metadata)> languages, PageType pageType) 
+            => await _pageRepository.UpdatePages(id, await Convert(languages), pageType);
 
         public Task<IList<Page>> GetPageLanguages(int id) => _pageRepository.GetPagesByPageRootIdAsync(id);
 
@@ -71,9 +80,13 @@ namespace QuartierLatin.Backend.Application
 
             var blocks = pages.ToDictionary(page => languageIds[page.LanguageId], page => JObject.Parse(page.PageData));
 
-            var adminPageDto = new AdminPageDto(titles, blocks);
+            var dates = pages.Select(page => page.Date).ToList();
 
-            var adminPageModuleDto = new AdminPageModuleDto(adminPageDto, pages.First().PageRootId);
+            var pageRoot = await _pageRepository.GetPageRootByIdAsync(pages.First().PageRootId);
+
+            var adminPageDto = new AdminPageDto(titles, blocks, dates);
+
+            var adminPageModuleDto = new AdminPageModuleDto(adminPageDto, pageRoot.Id, pageRoot.PageType);
 
             var response = new AdminRouteDto<AdminPageModuleDto>(null, urls, adminPageModuleDto, "page", titles);
 
@@ -99,13 +112,20 @@ namespace QuartierLatin.Backend.Application
 
             var urls = pages.ToDictionary(page => languageIds[page.LanguageId], page => page.Url);
 
-            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData));
+            var pageRoot = await _pageRepository.GetPageRootByIdAsync(pageMain.PageRootId);
+
+            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData), pageMain.Date, pageRoot.PageType, pageMain.PreviewImageId);
 
             var pageModuleDto = new PageModuleDto(pageDto);
 
             var response = new RouteDto<PageModuleDto>(null, urls, pageModuleDto, "page", pageMain.Title);
 
             return response;
+        }
+
+        public async Task<PageRoot> GetPageRootByIdAsync(int id)
+        {
+            return await _pageRepository.GetPageRootByIdAsync(id);
         }
     }
 }

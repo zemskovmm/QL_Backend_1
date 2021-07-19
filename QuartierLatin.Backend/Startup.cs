@@ -22,6 +22,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Utils;
+using X.Web.Sitemap;
+using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
 
 namespace QuartierLatin.Backend
 {
@@ -38,6 +41,7 @@ namespace QuartierLatin.Backend
         public static bool IntegrationTestMode { get; set; }
 
         private DatabaseConfig DatabaseConfig => Configuration.GetSection("Database").Get<DatabaseConfig>();
+        private SitemapConfig SitemapConfig => Configuration.GetSection("Sitemap").Get<SitemapConfig>();
 
         private void AutoRegisterByTypeName(IServiceCollection services)
         {
@@ -82,8 +86,9 @@ namespace QuartierLatin.Backend
             services.AddControllers();
             AutoRegisterByTypeName(services);
             services.AddSingleton<UserAuthManager>();
-
-
+            services.AddSingleton<ISitemapGenerator, SitemapGenerator>();
+            services.AddSingleton<ISitemapIndexGenerator, SitemapIndexGenerator>();
+            services.AddSingleton<SitemapGeneratorForLinks>();
             services.AddSingleton<GlobalSettingsCache<JObject>>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -152,6 +157,7 @@ namespace QuartierLatin.Backend
 
             services.Configure<CallRequestConfig>(Configuration.GetSection("CallRequest"));
             services.Configure<BaseFilterOrderConfig>(Configuration.GetSection("BaseFilterOrder"));
+            services.Configure<SitemapConfig>(Configuration.GetSection("Sitemap"));
 
             services.AddRazorPages().AddNewtonsoftJson();
         }
@@ -179,6 +185,15 @@ namespace QuartierLatin.Backend
                         {FileProvider = new PhysicalFileProvider(dist), RequestPath = ""});
                 }
 
+                var contentRoot = env.ContentRootPath;
+                var sitemapDirectory = Path.Combine(contentRoot, SitemapConfig.Directory);
+                
+                if (!Directory.Exists(sitemapDirectory))
+                    Directory.CreateDirectory(sitemapDirectory);
+
+                app.UseStaticFiles(new StaticFileOptions
+                    { FileProvider = new PhysicalFileProvider(sitemapDirectory), RequestPath = "/sitemaps" });
+
                 app.UseStaticFiles(); // for wwwroot
             }
             
@@ -205,6 +220,7 @@ namespace QuartierLatin.Backend
                     c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "QuartierLatin API");
                 });
             });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -235,6 +251,22 @@ namespace QuartierLatin.Backend
             AppDbContextSeed.Seed(app.ApplicationServices.GetRequiredService<AppDbContextManager>());
             
             AppServices = app.ApplicationServices;
+
+            void StartUpdater() => Task.Run(async () => {
+                var appStateRepo = AppServices.GetService<IAppStateEntryRepository>();
+                var sitemapUpdater = AppServices.GetService<SitemapGeneratorForLinks>();
+                while (true)
+                {
+                    var dates = await appStateRepo.GetLastUpdateAndLastChangeDatesAsync();
+
+                    if (dates.lastUpdate < dates.lastChange)
+                        sitemapUpdater.GenerateSitemaps();
+                    await Task.Delay(TimeSpan.FromMinutes(1));
+                }
+
+            });
+
+            StartUpdater();
         }
     }
 }

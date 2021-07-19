@@ -70,5 +70,69 @@ namespace QuartierLatin.Backend.Application.Catalog
         {
             return await _commonTraitTypeRepository.GetTraitTypesWithIndetifierAsync();
         }
+
+        public async Task<List<int>> GetEntityTraitToSchoolIdListAsync(int schoolId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToSchoolIdListAsync(schoolId);
+        }
+
+        public async Task CreateEntityTraitToSchoolAsync(int schoolId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.CreateEntityTraitToSchoolAsync(schoolId, commonTraitId);
+        }
+
+        public async Task DeleteEntityTraitToSchoolAsync(int schoolId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.DeleteEntityTraitToSchoolAsync(schoolId, commonTraitId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToCourseIdListAsync(int courseId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToCourseIdListAsync(courseId);
+        }
+
+        public async Task CreateEntityTraitToCourseAsync(int courseId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.CreateEntityTraitToCourseAsync(courseId, commonTraitId);
+        }
+
+        public async Task DeleteEntityTraitToCourseAsync(int courseId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.DeleteEntityTraitToCourseAsync(courseId, commonTraitId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(int universityId, int commonTraitTypeId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(universityId,
+                commonTraitTypeId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(int schoolId, int commonTraitTypeId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(schoolId,
+                commonTraitTypeId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(int courseId,
+            int commonTraitTypeId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(courseId,
+                commonTraitTypeId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToPageIdListAsync(int pageId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToPageIdListAsync(pageId);
+        }
+
+        public async Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.CreateEntityTraitToPageAsync(pageId, commonTraitId);
+        }
+
+        public async Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.DeleteEntityTraitToPageAsync(pageId, commonTraitId);
+        }
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Dto.UniversityDto.GetUniversityListDto
 {
@@ -10,5 +7,6 @@ namespace QuartierLatin.Backend.Dto.UniversityDto.GetUniversityListDto
         public string Name { get; set; }
         public string HtmlDescription { get; set; }
         public string Url { get; set; }
+        public JObject? Metadata { get; set; }
     }
 }

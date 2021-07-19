@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Dto.UniversityDto
 {
@@ -13,5 +14,6 @@ namespace QuartierLatin.Backend.Dto.UniversityDto
         public int? BannerId { get; set; }
         public UniversityModuleTraitsDto Traits { get; set; }
         public List<int> GalleryList { get; set; }
+        public JObject? Metadata { get; set; }
     }
 }

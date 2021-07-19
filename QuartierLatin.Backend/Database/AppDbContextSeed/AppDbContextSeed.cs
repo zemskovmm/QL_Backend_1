@@ -6,6 +6,8 @@
         {
             AppDbContextUserSeed.Seed(dbManager);
             AppDbContextLanguageSeed.Seed(dbManager);
+            AppDbContextAppStateEntrySeed.Seed(dbManager);
+            AppDbContextImageStandardSizeSeed.Seed(dbManager);
         }
     }
 }

@@ -3,6 +3,8 @@ using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.Course.ModuleDto;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.School.ModuleDto;
 using QuartierLatin.Backend.Dto.UniversityDto;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.Repositories;
@@ -10,6 +12,9 @@ using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
+using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -23,11 +28,14 @@ namespace QuartierLatin.Backend.Controllers
         private readonly ISpecialtyAppService _specialtyAppService;
         private readonly IDegreeRepository _degreeRepository;
         private readonly IUniversityGalleryAppService _universityGalleryAppService;
+        private readonly ISchoolCatalogRepository _schoolCatalogRepository;
+        private readonly ICourseCatalogRepository _courseCatalogRepository;
 
         public RouteController(IRouteAppService routeAppService, IUniversityAppService universityAppService,
             ILanguageRepository languageRepository, ICommonTraitAppService commonTraitAppService,
             ICommonTraitTypeAppService traitTypeAppService, ISpecialtyAppService specialtyAppService,
-            IDegreeRepository degreeRepository, IUniversityGalleryAppService universityGalleryAppService)
+            IDegreeRepository degreeRepository, IUniversityGalleryAppService universityGalleryAppService, 
+            ISchoolCatalogRepository schoolCatalogRepository, ICourseCatalogRepository courseCatalogRepository)
         {
             _routeAppService = routeAppService;
             _universityAppService = universityAppService;
@@ -37,6 +45,8 @@ namespace QuartierLatin.Backend.Controllers
             _specialtyAppService = specialtyAppService;
             _degreeRepository = degreeRepository;
             _universityGalleryAppService = universityGalleryAppService;
+            _schoolCatalogRepository = schoolCatalogRepository;
+            _courseCatalogRepository = courseCatalogRepository;
         }
 
         [HttpGet("/api/route/{lang}/{**route}")]
@@ -122,10 +132,109 @@ namespace QuartierLatin.Backend.Controllers
                 Traits = universityTraits,
                 LogoId = university.university.LogoId,
                 BannerId = university.university.BannerId,
-                GalleryList = gallery
+                GalleryList = gallery,
+                Metadata = university.universityLanguage[languageId].Metadata is null ? null : JObject.Parse(university.universityLanguage[languageId].Metadata),
             };
 
             var response = new RouteDto<UniversityModuleDto>("university", urls, module, "university", university.Item2[languageId].Name);
+
+            return Ok(response);
+        }
+
+        [HttpGet("/api/route/{lang}/school/{**url}")]
+        public async Task<IActionResult> GetSchool(string lang, string url)
+        {
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
+
+            var school = await _schoolCatalogRepository.GetSchoolByUrlWithLanguageAsync(languageId, url);
+
+            var urls = school.schoolLanguage.ToDictionary(
+                school => languageIds[school.Key],
+                school => school.Value.Url);
+
+            var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();
+
+            var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+            foreach (var traitType in traitsType)
+            {
+                var commonTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndSchoolIdAsync(traitType.Id, school.school.Id);
+
+                traits.Add(traitType.Identifier, commonTraits.Select(trait => new CommonTraitLanguageDto
+                {
+                    Id = trait.Id,
+                    IconBlobId = trait.IconBlobId,
+                    Identifier = trait.Identifier,
+                    Name = trait.Names[lang]
+                }).ToList());
+            }
+
+            var schoolTraits = new SchoolModuleTraitsDto
+            {
+                NamedTraits = traits,
+            };
+
+            var module = new SchoolModuleDto
+            {
+                Title = school.schoolLanguage[languageId].Name,
+                DescriptionHtml = school.schoolLanguage[languageId].Description,
+                FoundationYear = school.school.FoundationYear,
+                Traits = schoolTraits,
+                Metadata = school.schoolLanguage[languageId].Metadata is null ? null : JObject.Parse(school.schoolLanguage[languageId].Metadata)
+            };
+
+            var response = new RouteDto<SchoolModuleDto>("school", urls, module, "school", module.Title);
+
+            return Ok(response);
+        }
+
+        [HttpGet("/api/route/{lang}/course/{**url}")]
+        public async Task<IActionResult> GetCourse(string lang, string url)
+        {
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
+
+            var course = await _courseCatalogRepository.GetCourseByUrlWithLanguageAsync(languageId, url);
+
+            var urls = course.courseLanguage.ToDictionary(
+                course => languageIds[course.Key],
+                course => course.Value.Url);
+
+            var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();
+
+            var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+            foreach (var traitType in traitsType)
+            {
+                var commonTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndCourseIdAsync(traitType.Id, course.course.Id);
+
+                traits.Add(traitType.Identifier, commonTraits.Select(trait => new CommonTraitLanguageDto
+                {
+                    Id = trait.Id,
+                    IconBlobId = trait.IconBlobId,
+                    Identifier = trait.Identifier,
+                    Name = trait.Names[lang]
+                }).ToList());
+            }
+
+            var courseTraits = new CourseModuleTraitsDto()
+            {
+                NamedTraits = traits,
+            };
+
+            var module = new CourseModuleDto
+            {
+                Title = course.courseLanguage[languageId].Name,
+                DescriptionHtml = course.courseLanguage[languageId].Description,
+                SchoolId = course.course.SchoolId,
+                Traits = courseTraits,
+                Metadata = course.courseLanguage[languageId].Metadata is null ? null : JObject.Parse(course.courseLanguage[languageId].Metadata)
+            };
+
+            var response = new RouteDto<CourseModuleDto>("course", urls, module, "course", module.Title);
 
             return Ok(response);
         }

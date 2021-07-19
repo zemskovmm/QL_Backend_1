@@ -11,6 +11,7 @@ using QuartierLatin.Backend.Config;
 using QuartierLatin.Backend.Dto.CatalogDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.Course.CatalogDto;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
@@ -38,6 +39,24 @@ namespace QuartierLatin.Backend.Controllers
             _degreeRepository = degreeRepository;
             _baseFilterConfig = baseFilterConfig;
             _universityGalleryAppService = universityGalleryAppService;
+        }
+        
+        private string FormatPriceValue(int from, int? to, string lang)
+        {
+            return lang == "ru"
+                ? to is null ? $"От {from} евро" : $"От {from} до {to} евро"
+                : lang == "fr"
+                    ? to is null ? $"De {from} euros" : $"De {from} à {to} euros"
+                    : lang == "esp"
+                        ? to is null ? $"De {from} euros" : $"De {from} a {to} euros"
+                        : lang == "cn"
+                            ? to is null ? $"从 {from} euros" : $"从 {from} 到 {to} euros"
+                            : to is null ? $"From {from} euros" : $"From {from} to {to} euros";
+        }
+
+        private string FormatPrice(int group, string lang)
+        {
+            return FormatPriceValue(CostGroup.GetCostGroup(group).from, CostGroup.GetCostGroup(group).to, lang);
         }
 
         // Compatibility with old urls
@@ -212,23 +231,76 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(response);
         }
-
-        private string FormatPriceValue(int from, int? to, string lang)
+        
+        [AllowAnonymous]
+        [HttpGet("/api/catalog/course/filters/{lang}")]
+        public async Task<IActionResult> GetCatalogFiltersTocourseByLangAndEntityType(string lang)
         {
-            return lang == "ru"
-                ? to is null ? $"От {from} евро" : $"От {from} до {to} евро"
-                : lang == "fr"
-                    ? to is null ? $"De {from} euros" : $"De {from} à {to} euros"
-                    : lang == "esp"
-                        ? to is null ? $"De {from} euros" : $"De {from} a {to} euros"
-                            : lang == "cn"
-                                ? to is null ? $"从 {from} euros" : $"从 {from} 到 {to} euros"
-                                : to is null ? $"From {from} euros" : $"From {from} to {to} euros";
+            var entityType = EntityType.School;
+
+            var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
+
+            var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
+                .Select(trait => new CatalogFilterDto
+                {
+                    Name = trait.Item1.Names.GetSuitableName(lang),
+                    Identifier = trait.Item1.Identifier,
+                    Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
+                    {
+                        Name = commonTrait.Names.GetSuitableName(lang),
+                        Id = commonTrait.Id
+                    }).ToList()
+                }).ToList();
+
+            var response = new CatalogFilterResponseDto
+            {
+                Filters = filters
+            };
+
+            return Ok(response);
         }
 
-        private string FormatPrice(int group, string lang)
+        [AllowAnonymous]
+        [HttpPost("/api/catalog/course/search/{lang}")]
+        public async Task<IActionResult> SearchInCourseCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
-            return FormatPriceValue(CostGroup.GetCostGroup(group).from, CostGroup.GetCostGroup(group).to, lang);
+            var entityType = EntityType.University;
+            var pageSize = catalogSearchDto.PageSize ?? 1000;
+            var commonTraits =
+                catalogSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
+                    filter.Values);
+
+            var catalogPage =
+                await _catalogAppService.GetCatalogCoursePageByFilterAsync(lang, entityType, commonTraits,
+                    catalogSearchDto.PageNumber, pageSize);
+
+            var courseIds = catalogPage.Item2.Select(x => x.Item1.Id).ToList();
+            var traitDic = await _commonTraitAppService.GetTraitsForEntityIds(EntityType.University,
+                courseIds);
+
+            List<CommonTrait> GetTraits(string identifier, int id)
+            {
+                if (!traitDic.TryGetValue(id, out var traits))
+                    return new List<CommonTrait>();
+                return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
+            }
+
+            var courseDtos = catalogPage.Item2.Select(course => new CatalogCourseDto()
+            {
+                Url = $"/{lang}/course/{course.Item2.Url}",
+                LanglessUrl = $"/course/{course.Item2.Url}",
+                Name = course.Item2.Name,
+                
+            }).ToList();
+
+            var response = new CatalogSearchResponseDtoList<CatalogCourseDto>
+            {
+                Items = courseDtos,
+                TotalItems = catalogPage.totalItems,
+                TotalPages = FilterHelper.PageCount(catalogPage.totalItems, pageSize)
+            };
+
+            return Ok(response);
         }
     }
 }

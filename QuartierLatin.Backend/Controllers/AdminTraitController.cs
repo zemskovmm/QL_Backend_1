@@ -1,15 +1,16 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
 using QuartierLatin.Backend.Dto.TraitTypeDto;
 using QuartierLatin.Backend.Models.Enums;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers
 {
+    [Authorize(Roles = "Admin")]
+    [Route("/api/admin")]
     public class AdminTraitController : Controller
     {
         private readonly ICommonTraitAppService _commonTraitAppService;
@@ -22,8 +23,7 @@ namespace QuartierLatin.Backend.Controllers
             _commonTraitTypeAppService = commonTraitTypeAppService;
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("/api/admin/trait-types")]
+        [HttpGet("trait-types")]
         public async Task<IActionResult> GetTraitTypes()
         {
             var traitTypes = await _commonTraitTypeAppService.GetTraitTypesAsync();
@@ -38,8 +38,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("/api/admin/trait-types")]
+        [HttpPost("trait-types")]
         public async Task<IActionResult> CreateTraitTypes([FromBody] TraitTypeDto traitTypeDto)
         {
             var response =
@@ -48,8 +47,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new {id = response});
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("/api/admin/trait-types/{id}")]
+        [HttpGet("trait-types/{id}")]
         public async Task<IActionResult> GetTraitTypeById(int id)
         {
             var traitType = await _commonTraitTypeAppService.GetTraitTypeByIdAsync(id);
@@ -63,8 +61,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPut("/api/admin/trait-types/{id}")]
+        [HttpPut("trait-types/{id}")]
         public async Task<IActionResult> UpdateTraitTypeById([FromBody] TraitTypeDto traitTypeDto, int id)
         {
             await _commonTraitTypeAppService.UpdateTraitTypeByIdAsync(id, traitTypeDto.Identifier, traitTypeDto.Names, traitTypeDto.Order);
@@ -72,8 +69,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("/api/admin/entity-trait-types/{entityType}")]
+        [HttpGet("entity-trait-types/{entityType}")]
         public async Task<IActionResult> GetTraitTypeForEntityByEntityType(EntityType entityType)
         {
             var traitTypeForEntitiesByEntityType =
@@ -81,24 +77,21 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(traitTypeForEntitiesByEntityType);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("/api/admin/entity-trait-types/{entityType}/{commonTraitId}")]
+        [HttpPost("entity-trait-types/{entityType}/{commonTraitId}")]
         public async Task<IActionResult> CreateTraitTypeForEntityByEntityType(EntityType entityType, int commonTraitId)
         {
             await _commonTraitTypeAppService.CreateTraitTypeForEntityByEntityTypeAsync(entityType, commonTraitId);
             return Ok(new object());
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpDelete("/api/admin/entity-trait-types/{entityType}/{commonTraitId}")]
+        [HttpDelete("entity-trait-types/{entityType}/{commonTraitId}")]
         public async Task<IActionResult> DeleteTraitTypeForEntityByEntityType(EntityType entityType, int commonTraitId)
         {
             await _commonTraitTypeAppService.DeleteTraitTypeForEntityByEntityTypeAsync(entityType, commonTraitId);
             return Ok(new object());
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("/api/admin/traits/of-type/{typeId}")]
+        [HttpGet("traits/of-type/{typeId}")]
         public async Task<IActionResult> GetTraitOfTypeByTypeId(int typeId)
         {
             var traitList = await _commonTraitAppService.GetTraitOfTypesByTypeIdAsync(typeId);
@@ -116,8 +109,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("/api/admin/traits/of-type/{typeId}")]
+        [HttpPost("traits/of-type/{typeId}")]
         public async Task<IActionResult> CreateTraitOfTypeByTypeId([FromBody] CreateCommonTraitDto createCommonTraitDto,
             int typeId)
         {
@@ -126,8 +118,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new {id = response});
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("/api/admin/traits/{id}")]
+        [HttpGet("traits/{id}")]
         public async Task<IActionResult> GetTraitById(int id)
         {
             var trait = await _commonTraitAppService.GetTraitByIdAsync(id);
@@ -144,8 +135,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPut("/api/admin/traits/{id}")]
+        [HttpPut("traits/{id}")]
         public async Task<IActionResult> UpdateTraitById([FromBody] CommonTraitDto commonTraitDto, int id)
         {
             await _commonTraitAppService.UpdateCommonTraitAsync(id, commonTraitDto.Names,
@@ -154,27 +144,108 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("/api/admin/entity-traits-university/{universityId}")]
+        [HttpGet("entity-traits-university/{universityId}")]
         public async Task<IActionResult> GetEntityTraitToUniversity(int universityId)
         {
             var response = await _commonTraitTypeAppService.GetEntityTraitToUniversityIdListAsync(universityId);
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("/api/admin/entity-traits-university/{universityId}/{commonTraitId}")]
+        [HttpGet("entity-traits-university/{universityId}/by-type/{commonTraitTypeId}")]
+        public async Task<IActionResult> GetEntityTraitByTypeToUniversity(int universityId, int commonTraitTypeId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(universityId, commonTraitTypeId);
+            return Ok(response);
+        }
+
+        [HttpPost("entity-traits-university/{universityId}/{commonTraitId}")]
         public async Task<IActionResult> CreateEntityTraitToUniversity(int universityId, int commonTraitId)
         {
             await _commonTraitTypeAppService.CreateEntityTraitToUniversityAsync(universityId, commonTraitId);
             return Ok(new object());
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpDelete("/api/admin/entity-traits-university/{universityId}/{commonTraitId}")]
+        [HttpDelete("entity-traits-university/{universityId}/{commonTraitId}")]
         public async Task<IActionResult> DeleteEntityTraitToUniversity(int universityId, int commonTraitId)
         {
             await _commonTraitTypeAppService.DeleteEntityTraitToUniversityAsync(universityId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpGet("entity-traits-school/{schoolId}")]
+        public async Task<IActionResult> GetEntityTraitToSchool(int schoolId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToSchoolIdListAsync(schoolId);
+            return Ok(response);
+        }
+
+        [HttpGet("entity-traits-school/{schoolId}/by-type/{commonTraitTypeId}")]
+        public async Task<IActionResult> GetEntityTraitByTypeToSchool(int schoolId, int commonTraitTypeId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(schoolId, commonTraitTypeId);
+            return Ok(response);
+        }
+
+        [HttpPost("entity-traits-school/{schoolId}/{commonTraitId}")]
+        public async Task<IActionResult> CreateEntityTraitToSchool(int schoolId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.CreateEntityTraitToSchoolAsync(schoolId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpDelete("entity-traits-school/{schoolId}/{commonTraitId}")]
+        public async Task<IActionResult> DeleteEntityTraitToSchool(int schoolId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.DeleteEntityTraitToSchoolAsync(schoolId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpGet("entity-traits-course/{courseId}")]
+        public async Task<IActionResult> GetEntityTraitToCourse(int courseId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToCourseIdListAsync(courseId);
+            return Ok(response);
+        }
+
+        [HttpGet("entity-traits-course/{courseId}/by-type/{commonTraitTypeId}")]
+        public async Task<IActionResult> GetEntityTraitByTypeToCourse(int courseId, int commonTraitTypeId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(courseId, commonTraitTypeId);
+            return Ok(response);
+        }
+
+        [HttpPost("entity-traits-course/{courseId}/{commonTraitId}")]
+        public async Task<IActionResult> CreateEntityTraitToCourse(int courseId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.CreateEntityTraitToCourseAsync(courseId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpDelete("entity-traits-course/{courseId}/{commonTraitId}")]
+        public async Task<IActionResult> DeleteEntityTraitToCourse(int courseId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.DeleteEntityTraitToCourseAsync(courseId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpGet("entity-traits-page/{pageId}")]
+        public async Task<IActionResult> GetEntityTraitToPage(int pageId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToPageIdListAsync(pageId);
+            return Ok(response);
+        }
+
+        [HttpPost("entity-traits-page/{pageId}/{commonTraitId}")]
+        public async Task<IActionResult> CreateEntityTraitToPage(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.CreateEntityTraitToPageAsync(pageId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpDelete("entity-traits-page/{pageId}/{commonTraitId}")]
+        public async Task<IActionResult> DeleteEntityTraitToPage(int pageId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.DeleteEntityTraitToPageAsync(pageId, commonTraitId);
             return Ok(new object());
         }
     }

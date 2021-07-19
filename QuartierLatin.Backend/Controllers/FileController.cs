@@ -30,15 +30,15 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [HttpGet("scaled/{id}")]
-        public async Task<IActionResult> GetCompressedMedia(int id, [FromQuery]int dimension)
+        public async Task<IActionResult> GetCompressedMedia(int id, [FromQuery]int? dimension, [FromQuery] int? standardSizeId)
         {
-            var response = await _fileAppService.GetCompressedFileAsync(id, dimension);
+            var responseStandardSize = await _fileAppService.GetCompressedFileAsync(id, dimension, standardSizeId);
 
-            var provider = new FileExtensionContentTypeProvider();
+            var providerStandardSize = new FileExtensionContentTypeProvider();
 
-            provider.TryGetContentType(response.Value.Item3, out var contentType);
+            providerStandardSize.TryGetContentType(responseStandardSize.Value.Item3, out var contentTypeStandardSize);
 
-            return File(response.Value.Item1, contentType, response.Value.Item3);
+            return File(responseStandardSize.Value.Item1, contentTypeStandardSize, responseStandardSize.Value.Item3);
         }
     }
 }

@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Application.Interfaces.Catalog;
+﻿using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Application.Catalog
 {
@@ -59,6 +58,16 @@ namespace QuartierLatin.Backend.Application.Catalog
                         allTraits.GetValueOrDefault(entityId)?.Where(trait => trait.CommonTraitTypeId == traitType.Id)
                             .ToList() ??
                         new List<CommonTrait>()));
+        }
+
+        public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndSchoolIdAsync(int traitTypeId, int schoolId)
+        {
+            return await _commonTraitRepository.GetCommonTraitListByTypeIdAndSchoolIdAsync(traitTypeId, schoolId);
+        }
+
+        public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndCourseIdAsync(int traitTypeId, int courseId)
+        {
+            return await _commonTraitRepository.GetTraitOfTypesByTypeIdAndCourseIdAsync(traitTypeId, courseId);
         }
     }
 }

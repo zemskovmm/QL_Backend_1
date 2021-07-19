@@ -1,4 +1,5 @@
-﻿using LinqToDB.Mapping;
+﻿using LinqToDB;
+using LinqToDB.Mapping;
 
 namespace QuartierLatin.Backend.Models.CatalogModels
 {
@@ -11,5 +12,6 @@ namespace QuartierLatin.Backend.Models.CatalogModels
         [Column] public string Name { get; set; }
         [Column] public string Description { get; set; }
         [Column] public string Url { get; set; }
+        [Column(DataType = DataType.BinaryJson)] public string? Metadata { get; set; }
     }
 }

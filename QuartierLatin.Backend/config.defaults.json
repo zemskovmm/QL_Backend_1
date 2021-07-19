@@ -32,5 +32,9 @@
     "PriceOrder": 3,
     "DegreeOrder": -10,
     "CourseOrder": 0
+  },
+  "Sitemap": {
+    "DomainName": "https://quartier-latin.com/",
+    "Directory": "sitemaps"
   } 
 }

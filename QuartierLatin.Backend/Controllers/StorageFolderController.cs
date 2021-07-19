@@ -34,6 +34,7 @@ namespace QuartierLatin.Backend.Controllers
 
             var response = new StorageFolderDtoAdmin
             {
+                Id = storageFolder.Id,
                 FolderName = storageFolder.FolderName,
                 ParentId = storageFolder.FolderParentId,
                 Files = filesInFolder.Select(file =>

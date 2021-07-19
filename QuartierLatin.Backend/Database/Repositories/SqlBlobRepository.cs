@@ -20,9 +20,6 @@ namespace QuartierLatin.Backend.Database.Repositories
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new Blob {FileType = fileType, OriginalFileName = originalFileName, StorageFolderId = storageFolderId}));
         }
 
-        public async Task DeleteBlobAsync(int id) =>
-            await _db.ExecAsync(db => db.Blobs.Select(x => x.Id == id).DeleteAsync());
-
         public async Task EditBlobAsync(int id, string fileType)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new Blob
@@ -34,7 +31,17 @@ namespace QuartierLatin.Backend.Database.Repositories
 
         public async Task<Blob> GetBlobInfoAsync(int id)
         {
-            return await _db.ExecAsync(db => db.Blobs.FirstOrDefaultAsync(blob => blob.Id == id));
+            return await _db.ExecAsync(db => db.Blobs.FirstOrDefaultAsync(blob => blob.Id == id && blob.IsDeleted == false));
+        }
+
+        public async Task DeleteBlobAsync(int id)
+        {
+            await _db.ExecAsync(async db =>
+            {
+                var blob = await db.Blobs.FirstOrDefaultAsync(x => x.Id == id);
+                blob.IsDeleted = true;
+                await db.UpdateAsync(blob);
+            });
         }
     }
 }
