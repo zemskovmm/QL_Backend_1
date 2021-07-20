@@ -46,7 +46,7 @@ namespace QuartierLatin.Backend.Database.Repositories
                 .UpdateAsync(page));
         }
 
-        public Task<(int totalResults, List<(int id, List<Page> pages)> results)> GetPageRootsWithPagesAsync(string search, int skip, int take) =>
+        public Task<(int totalResults, List<(int id, List<Page> pages)> results)> GetPageRootsWithPagesAsync(string search, int skip, int take, PageType pageType) =>
             _db.ExecAsync(async db =>
             {
                 var q = db.PageRoots.AsQueryable();
@@ -55,12 +55,12 @@ namespace QuartierLatin.Backend.Database.Repositories
                 {
                     var ids = db.Pages.Where(p => p.Title.Contains(search) || p.Url.Contains(search))
                         .Select(p => p.PageRootId);
-                    q = q.Where(x => ids.Contains(x.Id));
+                    q = q.Where(x => ids.Contains(x.Id) && x.PageType == pageType);
                 }
 
                 var count = await q.CountAsync();
 
-                var idList = await q.Select(x => x.Id).ToListAsync();
+                var idList = await q.Select(x => x.Id).Skip(skip).Take(take).ToListAsync();
                 var pages = (await db.Pages.Where(x => idList.Contains(x.PageRootId)).ToListAsync()).GroupBy(x => x.PageRootId)
                     .ToDictionary(x => x.Key, x => x.ToList());
 

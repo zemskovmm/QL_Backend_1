@@ -18,7 +18,7 @@ namespace QuartierLatin.Backend.Models.Repositories
         public Task EditPageAsync(Page page);
 
         Task<(int totalResults, List<(int id, List<Page> pages)> results)> GetPageRootsWithPagesAsync(string search,
-            int skip, int take);
+            int skip, int take, PageType pageType);
 
         Task<PageRoot> GetPageRootByIdAsync(int id);
     }
