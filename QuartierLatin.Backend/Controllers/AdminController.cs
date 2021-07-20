@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Utils;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Repositories;
 
 namespace QuartierLatin.Backend.Controllers
@@ -23,10 +24,10 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [HttpGet(), ProducesResponseType(typeof(PageListDto), 200)]
-        public async Task<IActionResult> GetPageList([FromQuery]int page, [FromQuery]string search)
+        public async Task<IActionResult> GetPageList([FromQuery]int page, [FromQuery]string search, [FromQuery]PageType pageType)
         {
             const int pageSize = 10;
-            var result = await _pageAppService.GetPageListBySearch(page, search, pageSize);
+            var result = await _pageAppService.GetPageListBySearch(page, search, pageSize, pageType);
 
             return Ok(new PageListDto
             {
