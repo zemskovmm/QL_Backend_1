@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.RouteDto;
 using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
 using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
 
@@ -144,6 +146,49 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/api/route/{lang}/school/{**url}")]
         public async Task<IActionResult> GetSchool(string lang, string url)
         {
+            var moduleAndUrls = await GetSchoolModuleDto(lang, url);
+
+            var response = new RouteDto<SchoolModuleDto>("school", moduleAndUrls.urls, moduleAndUrls.schoolModule, "school", moduleAndUrls.schoolModule.Title);
+
+            return Ok(response);
+        }
+
+        [HttpGet("/api/route/{lang}/{schoolUrl}/courses/{**url}")]
+        public async Task<IActionResult> GetSchoolAndCourse(string lang, string schoolUrl, string url)
+        {
+            var courseModuleAndUrls = await GetCourseModuleDto(lang, url);
+
+            var schoolModuleAndUrls = await GetSchoolModuleDto(lang, schoolUrl);
+
+            var module = new SchoolCourseModuleDto
+            {
+                Course = courseModuleAndUrls.courseModule,
+                School = schoolModuleAndUrls.schoolModule
+            };
+
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var urls = languageIds.Where(langs => schoolModuleAndUrls.urls.ContainsKey(langs.Value) && courseModuleAndUrls.urls.ContainsKey(langs.Value))
+                .ToDictionary(langs => langs.Value, 
+                    langs => String.Format("{0}/courses/{1}", schoolModuleAndUrls.urls[langs.Value], courseModuleAndUrls.urls[langs.Value]));
+
+            var response = new RouteDto<SchoolCourseModuleDto>(null, urls, module, "schoolAndCourse", schoolModuleAndUrls.schoolModule.Title + ", " + courseModuleAndUrls.courseModule.Title);
+
+            return Ok(response);
+        }
+
+        [HttpGet("/api/route/{lang}/course/{**url}")]
+        public async Task<IActionResult> GetCourse(string lang, string url)
+        {
+            var moduleAndUrls = await GetCourseModuleDto(lang, url);
+
+            var response = new RouteDto<CourseModuleDto>("course", moduleAndUrls.urls, moduleAndUrls.courseModule, "course", moduleAndUrls.courseModule.Title);
+
+            return Ok(response);
+        }
+
+        private async Task<(SchoolModuleDto schoolModule, Dictionary<string, string> urls)> GetSchoolModuleDto(string lang, string url)
+        {
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
@@ -185,13 +230,11 @@ namespace QuartierLatin.Backend.Controllers
                 Metadata = school.schoolLanguage[languageId].Metadata is null ? null : JObject.Parse(school.schoolLanguage[languageId].Metadata)
             };
 
-            var response = new RouteDto<SchoolModuleDto>("school", urls, module, "school", module.Title);
-
-            return Ok(response);
+            return (schoolModule: module, urls: urls);
         }
 
-        [HttpGet("/api/route/{lang}/course/{**url}")]
-        public async Task<IActionResult> GetCourse(string lang, string url)
+        private async Task<(CourseModuleDto courseModule, Dictionary<string, string> urls)> GetCourseModuleDto(
+            string lang, string url)
         {
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
@@ -234,9 +277,7 @@ namespace QuartierLatin.Backend.Controllers
                 Metadata = course.courseLanguage[languageId].Metadata is null ? null : JObject.Parse(course.courseLanguage[languageId].Metadata)
             };
 
-            var response = new RouteDto<CourseModuleDto>("course", urls, module, "course", module.Title);
-
-            return Ok(response);
+            return (courseModule: module, urls: urls);
         }
     }
 }
