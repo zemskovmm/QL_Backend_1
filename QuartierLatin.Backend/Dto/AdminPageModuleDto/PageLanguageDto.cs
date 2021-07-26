@@ -9,6 +9,8 @@ namespace QuartierLatin.Backend.Dto.AdminPageModuleDto
         public string Title { get; set; }
         public JObject PageData { get; set; }
         public int? PreviewImageId { get; set; }
+        public int? SmallPreviewImageId { get; set; }
+        public int? WidePreviewImageId { get; set; }
         public JObject? Metadata { get; set; }
         public DateTime? Date { get; set; }
     }

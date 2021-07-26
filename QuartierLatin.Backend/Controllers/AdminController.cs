@@ -37,7 +37,9 @@ namespace QuartierLatin.Backend.Controllers
                     Id = x.id,
                     Titles = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Title),
                     Urls = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Url),
-                    PreviewImages = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.PreviewImageId)
+                    PreviewImages = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.PreviewImageId),
+                    SmallPreviewImages = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.SmallPreviewImageId),
+                    WidePreviewImages = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.WidePreviewImageId)
                 }).ToList()
             });
         }
@@ -47,7 +49,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> CreatePage([FromBody] PageDto createPageDto)
         {
             var id = await _pageAppService.CreatePageAsync(createPageDto.Languages.ToDictionary(x => x.Key,
-                x => (x.Value.Url, x.Value.Title, x.Value.PageData, x.Value.Date, x.Value.PreviewImageId, x.Value.Metadata)), createPageDto.PageType);
+                x => (x.Value.Url, x.Value.Title, x.Value.PageData, x.Value.Date, x.Value.PreviewImageId, x.Value.SmallPreviewImageId, x.Value.WidePreviewImageId, x.Value.Metadata)), createPageDto.PageType);
             return Ok(new {id = id});
         }
         
@@ -55,7 +57,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> UpdatePage(int id, [FromBody] PageDto createPageDto)
         {
             await _pageAppService.UpdatePage(id, createPageDto.Languages.ToDictionary(x => x.Key,
-                x => (x.Value.Url, x.Value.Title, x.Value.PageData, x.Value.Date, x.Value.PreviewImageId, x.Value.Metadata)), createPageDto.PageType);
+                x => (x.Value.Url, x.Value.Title, x.Value.PageData, x.Value.Date, x.Value.PreviewImageId, x.Value.SmallPreviewImageId, x.Value.WidePreviewImageId, x.Value.Metadata)), createPageDto.PageType);
             return Ok(new {id = id});
         }
 
@@ -78,6 +80,8 @@ namespace QuartierLatin.Backend.Controllers
                         Title = x.Value.Title,
                         PageData = JObject.Parse(x.Value.PageData),
                         PreviewImageId = x.Value.PreviewImageId,
+                        SmallPreviewImageId = x.Value.SmallPreviewImageId,
+                        WidePreviewImageId = x.Value.WidePreviewImageId,
                         Metadata = x.Value.Metadata is null ? null : JObject.Parse(x.Value.Metadata),
                         Date = x.Value.Date
                     })

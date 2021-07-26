@@ -17,11 +17,11 @@ namespace QuartierLatin.Backend.Application.Interfaces
 
         Task<AdminRouteDto<AdminPageModuleDto>> GetPageByUrlAdminAsync(string url);
 
-        Task<int> CreatePageAsync(Dictionary<string, (string url, string title, JObject pageData, DateTime? date, int? previewImageId, JObject? metadata)> languages, PageType pageType);
+        Task<int> CreatePageAsync(Dictionary<string, (string url, string title, JObject pageData, DateTime? date, int? previewImageId, int? smallPreviewImageId, int? widePreviewImageId, JObject? metadata)> languages, PageType pageType);
 
         Task<IList<Page>> GetPageLanguages(int id);
 
-        Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, DateTime? date, int? previewImageId, JObject? metadata)> languages, PageType pageType);
+        Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, DateTime? date, int? previewImageId, int? smallPreviewImageId, int? widePreviewImageId, JObject? metadata)> languages, PageType pageType);
 
         Task<(Dictionary<int, string> lang, (int totalResults, List<(int id, List<Page> pages)> results) result)>
             GetPageListBySearch(int page, string search, int pageSize, PageType pageType);

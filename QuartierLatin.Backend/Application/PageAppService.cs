@@ -30,7 +30,7 @@ namespace QuartierLatin.Backend.Application
         }
 
         private async Task<List<Page>> Convert(Dictionary<string, (string url, string title,
-            JObject pageData, DateTime? date, int? previewImageId, JObject? metadata)> languages)
+            JObject pageData, DateTime? date, int? previewImageId, int? smallPreviewImageId, int? widePreviewImageId, JObject? metadata)> languages)
         {
             var langs = (await _languageRepository.GetLanguageListAsync()).ToDictionary(x => x.LanguageShortName,
                 x => x.Id);
@@ -41,16 +41,18 @@ namespace QuartierLatin.Backend.Application
                 PageData = x.Value.pageData.ToString(),
                 LanguageId = langs[x.Key],
                 PreviewImageId = x.Value.previewImageId,
+                SmallPreviewImageId = x.Value.smallPreviewImageId,
+                WidePreviewImageId = x.Value.widePreviewImageId,
                 Metadata = x.Value.metadata?.ToString(),
                 Date = x.Value.date
             }).ToList();
         }
 
         public async Task<int> CreatePageAsync(Dictionary<string, (string url, string title,
-            JObject pageData, DateTime? date, int? previewImageId, JObject? metadata)> languages, PageType pageType) =>
+            JObject pageData, DateTime? date, int? previewImageId, int? smallPreviewImageId, int? widePreviewImageId, JObject? metadata)> languages, PageType pageType) =>
             await _pageRepository.CreatePages(await Convert(languages), pageType);
         
-        public async Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, DateTime? date, int? previewImageId, JObject? metadata)> languages, PageType pageType) 
+        public async Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, DateTime? date, int? previewImageId, int? smallPreviewImageId, int? widePreviewImageId, JObject? metadata)> languages, PageType pageType) 
             => await _pageRepository.UpdatePages(id, await Convert(languages), pageType);
 
         public Task<IList<Page>> GetPageLanguages(int id) => _pageRepository.GetPagesByPageRootIdAsync(id);

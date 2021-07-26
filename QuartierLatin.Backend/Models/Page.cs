@@ -13,6 +13,8 @@ namespace QuartierLatin.Backend.Models
         [Column] [PrimaryKey] public int LanguageId { get; set; }
         [Column] [PrimaryKey] public int PageRootId { get; set; }
         [Column] public int? PreviewImageId { get; set; }
+        [Column] public int? SmallPreviewImageId { get; set; }
+        [Column] public int? WidePreviewImageId { get; set; }
         [Column(DataType = DataType.BinaryJson)] public string? Metadata { get; set; }
         [Column] public DateTime? Date { get; set; }
     }
