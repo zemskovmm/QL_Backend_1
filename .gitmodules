@@ -1,0 +1,3 @@
+[submodule "remoteui"]
+	path = remoteui
+	url = https://github.com/kekekeks/remoteui

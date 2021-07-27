@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces.courseCatalog.SchoolCatalog;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.School;
 using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
@@ -6,20 +7,37 @@ using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
+using RemoteUi;
 
 namespace QuartierLatin.Backend.Controllers.courseCatalog.School
 {
+
+    public class SchoolAdminDtoResponse
+    {
+        public JObject Definition { get; set; }
+        public SchoolAdminDto Value { get; set; }
+    }
+    
     [Authorize(Roles = "Admin")]
     [Route("/api/admin/schools")]
     public class AdminSchoolController : Controller
     {
         private readonly ILanguageRepository _languageRepository;
         private readonly ISchoolAppService _schoolAppService;
+        private readonly JObject _definition;
 
         public AdminSchoolController(ILanguageRepository languageRepository, ISchoolAppService schoolAppService)
         {
+            var noFields = new IExtraRemoteUiField[0];
+            
             _languageRepository = languageRepository;
             _schoolAppService = schoolAppService;
+            _definition = new RemoteUiBuilder(typeof(SchoolAdminDto), noFields, null, new CamelCaseNamingStrategy())
+                .Register(typeof(SchoolAdminDto), noFields)
+                .Register(typeof(Dictionary<string, SchoolLanguageAdminDto>), noFields)
+                .Register(typeof(SchoolLanguageAdminDto), noFields)
+                .Build(null);
         }
 
         [HttpGet]
@@ -74,6 +92,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
 
             var response = new SchoolAdminDto
             {
+                Id = school.school.Id,
                 FoundationYear = school.school.FoundationYear,
                 Languages = school.schoolLanguage.ToDictionary(school => language[school.Key], 
                     school => new SchoolLanguageAdminDto
@@ -85,7 +104,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
                     })
             };
 
-            return Ok(response);
+            return Ok(new SchoolAdminDtoResponse {Definition = _definition, Value = response});
         }
 
         [HttpPut("{id}")]

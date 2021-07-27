@@ -35,6 +35,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\QuartierLatin.Importer.DataModel\QuartierLatin.Importer.DataModel.csproj" />
+        <ProjectReference Include="..\remoteui\RemoteUi\RemoteUi.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="$(IncludeWeb) == 'true'">
