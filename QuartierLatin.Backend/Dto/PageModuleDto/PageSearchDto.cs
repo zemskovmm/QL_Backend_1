@@ -1,10 +1,15 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
+using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto;
 using System.Collections.Generic;
+using QuartierLatin.Backend.Models.Enums;
 
-namespace QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto
+namespace QuartierLatin.Backend.Dto.PageModuleDto
 {
-    public class CatalogSearchDto
+    public class PageSearchDto
     {
+        [JsonProperty("type")]
+        public PageType PageType { get; set; }
         [JsonProperty("pageSize")]
         public int? PageSize { get; set; }
         [JsonProperty("page")]

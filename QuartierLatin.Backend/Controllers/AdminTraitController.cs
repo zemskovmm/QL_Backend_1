@@ -248,5 +248,23 @@ namespace QuartierLatin.Backend.Controllers
             await _commonTraitTypeAppService.DeleteEntityTraitToPageAsync(pageId, commonTraitId);
             return Ok(new object());
         }
+
+        [HttpGet("traits/by-type/{typeName}")]
+        public async Task<IActionResult> GetTraitOfTypeByTypeName(string typeName)
+        {
+            var traitList = await _commonTraitAppService.GetTraitOfTypesByTypeNameAsync(typeName);
+
+            var response = traitList.Select(trait => new CommonTraitListDto
+            {
+                Id = trait.Id,
+                CommonTraitTypeId = trait.CommonTraitTypeId,
+                IconBlobId = trait.IconBlobId,
+                Names = JObject.Parse(trait.NamesJson),
+                Order = trait.Order,
+                ParentId = trait.ParentId
+            });
+
+            return Ok(response);
+        }
     }
 }

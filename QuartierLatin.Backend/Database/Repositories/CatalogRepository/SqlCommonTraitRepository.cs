@@ -113,5 +113,17 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     select trait).ToListAsync()
             );
         }
+
+        public async Task<List<CommonTrait>> GetCommonTraitListByTypeNameAsync(string typeName)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+               var traitTypes = db.CommonTraitTypes.AsEnumerable();
+
+               var traitTypeId = traitTypes.FirstOrDefault(traitType => traitType.Names.ContainsValue(typeName)).Id;
+
+               return await GetCommonTraitListByTypeId(traitTypeId);
+            });
+        }
     }
 }

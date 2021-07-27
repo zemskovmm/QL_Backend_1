@@ -2,7 +2,7 @@
 
 namespace QuartierLatin.Backend.Models
 {
-    [Table("CommonTraitsToPages")]
+    [Table("CreateCommonTraitsToPages")]
     public class CommonTraitsToPage
     {
         [Column] [PrimaryKey] public int PageId { get; set; }
