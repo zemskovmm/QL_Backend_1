@@ -19,5 +19,6 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByUniversityIds(IEnumerable<int> ids);
         Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndSchoolIdAsync(int traitTypeId, int schoolId);
         Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndCourseIdAsync(int traitTypeId, int courseId);
+        Task<List<CommonTrait>> GetCommonTraitListByTypeNameAsync(string typeName);
     }
 }

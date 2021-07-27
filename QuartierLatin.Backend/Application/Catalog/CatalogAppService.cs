@@ -1,5 +1,6 @@
 ﻿using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
@@ -7,7 +8,6 @@ using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRe
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
 
 namespace QuartierLatin.Backend.Application.Catalog
 {

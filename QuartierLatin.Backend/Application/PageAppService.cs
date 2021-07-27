@@ -129,5 +129,15 @@ namespace QuartierLatin.Backend.Application
         {
             return await _pageRepository.GetPageRootByIdAsync(id);
         }
+
+        public async Task<(int totalItems, List<(PageRoot pageRoot, Page page)>)> GetPagesByFilter(string lang, PageType entityType, Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize)
+        {
+            var commonTraitsIds = commonTraits
+                .Select(x => x.Value).ToList();
+
+            var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
+
+            return await _pageRepository.GetPagesByFilter(commonTraitsIds, langId, pageSize * pageNumber, pageSize, entityType);
+        }
     }
 }

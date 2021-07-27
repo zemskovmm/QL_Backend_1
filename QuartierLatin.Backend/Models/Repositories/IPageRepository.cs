@@ -1,4 +1,5 @@
-﻿using QuartierLatin.Backend.Models.Enums;
+﻿using System;
+using QuartierLatin.Backend.Models.Enums;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -21,5 +22,6 @@ namespace QuartierLatin.Backend.Models.Repositories
             int skip, int take, PageType pageType);
 
         Task<PageRoot> GetPageRootByIdAsync(int id);
+        Task<(int totalItems, List<(PageRoot pageRoot, Page page)>)> GetPagesByFilter(List<List<int>> commonTraitsIds, int langId, int skip, int take, PageType entityType);
     }
 }

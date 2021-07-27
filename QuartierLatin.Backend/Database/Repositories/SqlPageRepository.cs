@@ -1,4 +1,5 @@
-﻿using LinqToDB;
+﻿using System;
+using LinqToDB;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Utils;
@@ -28,16 +29,21 @@ namespace QuartierLatin.Backend.Database.Repositories
         private Task<int> CreateOrUpdatePageCore(int? pageRootId, IList<Page> pages, PageType pageType) =>
             _db.ExecAsync(db => db.InTransaction(async () =>
             {
-                var rootId = pageRootId ?? await db.InsertWithInt32IdentityAsync(new PageRoot{PageType = pageType});
+                if (pageRootId is null)
+                    pageRootId = await db.InsertWithInt32IdentityAsync(new PageRoot {PageType = pageType});
+                else
+                    await db.UpdateAsync(new PageRoot {Id = pageRootId.Value, PageType = pageType});
+
                 if (pageRootId.HasValue)
-                    await db.Pages.DeleteAsync(x => x.PageRootId == rootId);
+                    await db.Pages.DeleteAsync(x => x.PageRootId == pageRootId.Value);
+
                 foreach (var p in pages)
                 {
-                    p.PageRootId = rootId;
+                    p.PageRootId = pageRootId.Value;
                     await db.InsertAsync(p);
                 }
 
-                return rootId;
+                return pageRootId.Value;
             }));
         
         public async Task EditPageAsync(Page page)
@@ -49,7 +55,7 @@ namespace QuartierLatin.Backend.Database.Repositories
         public Task<(int totalResults, List<(int id, List<Page> pages)> results)> GetPageRootsWithPagesAsync(string search, int skip, int take, PageType pageType) =>
             _db.ExecAsync(async db =>
             {
-                var q = db.PageRoots.AsQueryable();
+                var q = db.PageRoots.Where(page => page.PageType == pageType).AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {
@@ -92,6 +98,44 @@ namespace QuartierLatin.Backend.Database.Repositories
         public async Task<PageRoot> GetPageRootByIdAsync(int id)
         {
             return await _db.ExecAsync(db => db.PageRoots.FirstOrDefaultAsync(pageRoot => pageRoot.Id == id));
+        }
+
+        public async Task<(int totalItems, List<(PageRoot pageRoot, Page page)>)> GetPagesByFilter(List<List<int>> commonTraitsIds, int langId, int skip, int take, PageType entityType)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var pageRoots = db.PageRoots.AsQueryable();
+
+                if (commonTraitsIds.Any())
+                {
+                    var pageWithTraits = db.CommonTraitsToPages.AsQueryable();
+
+                    foreach (var commonTraitGroup in commonTraitsIds)
+                    {
+                        if (commonTraitGroup.Count != 0)
+                            pageWithTraits =
+                                pageWithTraits.Where(t => commonTraitGroup.Contains(t.CommonTraitId));
+                    }
+
+                    pageRoots = pageRoots.Where(page =>
+                        pageWithTraits.Select(x => x.PageId).Contains(page.Id) && page.PageType == entityType);
+                }
+
+                var pageWithLanguages = from pageRoot in pageRoots
+                                          join page in db.Pages.Where(l => l.LanguageId == langId)
+                                              on pageRoot.Id equals page.PageRootId
+                                          select new
+                                          {
+                                              pageRoot,
+                                              page
+                                          };
+
+                var totalCount = await pageWithLanguages.CountAsync();
+
+                return (totalCount,
+                    (await pageWithLanguages.OrderBy(x => x.page.Date).Skip(skip).Take(take).ToListAsync())
+                    .Select(x => (pageRoot: x.pageRoot, page: x.page)).ToList());
+            });
         }
     }
 }

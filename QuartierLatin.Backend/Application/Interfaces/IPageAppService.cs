@@ -27,5 +27,6 @@ namespace QuartierLatin.Backend.Application.Interfaces
             GetPageListBySearch(int page, string search, int pageSize, PageType pageType);
 
         Task<PageRoot> GetPageRootByIdAsync(int id);
+        Task<(int totalItems, List<(PageRoot pageRoot, Page page)>)> GetPagesByFilter(string lang, PageType entityType, Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize);
     }
 }

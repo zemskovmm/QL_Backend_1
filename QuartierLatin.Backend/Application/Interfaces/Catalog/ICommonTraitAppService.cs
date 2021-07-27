@@ -17,5 +17,6 @@ namespace QuartierLatin.Backend.Application.Interfaces.Catalog
             List<int> ids);
         Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndSchoolIdAsync(int traitTypeId, int schoolId);
         Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndCourseIdAsync(int traitTypeId, int courseId);
+        Task<List<CommonTrait>> GetTraitOfTypesByTypeNameAsync(string typeName);
     }
 }
