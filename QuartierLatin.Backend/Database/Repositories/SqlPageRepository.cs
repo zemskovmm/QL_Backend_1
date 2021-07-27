@@ -1,4 +1,5 @@
-﻿using LinqToDB;
+﻿using System;
+using LinqToDB;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Utils;
@@ -49,7 +50,7 @@ namespace QuartierLatin.Backend.Database.Repositories
         public Task<(int totalResults, List<(int id, List<Page> pages)> results)> GetPageRootsWithPagesAsync(string search, int skip, int take, PageType pageType) =>
             _db.ExecAsync(async db =>
             {
-                var q = db.PageRoots.AsQueryable();
+                var q = db.PageRoots.Where(page => page.PageType == pageType).AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {
@@ -92,6 +93,44 @@ namespace QuartierLatin.Backend.Database.Repositories
         public async Task<PageRoot> GetPageRootByIdAsync(int id)
         {
             return await _db.ExecAsync(db => db.PageRoots.FirstOrDefaultAsync(pageRoot => pageRoot.Id == id));
+        }
+
+        public async Task<(int totalItems, List<(PageRoot pageRoot, Page page)>)> GetPagesByFilter(List<List<int>> commonTraitsIds, int langId, int skip, int take, PageType entityType)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var pageRoots = db.PageRoots.AsQueryable();
+
+                if (commonTraitsIds.Any())
+                {
+                    var pageWithTraits = db.CommonTraitsToPages.AsQueryable();
+
+                    foreach (var commonTraitGroup in commonTraitsIds)
+                    {
+                        if (commonTraitGroup.Count != 0)
+                            pageWithTraits =
+                                pageWithTraits.Where(t => commonTraitGroup.Contains(t.CommonTraitId));
+                    }
+
+                    pageRoots = pageRoots.Where(page =>
+                        pageWithTraits.Select(x => x.PageId).Contains(page.Id) && page.PageType == entityType);
+                }
+
+                var pageWithLanguages = from pageRoot in pageRoots
+                                          join page in db.Pages.Where(l => l.LanguageId == langId)
+                                              on pageRoot.Id equals page.PageRootId
+                                          select new
+                                          {
+                                              pageRoot,
+                                              page
+                                          };
+
+                var totalCount = await pageWithLanguages.CountAsync();
+
+                return (totalCount,
+                    (await pageWithLanguages.OrderBy(x => x.page.Date).Skip(skip).Take(take).ToListAsync())
+                    .Select(x => (pageRoot: x.pageRoot, page: x.page)).ToList());
+            });
         }
     }
 }

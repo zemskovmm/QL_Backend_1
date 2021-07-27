@@ -7,6 +7,7 @@ namespace QuartierLatin.Backend.Models.Enums
     {
         University,
         Housing,
-        School
+        School,
+        Page
     }
 }

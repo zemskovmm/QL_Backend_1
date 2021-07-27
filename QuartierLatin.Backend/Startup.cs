@@ -159,7 +159,10 @@ namespace QuartierLatin.Backend
             services.Configure<BaseFilterOrderConfig>(Configuration.GetSection("BaseFilterOrder"));
             services.Configure<SitemapConfig>(Configuration.GetSection("Sitemap"));
 
-            services.AddRazorPages().AddNewtonsoftJson();
+            services.AddRazorPages().AddNewtonsoftJson(o =>
+            {
+                o.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
