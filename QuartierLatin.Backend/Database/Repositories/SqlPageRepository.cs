@@ -29,16 +29,21 @@ namespace QuartierLatin.Backend.Database.Repositories
         private Task<int> CreateOrUpdatePageCore(int? pageRootId, IList<Page> pages, PageType pageType) =>
             _db.ExecAsync(db => db.InTransaction(async () =>
             {
-                var rootId = pageRootId ?? await db.InsertWithInt32IdentityAsync(new PageRoot{PageType = pageType});
+                if (pageRootId is null)
+                    pageRootId = await db.InsertWithInt32IdentityAsync(new PageRoot {PageType = pageType});
+                else
+                    await db.UpdateAsync(new PageRoot {Id = pageRootId.Value, PageType = pageType});
+
                 if (pageRootId.HasValue)
-                    await db.Pages.DeleteAsync(x => x.PageRootId == rootId);
+                    await db.Pages.DeleteAsync(x => x.PageRootId == pageRootId.Value);
+
                 foreach (var p in pages)
                 {
-                    p.PageRootId = rootId;
+                    p.PageRootId = pageRootId.Value;
                     await db.InsertAsync(p);
                 }
 
-                return rootId;
+                return pageRootId.Value;
             }));
         
         public async Task EditPageAsync(Page page)
