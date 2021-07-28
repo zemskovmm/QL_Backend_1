@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces.CourseCatalog.CourseCatalog;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.Course;
 using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
@@ -6,20 +7,37 @@ using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
+using RemoteUi;
 
 namespace QuartierLatin.Backend.Controllers.courseCatalog.course
 {
+    public class SchoolAdminDtoResponse
+    {
+        public JObject Definition { get; set; }
+        public CourseAdminDto Value { get; set; }
+    }
+    
     [Authorize(Roles = "Admin")]
     [Route("/api/admin/courses")]
     public class AdmincourseController : Controller
     {
         private readonly ILanguageRepository _languageRepository;
         private readonly ICourseAppService _courseAppService;
+        private readonly JObject _definition;
+
 
         public AdmincourseController(ILanguageRepository languageRepository, ICourseAppService courseAppService)
         {
+            var noFields = new IExtraRemoteUiField[0];
+
             _languageRepository = languageRepository;
             _courseAppService = courseAppService;
+            _definition = new RemoteUiBuilder(typeof(CourseAdminDto), noFields, null, new CamelCaseNamingStrategy())
+                .Register(typeof(CourseAdminDto), noFields)
+                .Register(typeof(Dictionary<string, CourseLanguageAdminDto>), noFields)
+                .Register(typeof(CourseLanguageAdminDto), noFields)
+                .Build(null);
         }
 
         [HttpGet]
@@ -27,7 +45,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
         {
             var courseList = await _courseAppService.GetCourseListAsync();
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
-
+            
             var response = courseList.Select(course => new CourseListAdminDto()
             {
                 Id = course.course.Id,
@@ -44,6 +62,9 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
 
             return Ok(response);
         }
+        
+        [HttpGet("definition")]
+        public IActionResult GetDefinition() => Ok(_definition);
 
         [HttpPost]
         public async Task<IActionResult> CreateCourse([FromBody] CourseAdminDto courseDto)
@@ -74,6 +95,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
 
             var response = new CourseAdminDto
             {
+                Id = id,
                 SchoolId = course.course.SchoolId,
                 Languages = course.schoolLanguage.ToDictionary(course => language[course.Key],
                     course => new CourseLanguageAdminDto
