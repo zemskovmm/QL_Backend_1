@@ -52,16 +52,19 @@ namespace QuartierLatin.Backend.Database.Repositories
                 .UpdateAsync(page));
         }
 
-        public Task<(int totalResults, List<(int id, List<Page> pages)> results)> GetPageRootsWithPagesAsync(string search, int skip, int take, PageType pageType) =>
+        public Task<(int totalResults, List<(int id, List<Page> pages)> results)> GetPageRootsWithPagesAsync(string search, int skip, int take, PageType? pageType) =>
             _db.ExecAsync(async db =>
             {
-                var q = db.PageRoots.Where(page => page.PageType == pageType).AsQueryable();
+                var q = db.PageRoots.AsQueryable();
+
+                if (pageType is not null)
+                    q = q.Where(page => page.PageType == pageType);
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {
                     var ids = db.Pages.Where(p => p.Title.Contains(search) || p.Url.Contains(search))
                         .Select(p => p.PageRootId);
-                    q = q.Where(x => ids.Contains(x.Id) && x.PageType == pageType);
+                    q = q.Where(x => ids.Contains(x.Id));
                 }
 
                 var count = await q.CountAsync();
