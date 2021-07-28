@@ -63,6 +63,9 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
             return Ok(response);
         }
 
+        [HttpGet("definition")]
+        public IActionResult GetDefinition() => Ok(_definition);
+
         [HttpPost]
         public async Task<IActionResult> CreateSchool([FromBody] SchoolAdminDto schoolDto)
         {

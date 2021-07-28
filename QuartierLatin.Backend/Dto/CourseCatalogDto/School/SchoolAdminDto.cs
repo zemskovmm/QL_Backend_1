@@ -5,7 +5,6 @@ namespace QuartierLatin.Backend.Dto.CourseCatalogDto.School
 {
     public class SchoolAdminDto 
     {
-        [RemoteUiField("id")]
         public int Id { get; set; }
         [RemoteUiField("foundationYear")]
         public int? FoundationYear { get; set; }
