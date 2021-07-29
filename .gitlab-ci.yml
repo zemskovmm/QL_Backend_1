@@ -11,6 +11,7 @@ build:
     paths:
       - out
   script: 
+    - git submodule update --init --recursive
     - dotnet publish -c Release -o out QuartierLatin.Backend
 
 deploy:
