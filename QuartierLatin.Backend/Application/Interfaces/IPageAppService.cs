@@ -24,7 +24,7 @@ namespace QuartierLatin.Backend.Application.Interfaces
         Task UpdatePage(int id, Dictionary<string, (string url, string title, JObject pageData, DateTime? date, int? previewImageId, int? smallPreviewImageId, int? widePreviewImageId, JObject? metadata)> languages, PageType pageType);
 
         Task<(Dictionary<int, string> lang, (int totalResults, List<(int id, List<Page> pages)> results) result)>
-            GetPageListBySearch(int page, string search, int pageSize, PageType pageType);
+            GetPageListBySearch(int page, string search, int pageSize, PageType? pageType);
 
         Task<PageRoot> GetPageRootByIdAsync(int id);
         Task<(int totalItems, List<(PageRoot pageRoot, Page page)>)> GetPagesByFilter(string lang, PageType entityType, Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize);
