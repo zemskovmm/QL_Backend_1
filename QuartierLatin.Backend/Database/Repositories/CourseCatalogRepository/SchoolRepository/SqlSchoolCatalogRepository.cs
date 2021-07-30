@@ -113,14 +113,16 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
                 schoolLanguageQuery = schoolLanguageQuery.Where(schoolLanguageFilter);
 
             var query = from c in schoolQuery
-                    join l in schoolLanguageQuery on c.Id equals l.SchoolId
-                    select new { c, l };
+                let langs = schoolLanguageQuery.Where(lang => lang.SchoolId == c.Id)
+                    select new { c, langs };
 
-            return query.AsEnumerable().GroupBy(x => x.c).Select(x => new SchoolAndLanguageTuple
+            var response = query.AsEnumerable().Select(q => new SchoolAndLanguageTuple
             {
-                School = x.First().c,
-                SchoolLanguage = x.ToDictionary(schoolLang => schoolLang.l.LanguageId, schoolLang => schoolLang.l)
+                School = q.c,
+                SchoolLanguage = q.langs.ToDictionary(lang => lang.LanguageId, lang => lang)
             }).ToList();
+
+            return response;
         }
     }
 }
