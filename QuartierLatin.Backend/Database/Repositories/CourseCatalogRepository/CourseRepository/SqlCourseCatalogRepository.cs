@@ -135,6 +135,28 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
             });
         }
 
+        public async Task<List<string>> GetCourseUrlsListAsync(int schoolId)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var courseIds = db.Courses.Where(course => course.SchoolId == schoolId).Select(course => course.Id);
+
+                return await db.CourseLanguages.Where(courseLang => courseIds.Contains(courseLang.CourseId))
+                    .Select(courseLang => courseLang.Url).ToListAsync();
+            });
+        }
+
+        public async Task<List<(Course course, Dictionary<int, CourseLanguage> courseLanguage)>> GetCoursesListAsync(int schoolId)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var entity =  CourseWithLanguages(db, course => course.SchoolId == schoolId);
+                var response = entity.Select(resp => (resp.Course, resp.CourseLanguage)).ToList();
+
+                return response;
+            });
+        }
+
         private record CourseAndLanguageTuple
         {
             public Course Course { get; set; }

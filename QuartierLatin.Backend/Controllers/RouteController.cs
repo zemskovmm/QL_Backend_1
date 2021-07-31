@@ -15,6 +15,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.RouteDto;
+using QuartierLatin.Backend.Models.CatalogModels;
+using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
 using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
 using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
 
@@ -156,7 +158,7 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/api/route/{lang}/{schoolUrl}/courses/{**url}")]
         public async Task<IActionResult> GetSchoolAndCourse(string lang, string schoolUrl, string url)
         {
-            var courseModuleAndUrls = await GetCourseModuleDto(lang, url);
+            var courseModuleAndUrls = await GetCourseModuleDtoWithUrls(lang, url);
 
             var schoolModuleAndUrls = await GetSchoolModuleDto(lang, schoolUrl);
 
@@ -177,17 +179,41 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
+        [HttpGet("/api/route/{lang}/{schoolUrl}/courses/")]
+        public async Task<IActionResult> GetSchoolAndCourseList(string lang, string schoolUrl)
+        {
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var schoolModuleAndUrls = await GetSchoolModuleDto(lang, schoolUrl);
+
+            var courseModuleList = await GetCourseModuleDtoList(lang, schoolModuleAndUrls.schoolId, languageIds);
+
+            var module = new SchoolCourseListModuleDto()
+            {
+                Courses = courseModuleList,
+                School = schoolModuleAndUrls.schoolModule
+            };
+
+            var urls = languageIds.Where(langs => schoolModuleAndUrls.urls.ContainsKey(langs.Value))
+                .ToDictionary(langs => langs.Value,
+                    langs => String.Format("{0}/courses/", schoolModuleAndUrls.urls[langs.Value]));
+
+            var response = new RouteDto<SchoolCourseListModuleDto>(null, urls, module, "schoolAndCourseList", schoolModuleAndUrls.schoolModule.Title);
+
+            return Ok(response);
+        }
+
         [HttpGet("/api/route/{lang}/course/{**url}")]
         public async Task<IActionResult> GetCourse(string lang, string url)
         {
-            var moduleAndUrls = await GetCourseModuleDto(lang, url);
+            var moduleAndUrls = await GetCourseModuleDtoWithUrls(lang, url);
 
             var response = new RouteDto<CourseModuleDto>("course", moduleAndUrls.urls, moduleAndUrls.courseModule, "course", moduleAndUrls.courseModule.Title);
 
             return Ok(response);
         }
 
-        private async Task<(SchoolModuleDto schoolModule, Dictionary<string, string> urls)> GetSchoolModuleDto(string lang, string url)
+        private async Task<(SchoolModuleDto schoolModule, Dictionary<string, string> urls, int schoolId)> GetSchoolModuleDto(string lang, string url)
         {
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
@@ -230,24 +256,41 @@ namespace QuartierLatin.Backend.Controllers
                 Metadata = school.schoolLanguage[languageId].Metadata is null ? null : JObject.Parse(school.schoolLanguage[languageId].Metadata)
             };
 
-            return (schoolModule: module, urls: urls);
+            return (schoolModule: module, urls: urls, schoolId: school.school.Id);
         }
 
-        private async Task<(CourseModuleDto courseModule, Dictionary<string, string> urls)> GetCourseModuleDto(
+        private async Task<(CourseModuleDto courseModule, Dictionary<string, string> urls)> GetCourseModuleDtoWithUrls(
             string lang, string url)
         {
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
+            var courseModule = await GetCourseDto(lang, url, languageIds);
+
+            var urls = courseModule.Item2.Item2.ToDictionary(
+                course => languageIds[course.Key],
+                course => course.Value.Url);
+
+            return (courseModule: courseModule.courseModule, urls: urls);
+        }
+
+        private async Task<(CourseModuleDto courseModule, (Course, Dictionary<int, CourseLanguage>))> GetCourseDto(
+            string lang, string url, Dictionary<int, string> languageIds)
+        {
             var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
 
             var course = await _courseCatalogRepository.GetCourseByUrlWithLanguageAsync(languageId, url);
 
-            var urls = course.courseLanguage.ToDictionary(
-                course => languageIds[course.Key],
-                course => course.Value.Url);
-
             var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();
 
+            var module = await GetCourseModule(traitsType, course, languageIds, lang, languageId);
+
+            return (courseModule: module, course);
+        }
+
+        public async Task<CourseModuleDto> GetCourseModule(List<CommonTraitType> traitsType,
+            (Course course, Dictionary<int, CourseLanguage> courseLanguage) course,
+            Dictionary<int, string> languageIds, string lang, int languageId) 
+        {
             var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
 
             foreach (var traitType in traitsType)
@@ -277,7 +320,26 @@ namespace QuartierLatin.Backend.Controllers
                 Metadata = course.courseLanguage[languageId].Metadata is null ? null : JObject.Parse(course.courseLanguage[languageId].Metadata)
             };
 
-            return (courseModule: module, urls: urls);
+            return module;
+        }
+
+        private async Task<List<CourseModuleDto>> GetCourseModuleDtoList(
+            string lang, int schoolId, Dictionary<int, string> languageIds)
+        {
+            var courses = await _courseCatalogRepository.GetCoursesListAsync(schoolId);
+
+            var response = new List<CourseModuleDto>();
+
+            var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
+
+            var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();
+
+            foreach (var course in courses)
+            {
+                response.Add(await GetCourseModule(traitsType, course, languageIds, lang, languageId));
+            }
+
+            return response;
         }
     }
 }
