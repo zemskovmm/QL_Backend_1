@@ -15,5 +15,7 @@ namespace QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.Cour
         Task CreateOrUpdateCourseLanguageByIdAsync(int id, string htmlDescription, int languageId, string name, string url, JObject? metadata);
         Task<(Course course, Dictionary<int, CourseLanguage> courseLanguage)> GetCourseByUrlWithLanguageAsync(int languageId, string url);
         Task<(int totalItems, List<(Course course, CourseLanguage courseLanguage)>)> GetCoursePageByFilter(List<List<int>> commonTraitsIds, int langId, int skip, int take);
+        Task<List<string>> GetCourseUrlsListAsync(int schoolId);
+        Task<List<(Course course, Dictionary<int, CourseLanguage> courseLanguage)>> GetCoursesListAsync(int schoolId);
     }
 }
