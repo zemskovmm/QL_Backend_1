@@ -236,9 +236,13 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/api/catalog/course/filters/{lang}")]
         public async Task<IActionResult> GetCatalogFiltersTocourseByLangAndEntityType(string lang)
         {
-            var entityType = EntityType.School;
+            var entityTypeSchool = EntityType.School;
+            var entityTypeCourse = EntityType.Course;
 
-            var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
+            var commonTraitsSchool = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityTypeSchool);
+            var commonTraitsCourse = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityTypeCourse);
+
+            var commonTraits = commonTraitsSchool.Concat(commonTraitsCourse);
 
             var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
                 .Select(trait => new CatalogFilterDto
@@ -264,26 +268,14 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPost("/api/catalog/course/search/{lang}")]
         public async Task<IActionResult> SearchInCourseCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
-            var entityType = EntityType.University;
             var pageSize = catalogSearchDto.PageSize ?? 1000;
             var commonTraits =
                 catalogSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
                     filter.Values);
 
             var catalogPage =
-                await _catalogAppService.GetCatalogCoursePageByFilterAsync(lang, entityType, commonTraits,
+                await _catalogAppService.GetCatalogCoursePageByFilterAsync(lang, commonTraits,
                     catalogSearchDto.PageNumber, pageSize);
-
-            var courseIds = catalogPage.Item2.Select(x => x.Item1.Id).ToList();
-            var traitDic = await _commonTraitAppService.GetTraitsForEntityIds(EntityType.University,
-                courseIds);
-
-            List<CommonTrait> GetTraits(string identifier, int id)
-            {
-                if (!traitDic.TryGetValue(id, out var traits))
-                    return new List<CommonTrait>();
-                return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
-            }
 
             var courseDtos = catalogPage.Item2.Select(course => new CatalogCourseDto()
             {
