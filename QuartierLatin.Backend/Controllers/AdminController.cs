@@ -39,7 +39,9 @@ namespace QuartierLatin.Backend.Controllers
                     Urls = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Url),
                     PreviewImages = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.PreviewImageId),
                     SmallPreviewImages = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.SmallPreviewImageId),
-                    WidePreviewImages = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.WidePreviewImageId)
+                    WidePreviewImages = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.WidePreviewImageId),
+                    Metadata = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Metadata is null ? null : JObject.Parse(x.Metadata)),
+                    Date = x.pages.ToDictionary(x => result.lang[x.LanguageId], x => x.Date)
                 }).ToList()
             });
         }
