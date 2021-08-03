@@ -266,5 +266,47 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("entity-traits-housing/{housingId}")]
+        public async Task<IActionResult> GetEntityTraitToHousing(int housingId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToHousingIdListAsync(housingId);
+            return Ok(response);
+        }
+
+        [HttpPost("entity-traits-housing/{housingId}/{commonTraitId}")]
+        public async Task<IActionResult> CreateEntityTraitToHousing(int housingId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.CreateEntityTraitToHousingAsync(housingId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpDelete("entity-traits-housing/{housingId}/{commonTraitId}")]
+        public async Task<IActionResult> DeleteEntityTraitToHousing(int housingId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.DeleteEntityTraitToHousingAsync(housingId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpGet("entity-traits-housing-accommodation-type/{housingAccommodationTypeId}")]
+        public async Task<IActionResult> GetEntityTraitToHousingAccommodationType(int housingAccommodationTypeId)
+        {
+            var response = await _commonTraitTypeAppService.GetEntityTraitToHousingAccommodationTypeIdListAsync(housingAccommodationTypeId);
+            return Ok(response);
+        }
+
+        [HttpPost("entity-traits-housing-accommodation-type/{housingAccommodationTypeId}/{commonTraitId}")]
+        public async Task<IActionResult> CreateEntityTraitToHousingAccommodationType(int housingAccommodationTypeId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.CreateEntityTraitToHousingAccommodationTypeAsync(housingAccommodationTypeId, commonTraitId);
+            return Ok(new object());
+        }
+
+        [HttpDelete("entity-traits-housing-accommodation-type/{housingAccommodationTypeId}/{commonTraitId}")]
+        public async Task<IActionResult> DeleteEntityTraitToHousingAccommodationType(int housingAccommodationTypeId, int commonTraitId)
+        {
+            await _commonTraitTypeAppService.DeleteEntityTraitToHousingAccommodationTypeAsync(housingAccommodationTypeId, commonTraitId);
+            return Ok(new object());
+        }
     }
 }
