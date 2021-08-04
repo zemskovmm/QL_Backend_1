@@ -17,7 +17,7 @@ using PageDto = QuartierLatin.Backend.Dto.PageModuleDto.PageDto;
 namespace QuartierLatin.Backend.Controllers
 {
     [Authorize(Roles = "Admin")]
-    [Route("/api/admin/pages")]
+    [Route("/api/pages")]
     public class PageController : Controller
     {
         private readonly IPageAppService _pageAppService;
