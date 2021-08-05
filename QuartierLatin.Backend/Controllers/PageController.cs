@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Dto.CommonTraitDto;
 using PageDto = QuartierLatin.Backend.Dto.PageModuleDto.PageDto;
 
 namespace QuartierLatin.Backend.Controllers
@@ -22,18 +23,21 @@ namespace QuartierLatin.Backend.Controllers
     {
         private readonly IPageAppService _pageAppService;
         private readonly ICatalogAppService _catalogAppService;
+        private readonly ICommonTraitTypeAppService _commonTraitTypeAppService;
 
-        public PageController(IPageAppService pageAppService, ICatalogAppService catalogAppService)
+        public PageController(IPageAppService pageAppService, ICatalogAppService catalogAppService,
+            ICommonTraitTypeAppService commonTraitTypeAppService)
         {
             _pageAppService = pageAppService;
             _catalogAppService = catalogAppService;
+            _commonTraitTypeAppService = commonTraitTypeAppService;
         }
 
         [AllowAnonymous]
         [HttpPost("search/{lang}")]
         public async Task<IActionResult> SearchInPages(string lang, [FromBody] PageSearchDto pageSearchDto)
         {
-            var entityType = pageSearchDto.PageType;//(PageType)Enum.Parse(typeof(PageType), pageSearchDto.PageType);
+            var entityType = pageSearchDto.PageType;
             var pageSize = pageSearchDto.PageSize ?? 1000;
             var commonTraits =
                 pageSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
@@ -45,13 +49,38 @@ namespace QuartierLatin.Backend.Controllers
 
             var pageIds = catalogPage.Item2.Select(x => x.Item1.Id).ToList();
 
+            var commonTraitsPages = await _pageAppService.GetCommonTraitListByPageIds(pageIds);
+
+            var traitsType = await _commonTraitTypeAppService.GetTraitTypesWithIndetifierAsync();
+
             var pageDtos = new List<PageDto>();
 
             foreach (var page in catalogPage.Item2)
             {
+                var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+                foreach (var traitType in traitsType)
+                {
+                    var pageTraitTypedList = commonTraitsPages.GetValueOrDefault(page.pageRoot.Id)
+                        ?.Where(type => type.CommonTraitTypeId == traitType.Id);
+
+                    if (pageTraitTypedList is null) continue;
+
+                    var pageTraitList = pageTraitTypedList.Select(page => new CommonTraitLanguageDto
+                    {
+                        Id = page.Id,
+                        IconBlobId = page.IconBlobId,
+                        Identifier = page.Identifier,
+                        Name = page.Names.GetSuitableName(lang)
+                    }).ToList();
+
+                    traits.Add(traitType.Identifier, pageTraitList);
+                }
+
                 pageDtos.Add(new PageDto(page.page.Title, JObject.Parse(page.page.PageData), page.page.Date,
-                    page.pageRoot.PageType, page.page.PreviewImageId));
+                    page.pageRoot.PageType, page.page.PreviewImageId, page.page.SmallPreviewImageId, page.page.WidePreviewImageId, traits));
             };
+
 
             var response = new CatalogSearchResponseDtoList<PageDto>
             {

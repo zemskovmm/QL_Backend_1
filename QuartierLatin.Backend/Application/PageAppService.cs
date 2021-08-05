@@ -9,9 +9,11 @@ using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
+using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Utils;
 using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
+using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 
 namespace QuartierLatin.Backend.Application
 {
@@ -20,13 +22,15 @@ namespace QuartierLatin.Backend.Application
         private readonly IPageRepository _pageRepository;
         private readonly ILanguageRepository _languageRepository;
         private readonly IAppStateEntryRepository _appStateEntryRepository;
+        private readonly ICommonTraitRepository _commonTraitRepository;
 
         public PageAppService(IPageRepository pageRepository, ILanguageRepository languageRepository,
-            IAppStateEntryRepository appStateEntryRepository)
+            IAppStateEntryRepository appStateEntryRepository, ICommonTraitRepository commonTraitRepository)
         {
             _pageRepository = pageRepository;
             _languageRepository = languageRepository;
             _appStateEntryRepository = appStateEntryRepository;
+            _commonTraitRepository = commonTraitRepository;
         }
 
         private async Task<List<Page>> Convert(Dictionary<string, (string url, string title,
@@ -116,7 +120,7 @@ namespace QuartierLatin.Backend.Application
 
             var pageRoot = await _pageRepository.GetPageRootByIdAsync(pageMain.PageRootId);
 
-            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData), pageMain.Date, pageRoot.PageType, pageMain.PreviewImageId);
+            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData), pageMain.Date, pageRoot.PageType, pageMain.PreviewImageId, pageMain.SmallPreviewImageId, pageMain.WidePreviewImageId, null);
 
             var pageModuleDto = new PageModuleDto(pageDto);
 
@@ -138,6 +142,11 @@ namespace QuartierLatin.Backend.Application
             var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
 
             return await _pageRepository.GetPagesByFilter(commonTraitsIds, langId, pageSize * pageNumber, pageSize, entityType);
+        }
+
+        public async Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByPageIds(IEnumerable<int> ids)
+        {
+            return await _commonTraitRepository.GetCommonTraitListByPageIds(ids);
         }
     }
 }
