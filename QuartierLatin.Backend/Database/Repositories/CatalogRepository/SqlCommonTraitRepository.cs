@@ -94,6 +94,14 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 .GroupBy(x => x.mapping.UniversityId)
                 .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
 
+        public Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByPageIds(IEnumerable<int> ids) =>
+            _db.ExecAsync(async db =>
+                (await (from mapping in db.CommonTraitsToPages.Where(x => ids.Contains(x.PageId))
+                    join trait in db.CommonTraits on mapping.CommonTraitId equals trait.Id
+                    select new { mapping, trait }).ToListAsync())
+                .GroupBy(x => x.mapping.PageId)
+                .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
+
         public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndSchoolIdAsync(int traitTypeId, int schoolId)
         {
             return await _db.ExecAsync(db =>
