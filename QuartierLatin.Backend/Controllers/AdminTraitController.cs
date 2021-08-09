@@ -20,6 +20,7 @@ namespace QuartierLatin.Backend.Controllers
         private readonly ICommonTraitAppService _commonTraitAppService;
         private readonly ICommonTraitTypeAppService _commonTraitTypeAppService;
         private readonly JObject _definition;
+        private readonly JObject _traitTypeDefinition;
 
         public AdminTraitController(ICommonTraitAppService commonTraitAppService,
             ICommonTraitTypeAppService commonTraitTypeAppService)
@@ -28,13 +29,23 @@ namespace QuartierLatin.Backend.Controllers
             
             _commonTraitAppService = commonTraitAppService;
             _commonTraitTypeAppService = commonTraitTypeAppService;
+            
             _definition = new RemoteUiBuilder(typeof(CommonTraitDtoRemoteUI), noFields, null, new CamelCaseNamingStrategy())
                 .Register(typeof(CommonTraitDtoRemoteUI), noFields)
                 .Register(typeof(Dictionary<string, string>), noFields)
                 .Build(null);
+
+            _traitTypeDefinition =
+                new RemoteUiBuilder(typeof(TraitTypeDto), noFields, null, new CamelCaseNamingStrategy())
+                    .Register(typeof(TraitTypeDto), noFields)
+                    .Register(typeof(Dictionary<string, string>), noFields)
+                    .Build(null);
         }
 
-        [HttpGet("trait-types/definition")]
+        [HttpGet("trait-type/definition")]
+        public async Task<IActionResult> GetTraitTypeDefinition() => Ok(_traitTypeDefinition);
+        
+        [HttpGet("trait/definition")]
         public async Task<IActionResult> GetDefinition() => Ok(_definition);
 
         [HttpGet("trait-types")]
