@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
@@ -6,6 +8,8 @@ using QuartierLatin.Backend.Dto.TraitTypeDto;
 using QuartierLatin.Backend.Models.Enums;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
+using RemoteUi;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -15,13 +19,23 @@ namespace QuartierLatin.Backend.Controllers
     {
         private readonly ICommonTraitAppService _commonTraitAppService;
         private readonly ICommonTraitTypeAppService _commonTraitTypeAppService;
+        private readonly JObject _definition;
 
         public AdminTraitController(ICommonTraitAppService commonTraitAppService,
             ICommonTraitTypeAppService commonTraitTypeAppService)
         {
+            var noFields = Array.Empty<IExtraRemoteUiField>();
+            
             _commonTraitAppService = commonTraitAppService;
             _commonTraitTypeAppService = commonTraitTypeAppService;
+            _definition = new RemoteUiBuilder(typeof(CommonTraitDtoRemoteUI), noFields, null, new CamelCaseNamingStrategy())
+                .Register(typeof(CommonTraitDtoRemoteUI), noFields)
+                .Register(typeof(Dictionary<string, string>), noFields)
+                .Build(null);
         }
+
+        [HttpGet("trait-types/definition")]
+        public async Task<IActionResult> GetDefinition() => Ok(_definition);
 
         [HttpGet("trait-types")]
         public async Task<IActionResult> GetTraitTypes()
