@@ -17,7 +17,7 @@ using PageDto = QuartierLatin.Backend.Dto.PageModuleDto.PageDto;
 
 namespace QuartierLatin.Backend.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [AllowAnonymous]
     [Route("/api/pages")]
     public class PageController : Controller
     {
@@ -33,7 +33,6 @@ namespace QuartierLatin.Backend.Controllers
             _commonTraitTypeAppService = commonTraitTypeAppService;
         }
 
-        [AllowAnonymous]
         [HttpPost("search/{lang}")]
         public async Task<IActionResult> SearchInPages(string lang, [FromBody] PageSearchDto pageSearchDto)
         {
@@ -92,7 +91,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [AllowAnonymous]
         [HttpGet("filters/{lang}")]
         public async Task<IActionResult> GetPageFiltersByLang(string lang)
         {

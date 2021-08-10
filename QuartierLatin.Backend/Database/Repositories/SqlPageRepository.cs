@@ -121,7 +121,7 @@ namespace QuartierLatin.Backend.Database.Repositories
                     }
 
                     pageRoots = pageRoots.Where(page =>
-                        pageWithTraits.Select(x => x.PageId).Contains(page.Id) && page.PageType == entityType);
+                        pageWithTraits.Select(x => x.PageId).Contains(page.Id));
                 }
 
                 var pageWithLanguages = from pageRoot in pageRoots
@@ -133,10 +133,13 @@ namespace QuartierLatin.Backend.Database.Repositories
                                               page
                                           };
 
+                pageWithLanguages = pageWithLanguages.Where(page => page.pageRoot.PageType == entityType);
+                pageWithLanguages = pageWithLanguages.Skip(skip).Take(take);
+
                 var totalCount = await pageWithLanguages.CountAsync();
 
                 return (totalCount,
-                    (await pageWithLanguages.OrderBy(x => x.page.Date).Skip(skip).Take(take).ToListAsync())
+                    (await pageWithLanguages.OrderBy(x => x.page.Date).ToListAsync())
                     .Select(x => (pageRoot: x.pageRoot, page: x.page)).ToList());
             });
         }
