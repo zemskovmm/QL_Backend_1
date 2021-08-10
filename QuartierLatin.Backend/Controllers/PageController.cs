@@ -77,7 +77,7 @@ namespace QuartierLatin.Backend.Controllers
                 }
 
                 pageDtos.Add(new PageDto(page.page.Title, JObject.Parse(page.page.PageData), page.page.Date,
-                    page.pageRoot.PageType, page.page.PreviewImageId, page.page.SmallPreviewImageId, page.page.WidePreviewImageId, traits));
+                    page.pageRoot.PageType, page.page.PreviewImageId, page.page.SmallPreviewImageId, page.page.WidePreviewImageId, traits, page.page.Url));
             };
 
 

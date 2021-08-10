@@ -120,7 +120,8 @@ namespace QuartierLatin.Backend.Application
 
             var pageRoot = await _pageRepository.GetPageRootByIdAsync(pageMain.PageRootId);
 
-            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData), pageMain.Date, pageRoot.PageType, pageMain.PreviewImageId, pageMain.SmallPreviewImageId, pageMain.WidePreviewImageId, null);
+            var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData), pageMain.Date, pageRoot.PageType,
+                pageMain.PreviewImageId, pageMain.SmallPreviewImageId, pageMain.WidePreviewImageId, null, null);
 
             var pageModuleDto = new PageModuleDto(pageDto);
 
