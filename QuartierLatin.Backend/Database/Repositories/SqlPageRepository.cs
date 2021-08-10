@@ -132,9 +132,11 @@ namespace QuartierLatin.Backend.Database.Repositories
                                               pageRoot,
                                               page
                                           };
+                
+                pageWithLanguages = pageWithLanguages.Where(page => page.pageRoot.PageType == entityType);
+
                 var totalCount = await pageWithLanguages.CountAsync();
 
-                pageWithLanguages = pageWithLanguages.Where(page => page.pageRoot.PageType == entityType);
                 pageWithLanguages = pageWithLanguages.Skip(skip).Take(take);
 
                 return (totalCount,
