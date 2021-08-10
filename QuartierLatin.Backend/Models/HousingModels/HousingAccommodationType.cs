@@ -7,6 +7,7 @@ namespace QuartierLatin.Backend.Models.HousingModels
     {
         [Column] public string Square { get; set; }
         [Column] public string Residents { get; set; }
-        [Column] public int Price { get; set; } 
+        [Column] public int Price { get; set; }
+        [Column] public int HousingId { get; set; }
     }
 }

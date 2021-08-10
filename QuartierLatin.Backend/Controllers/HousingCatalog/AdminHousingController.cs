@@ -32,8 +32,9 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
             _housingAppService = housingAppService;
             _languageRepository = languageRepository;
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetSchool()
+        public async Task<IActionResult> GetHousing()
         {
             var housingList = await _housingAppService.GetHousingListAsync();
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
@@ -59,7 +60,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
         public IActionResult GetDefinition() => Ok(_definition);
 
         [HttpPost]
-        public async Task<IActionResult> CreateSchool([FromBody] HousingAdminDto housingDto)
+        public async Task<IActionResult> CreateHousing([FromBody] HousingAdminDto housingDto)
         {
             var housingId = await _housingAppService.CreateHousingAsync(housingDto.Price);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
@@ -80,7 +81,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GeSchoolById(int id)
+        public async Task<IActionResult> GetHousingById(int id)
         {
             var housing = await _housingAppService.GetHousingByIdAsync(id);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
@@ -103,7 +104,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSchoolById([FromBody] HousingAdminDto housingDto, int id)
+        public async Task<IActionResult> UpdateHousingById([FromBody] HousingAdminDto housingDto, int id)
         {
             await _housingAppService.UpdateHousingByIdAsync(id, housingDto.Price);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();

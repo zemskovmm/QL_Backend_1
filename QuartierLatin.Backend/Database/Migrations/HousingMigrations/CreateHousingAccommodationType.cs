@@ -12,7 +12,8 @@ namespace QuartierLatin.Backend.Database.Migrations.HousingMigrations
                 .WithColumn("Names").AsCustom("jsonb")
                 .WithColumn("Square").AsString()
                 .WithColumn("Residents").AsString()
-                .WithColumn("Price").AsInt32();
+                .WithColumn("Price").AsInt32()
+                .WithColumn("HousingId").AsInt32().ForeignKey("Housings", "Id");
         }
     }
 }
