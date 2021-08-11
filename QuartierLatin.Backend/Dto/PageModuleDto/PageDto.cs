@@ -31,9 +31,11 @@ namespace QuartierLatin.Backend.Dto.PageModuleDto
 
         public Dictionary<string, List<CommonTraitLanguageDto>>? NamedTraits { get; set; }
 
+        public string? Url { get; set; }
+
         public PageDto(string title, JObject pageBlockDto, 
             DateTime? date, PageType pageType, int? previewImageId, 
-            int? smallPreviewImageId, int? widePreviewImageId, Dictionary<string, List<CommonTraitLanguageDto>>? namedTraits)
+            int? smallPreviewImageId, int? widePreviewImageId, Dictionary<string, List<CommonTraitLanguageDto>>? namedTraits, string? url)
         {
             Title = title;
             PageBlockDto = pageBlockDto;
@@ -43,6 +45,7 @@ namespace QuartierLatin.Backend.Dto.PageModuleDto
             SmallPreviewImageId = smallPreviewImageId;
             WidePreviewImageId = widePreviewImageId;
             NamedTraits = namedTraits;
+            Url = url;
         }
     }
 }
