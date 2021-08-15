@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
+using QuartierLatin.Backend.Application.Interfaces.CourseCatalog.CourseCatalog;
+using QuartierLatin.Backend.Application.Interfaces.courseCatalog.SchoolCatalog;
 using QuartierLatin.Backend.Config;
 using QuartierLatin.Backend.Dto.CatalogDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
+using QuartierLatin.Backend.Dto.CommonTraitDto;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.Course.CatalogDto;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.CatalogModels;
@@ -28,10 +32,15 @@ namespace QuartierLatin.Backend.Controllers
         private readonly IDegreeRepository _degreeRepository;
         private readonly ISpecialtyAppService _specialtyAppService;
         private readonly IUniversityGalleryAppService _universityGalleryAppService;
+        private readonly ICourseAppService _courseAppService;
+        private readonly ICommonTraitTypeAppService _commonTraitTypeAppService;
+        private readonly ISchoolAppService _schoolAppService;
 
         public CatalogController(ICatalogAppService catalogAppService, ISpecialtyAppService specialtyAppService,
             ICommonTraitAppService commonTraitAppService, IDegreeRepository degreeRepository,
-            IOptions<BaseFilterOrderConfig> baseFilterConfig, IUniversityGalleryAppService universityGalleryAppService)
+            IOptions<BaseFilterOrderConfig> baseFilterConfig, IUniversityGalleryAppService universityGalleryAppService,
+            ICourseAppService courseAppService, ICommonTraitTypeAppService commonTraitTypeAppService,
+            ISchoolAppService schoolAppService)
         {
             _catalogAppService = catalogAppService;
             _specialtyAppService = specialtyAppService;
@@ -39,6 +48,9 @@ namespace QuartierLatin.Backend.Controllers
             _degreeRepository = degreeRepository;
             _baseFilterConfig = baseFilterConfig;
             _universityGalleryAppService = universityGalleryAppService;
+            _courseAppService = courseAppService;
+            _commonTraitTypeAppService = commonTraitTypeAppService;
+            _schoolAppService = schoolAppService;
         }
         
         private string FormatPriceValue(int from, int? to, string lang)
@@ -269,6 +281,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> SearchInCourseCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
             var pageSize = catalogSearchDto.PageSize ?? 1000;
+
             var commonTraits =
                 catalogSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
                     filter.Values);
@@ -277,13 +290,50 @@ namespace QuartierLatin.Backend.Controllers
                 await _catalogAppService.GetCatalogCoursePageByFilterAsync(lang, commonTraits,
                     catalogSearchDto.PageNumber, pageSize);
 
-            var courseDtos = catalogPage.Item2.Select(course => new CatalogCourseDto()
+            var courseIds = catalogPage.courseAndLanguage.Select(x => x.course.Id);
+            var schoolIds = catalogPage.courseAndLanguage.Select(x => x.course.SchoolId).Distinct();
+
+            var schoolImageIdAndName = await _schoolAppService.GetSchoolImageIdAndNameByIdsAsync(schoolIds, lang);
+
+            var commonTraitsCourse = await _courseAppService.GetCommonTraitListByCourseIdsAsync(courseIds);
+
+            var traitsType = await _commonTraitTypeAppService.GetTraitTypesWithIndetifierAsync();
+
+            var courseDtos = new List<CatalogCourseDto>();
+
+            foreach (var course in catalogPage.Item2)
             {
-                Url = $"/{lang}/course/{course.Item2.Url}",
-                LanglessUrl = $"/course/{course.Item2.Url}",
-                Name = course.Item2.Name,
-                
-            }).ToList();
+                var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+                foreach (var traitType in traitsType)
+                {
+                    var pageTraitTypedList = commonTraitsCourse.GetValueOrDefault(course.course.Id)
+                        ?.Where(type => type.CommonTraitTypeId == traitType.Id);
+
+                    if (pageTraitTypedList is null) continue;
+
+                    var courseTraitList = pageTraitTypedList.Select(courseTrait => new CommonTraitLanguageDto
+                    {
+                        Id = courseTrait.Id,
+                        IconBlobId = courseTrait.IconBlobId,
+                        Identifier = courseTrait.Identifier,
+                        Name = courseTrait.Names.GetSuitableName(lang)
+                    }).ToList();
+
+                    traits.Add(traitType.Identifier, courseTraitList);
+                }
+
+                courseDtos.Add(new CatalogCourseDto()
+                {
+                    Url = $"/{lang}/course/{course.Item2.Url}",
+                    LanglessUrl = $"/course/{course.Item2.Url}",
+                    Name = course.Item2.Name,
+                    CourseImageId = course.course.ImageId,
+                    NamedTraits = traits,
+                    SchoolImageId = schoolImageIdAndName[course.course.SchoolId].schoolImageId,
+                    SchoolName = schoolImageIdAndName[course.course.SchoolId].schoolName
+                });
+            };
 
             var response = new CatalogSearchResponseDtoList<CatalogCourseDto>
             {

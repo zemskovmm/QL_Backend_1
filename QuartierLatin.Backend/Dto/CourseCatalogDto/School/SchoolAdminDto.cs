@@ -5,10 +5,11 @@ namespace QuartierLatin.Backend.Dto.CourseCatalogDto.School
 {
     public class SchoolAdminDto 
     {
-        public int Id { get; set; }
         [RemoteUiField("foundationYear")]
         public int? FoundationYear { get; set; }
         [RemoteUiField("languages", "", RemoteUiFieldType.Custom, CustomType = "LanguageDictionary")]
         public Dictionary<string, SchoolLanguageAdminDto> Languages { get; set; }
+        [RemoteUiField("imageId")]
+        public int? ImageId { get; set; }
     }
 }

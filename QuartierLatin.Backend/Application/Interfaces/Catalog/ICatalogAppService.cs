@@ -11,7 +11,7 @@ namespace QuartierLatin.Backend.Application.Interfaces.Catalog
         Task<List<(CommonTraitType commonTraitType, List<CommonTrait> commonTraits)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType);
         Task<(int totalItems, List<(University, UniversityLanguage, int costGroup)>)> GetCatalogPageByFilter(string lang,
             EntityType entityType, Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize);
-        Task<(int totalItems, List<(Course course, CourseLanguage courseLanguage)>)> GetCatalogCoursePageByFilterAsync(string lang, 
+        Task<(int totalItems, List<(Course course, CourseLanguage courseLanguage)> courseAndLanguage)> GetCatalogCoursePageByFilterAsync(string lang, 
             Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize);
     }
 }

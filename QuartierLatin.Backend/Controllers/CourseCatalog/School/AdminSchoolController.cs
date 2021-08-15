@@ -50,6 +50,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
             {
                 Id = school.school.Id,
                 FoundationYear = school.school.FoundationYear,
+                ImageId = school.school.ImageId,
                 Languages = school.schoolLanguage.ToDictionary(school => language[school.Key],
                     school => new SchoolLanguageAdminDto()
                     {
@@ -69,7 +70,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
         [HttpPost]
         public async Task<IActionResult> CreateSchool([FromBody] SchoolAdminDto schoolDto)
         {
-            var schoolId = await _schoolAppService.CreateSchoolAsync(schoolDto.FoundationYear);
+            var schoolId = await _schoolAppService.CreateSchoolAsync(schoolDto.FoundationYear, schoolDto.ImageId);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var schoolLanguage = schoolDto.Languages.Select(school => new SchoolLanguages
@@ -79,7 +80,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
                 Name = school.Value.Name,
                 Url = school.Value.Url,
                 LanguageId = language.FirstOrDefault(language => language.Value == school.Key).Key,
-                Metadata = school.Value.Metadata is null ? null : school.Value.Metadata.ToString()
+                Metadata = school.Value.Metadata is null ? null : school.Value.Metadata.ToString(),
             }).ToList();
 
             await _schoolAppService.CreateSchoolLanguageListAsync(schoolLanguage);
@@ -95,8 +96,8 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
 
             var response = new SchoolAdminDto
             {
-                Id = school.school.Id,
                 FoundationYear = school.school.FoundationYear,
+                ImageId = school.school.ImageId,
                 Languages = school.schoolLanguage.ToDictionary(school => language[school.Key], 
                     school => new SchoolLanguageAdminDto
                     {
@@ -113,7 +114,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSchoolById([FromBody] SchoolAdminDto schoolDto, int id)
         {
-            await _schoolAppService.UpdateSchoolByIdAsync(id, schoolDto.FoundationYear);
+            await _schoolAppService.UpdateSchoolByIdAsync(id, schoolDto.FoundationYear, schoolDto.ImageId);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             foreach (var schoolLanguage in schoolDto.Languages)
