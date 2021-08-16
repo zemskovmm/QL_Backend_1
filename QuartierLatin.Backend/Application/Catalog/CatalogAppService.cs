@@ -80,7 +80,7 @@ namespace QuartierLatin.Backend.Application.Catalog
                 priceFiltersId, langId, pageSize * pageNumber, pageSize);
         }
 
-        public async Task<(int totalItems, List<(Course course, CourseLanguage courseLanguage)>)> GetCatalogCoursePageByFilterAsync(string lang, Dictionary<string, List<int>> commonTraits, int pageNumber,
+        public async Task<(int totalItems, List<(Course course, CourseLanguage courseLanguage)> courseAndLanguage)> GetCatalogCoursePageByFilterAsync(string lang, Dictionary<string, List<int>> commonTraits, int pageNumber,
             int pageSize)
         {
             var commonTraitsIds = commonTraits

@@ -254,7 +254,8 @@ namespace QuartierLatin.Backend.Controllers
                 DescriptionHtml = school.schoolLanguage[languageId].Description,
                 FoundationYear = school.school.FoundationYear,
                 Traits = schoolTraits,
-                Metadata = school.schoolLanguage[languageId].Metadata is null ? null : JObject.Parse(school.schoolLanguage[languageId].Metadata)
+                Metadata = school.schoolLanguage[languageId].Metadata is null ? null : JObject.Parse(school.schoolLanguage[languageId].Metadata),
+                ImageId = school.school.ImageId
             };
 
             return (schoolModule: module, urls: urls, schoolId: school.school.Id);
@@ -318,7 +319,8 @@ namespace QuartierLatin.Backend.Controllers
                 DescriptionHtml = course.courseLanguage[languageId].Description,
                 SchoolId = course.course.SchoolId,
                 Traits = courseTraits,
-                Metadata = course.courseLanguage[languageId].Metadata is null ? null : JObject.Parse(course.courseLanguage[languageId].Metadata)
+                Metadata = course.courseLanguage[languageId].Metadata is null ? null : JObject.Parse(course.courseLanguage[languageId].Metadata),
+                ImageId = course.course.ImageId
             };
 
             return module;

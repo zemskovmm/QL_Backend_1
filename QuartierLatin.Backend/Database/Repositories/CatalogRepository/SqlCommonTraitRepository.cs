@@ -133,5 +133,13 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                return await GetCommonTraitListByTypeId(traitTypeId);
             });
         }
+
+        public Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByCourseIdsAsync(IEnumerable<int> courseIds) =>
+            _db.ExecAsync(async db =>
+                (await (from mapping in db.CommonTraitToCourses.Where(x => courseIds.Contains(x.CourseId))
+                    join trait in db.CommonTraits on mapping.CommonTraitId equals trait.Id
+                    select new { mapping, trait }).ToListAsync())
+                .GroupBy(x => x.mapping.CourseId)
+                .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
     }
 }
