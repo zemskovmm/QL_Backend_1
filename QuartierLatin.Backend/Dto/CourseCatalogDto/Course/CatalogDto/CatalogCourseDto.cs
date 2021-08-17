@@ -11,6 +11,7 @@ namespace QuartierLatin.Backend.Dto.CourseCatalogDto.Course.CatalogDto
         public int? CourseImageId { get; set; }
         public int? SchoolImageId { get; set; }
         public string SchoolName { get; set; }
+        public int Price { get; set; }
         public Dictionary<string, List<CommonTraitLanguageDto>>? NamedTraits { get; set; }
     }
 }

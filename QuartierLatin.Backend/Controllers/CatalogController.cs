@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
-using QuartierLatin.Backend.Application.Interfaces.CourseCatalog.CourseCatalog;
 using QuartierLatin.Backend.Application.Interfaces.courseCatalog.SchoolCatalog;
+using QuartierLatin.Backend.Application.Interfaces.CourseCatalog.CourseCatalog;
 using QuartierLatin.Backend.Config;
 using QuartierLatin.Backend.Dto.CatalogDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto;
@@ -21,6 +16,9 @@ using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Utils;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -325,13 +323,14 @@ namespace QuartierLatin.Backend.Controllers
 
                 courseDtos.Add(new CatalogCourseDto()
                 {
-                    Url = $"/{lang}/course/{course.Item2.Url}",
-                    LanglessUrl = $"/course/{course.Item2.Url}",
-                    Name = course.Item2.Name,
+                    Url = $"/{lang}/course/{course.courseLanguage.Url}",
+                    LanglessUrl = $"/course/{course.courseLanguage.Url}",
+                    Name = course.courseLanguage.Name,
                     CourseImageId = course.course.ImageId,
                     NamedTraits = traits,
                     SchoolImageId = schoolImageIdAndName[course.course.SchoolId].schoolImageId,
-                    SchoolName = schoolImageIdAndName[course.course.SchoolId].schoolName
+                    SchoolName = schoolImageIdAndName[course.course.SchoolId].schoolName,
+                    Price = course.course.Price
                 });
             };
 

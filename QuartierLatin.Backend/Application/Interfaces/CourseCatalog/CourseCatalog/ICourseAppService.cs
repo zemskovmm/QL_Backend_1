@@ -9,10 +9,10 @@ namespace QuartierLatin.Backend.Application.Interfaces.CourseCatalog.CourseCatal
     public interface ICourseAppService
     {
         Task<List<(Course course, Dictionary<int, CourseLanguage> courseLanguage)>> GetCourseListAsync();
-        Task<int> CreateCourseAsync(int schoolId, int? imageId);
+        Task<int> CreateCourseAsync(int schoolId, int? imageId, int price);
         Task CreateCourseLanguageListAsync(List<CourseLanguage> courseLanguage);
         Task<(Course course, Dictionary<int, CourseLanguage> schoolLanguage)> GetCourseByIdAsync(int id);
-        Task UpdateCourseByIdAsync(int id, int schoolId, int? imageId);
+        Task UpdateCourseByIdAsync(int id, int schoolId, int? imageId, int price);
         Task UpdateCourseLanguageByIdAsync(int id, string htmlDescription, int languageId, string name, string url, JObject? metadata);
         Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByCourseIdsAsync(IEnumerable<int> courseIds);
     }

@@ -7,5 +7,6 @@ namespace QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels
     {
         [Column] public int SchoolId { get; set; }
         [Column] public int? ImageId { get; set; }
+        [Column] public int Price { get; set; }
     }
 }
