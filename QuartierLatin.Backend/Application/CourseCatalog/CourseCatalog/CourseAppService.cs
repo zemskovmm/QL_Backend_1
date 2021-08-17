@@ -29,9 +29,9 @@ namespace QuartierLatin.Backend.Application.CourseCatalog.CourseCatalog
             return await _courseCatalogRepository.GetCourseListAsync();
         }
 
-        public async Task<int> CreateCourseAsync(int schoolId, int? imageId)
+        public async Task<int> CreateCourseAsync(int schoolId, int? imageId, int price)
         {
-            var id = await _courseCatalogRepository.CreateCourseAsync(schoolId, imageId);
+            var id = await _courseCatalogRepository.CreateCourseAsync(schoolId, imageId, price);
             await _appStateEntryRepository.UpdateLastChangeTimeAsync();
             return id;
         }
@@ -47,9 +47,9 @@ namespace QuartierLatin.Backend.Application.CourseCatalog.CourseCatalog
             return await _courseCatalogRepository.GetCourseByIdAsync(id);
         }
 
-        public async Task UpdateCourseByIdAsync(int id, int schoolId, int? imageId)
+        public async Task UpdateCourseByIdAsync(int id, int schoolId, int? imageId, int price)
         {
-            await _courseCatalogRepository.UpdateCourseByIdAsync(id, schoolId, imageId);
+            await _courseCatalogRepository.UpdateCourseByIdAsync(id, schoolId, imageId, price);
             await _appStateEntryRepository.UpdateLastChangeTimeAsync();
         }
 

@@ -12,5 +12,7 @@ namespace QuartierLatin.Backend.Dto.CourseCatalogDto.Course
         public Dictionary<string, CourseLanguageAdminDto> Languages { get; set; }
         [RemoteUiField("imageId")]
         public int? ImageId { get; set; }
+        [RemoteUiField("price")]
+        public int Price { get; set; }
     }
 }

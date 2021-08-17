@@ -32,12 +32,13 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
             });
         }
 
-        public async Task<int> CreateCourseAsync(int courseId, int? imageId)
+        public async Task<int> CreateCourseAsync(int courseId, int? imageId, int price)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new Course
             {
                 SchoolId = courseId,
-                ImageId = imageId
+                ImageId = imageId,
+                Price = price
             }));
         }
 
@@ -56,13 +57,14 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
             });
         }
 
-        public async Task UpdateCourseByIdAsync(int id, int schoolId, int? imageId)
+        public async Task UpdateCourseByIdAsync(int id, int schoolId, int? imageId, int price)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new Course
             {
                 Id = id,
                 SchoolId = schoolId,
-                ImageId = imageId
+                ImageId = imageId,
+                Price = price
             }));
         }
 
