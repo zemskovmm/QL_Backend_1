@@ -70,9 +70,9 @@ namespace QuartierLatin.Backend.Application.Catalog
             return await _commonTraitRepository.GetTraitOfTypesByTypeIdAndCourseIdAsync(traitTypeId, courseId);
         }
 
-        public async Task<List<CommonTrait>> GetTraitOfTypesByTypeNameAsync(string typeName)
+        public async Task<List<CommonTrait>> GetTraitOfTypesByIdentifierAsync(string traitIdentifier)
         {
-            return await _commonTraitRepository.GetCommonTraitListByTypeNameAsync(typeName);
+            return await _commonTraitRepository.GetTraitOfTypesByIdentifierAsync(traitIdentifier);
         }
     }
 }
