@@ -36,7 +36,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
         {
             await _db.ExecAsync(db =>
                 db.UniversityGalleries
-                    .Where(trait => trait.UniversityId == universityId && trait.ImageId == imageId)
+                    .Where(gallery => gallery.UniversityId == universityId && gallery.ImageId == imageId)
                     .DeleteAsync());
         }
     }

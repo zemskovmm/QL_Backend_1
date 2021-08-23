@@ -29,7 +29,7 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
         {
             await _db.ExecAsync(db =>
                 db.CourseGalleries
-                    .Where(trait => trait.CourseId == courseId && trait.ImageId == imageId)
+                    .Where(gallery => gallery.CourseId == courseId && gallery.ImageId == imageId)
                     .DeleteAsync());
         }
 
