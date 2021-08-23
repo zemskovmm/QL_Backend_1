@@ -61,6 +61,7 @@ namespace QuartierLatin.Backend.Database
         public ITable<CommonTraitToHousing> CommonTraitToHousings => GetTable<CommonTraitToHousing>();
         public ITable<CommonTraitToHousingAccommodationType> CommonTraitToHousingAccommodationTypes =>
             GetTable<CommonTraitToHousingAccommodationType>();
+        public ITable<HousingGallery> HousingGalleries => GetTable<HousingGallery>();
     }
 
     public interface IAppDbConnectionFactory
