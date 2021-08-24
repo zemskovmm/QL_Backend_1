@@ -54,6 +54,8 @@ namespace QuartierLatin.Backend.Database
         public ITable<AppStateEntry> AppStateEntries => GetTable<AppStateEntry>();
         public ITable<CommonTraitsToPage> CommonTraitsToPages => GetTable<CommonTraitsToPage>();
         public ITable<ImageStandardSize> ImageStandardSizes => GetTable<ImageStandardSize>();
+        public ITable<SchoolGallery> SchoolGalleries => GetTable<SchoolGallery>();
+        public ITable<CourseGallery> CourseGalleries => GetTable<CourseGallery>();
     }
 
     public interface IAppDbConnectionFactory

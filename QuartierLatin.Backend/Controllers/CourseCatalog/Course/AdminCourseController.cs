@@ -20,14 +20,14 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
     
     [Authorize(Roles = "Admin")]
     [Route("/api/admin/courses")]
-    public class AdmincourseController : Controller
+    public class AdminCourseController : Controller
     {
         private readonly ILanguageRepository _languageRepository;
         private readonly ICourseAppService _courseAppService;
         private readonly JObject _definition;
 
 
-        public AdmincourseController(ILanguageRepository languageRepository, ICourseAppService courseAppService)
+        public AdminCourseController(ILanguageRepository languageRepository, ICourseAppService courseAppService)
         {
             var noFields = new IExtraRemoteUiField[0];
 
