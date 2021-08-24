@@ -122,13 +122,13 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             );
         }
 
-        public async Task<List<CommonTrait>> GetCommonTraitListByTypeNameAsync(string typeName)
+        public async Task<List<CommonTrait>> GetTraitOfTypesByIdentifierAsync(string traitIdentifier)
         {
             return await _db.ExecAsync(async db =>
             {
                var traitTypes = db.CommonTraitTypes.AsEnumerable();
 
-               var traitTypeId = traitTypes.FirstOrDefault(traitType => traitType.Names.ContainsValue(typeName)).Id;
+               var traitTypeId = traitTypes.FirstOrDefault(traitType => traitType.Identifier == traitIdentifier).Id;
 
                return await GetCommonTraitListByTypeId(traitTypeId);
             });

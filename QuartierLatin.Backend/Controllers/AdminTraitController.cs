@@ -274,10 +274,10 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        [HttpGet("traits/by-type/{typeName}")]
-        public async Task<IActionResult> GetTraitOfTypeByTypeName(string typeName)
+        [HttpGet("traits/by-type/{traitIdentifier}")]
+        public async Task<IActionResult> GetTraitOfTypeByTypeName(string traitIdentifier)
         {
-            var traitList = await _commonTraitAppService.GetTraitOfTypesByTypeNameAsync(typeName);
+            var traitList = await _commonTraitAppService.GetTraitOfTypesByIdentifierAsync(traitIdentifier);
 
             var response = traitList.Select(trait => new CommonTraitListDto
             {
