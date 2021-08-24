@@ -15,11 +15,15 @@ namespace QuartierLatin.Backend.Dto.AdminPageModuleDto
 
         public List<DateTime?> Dates { get; set; }
 
-        public AdminPageDto(Dictionary<string, string> title, Dictionary<string, JObject> adminPageBlockDtos, List<DateTime?> dates)
+        public Dictionary<string, JObject?> Metadata { get; set; }
+
+        public AdminPageDto(Dictionary<string, string> title, Dictionary<string, JObject> adminPageBlockDtos,
+            List<DateTime?> dates, Dictionary<string, JObject?> metadata)
         {
             Title = title;
             Blocks = adminPageBlockDtos;
             Dates = dates;
+            Metadata = metadata;
         }
     }
 }

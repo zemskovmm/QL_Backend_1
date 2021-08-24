@@ -88,9 +88,11 @@ namespace QuartierLatin.Backend.Application
 
             var dates = pages.Select(page => page.Date).ToList();
 
+            var metadata = pages.ToDictionary(page => languageIds[page.LanguageId], page => page.Metadata is null ? null : JObject.Parse(page.Metadata));
+
             var pageRoot = await _pageRepository.GetPageRootByIdAsync(pages.First().PageRootId);
 
-            var adminPageDto = new AdminPageDto(titles, blocks, dates);
+            var adminPageDto = new AdminPageDto(titles, blocks, dates, metadata);
 
             var adminPageModuleDto = new AdminPageModuleDto(adminPageDto, pageRoot.Id, pageRoot.PageType);
 
@@ -121,7 +123,7 @@ namespace QuartierLatin.Backend.Application
             var pageRoot = await _pageRepository.GetPageRootByIdAsync(pageMain.PageRootId);
 
             var pageDto = new Dto.PageModuleDto.PageDto(pageMain.Title, JObject.Parse(pageMain.PageData), pageMain.Date, pageRoot.PageType,
-                pageMain.PreviewImageId, pageMain.SmallPreviewImageId, pageMain.WidePreviewImageId, null, null);
+                pageMain.PreviewImageId, pageMain.SmallPreviewImageId, pageMain.WidePreviewImageId, null, null, pageMain.Metadata is null ? null : JObject.Parse(pageMain.Metadata));
 
             var pageModuleDto = new PageModuleDto(pageDto);
 
