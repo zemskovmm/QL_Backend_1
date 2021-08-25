@@ -24,17 +24,11 @@ namespace QuartierLatin.Backend.Application.courseCatalog.SchoolCatalog
             return await _schoolCatalogRepository.GetSchoolListAsync();
         }
 
-        public async Task<int> CreateSchoolAsync(int? schoolDtoFoundationYear, int? imageId)
+        public async Task<int> CreateSchoolAsync(int? foundationYear, int? imageId, List<SchoolLanguages> schoolLanguage)
         {
-            var id = await _schoolCatalogRepository.CreateSchoolAsync(schoolDtoFoundationYear, imageId);
+            var id = await _schoolCatalogRepository.CreateSchoolAsync(foundationYear, imageId, schoolLanguage);
             await _appStateEntryRepository.UpdateLastChangeTimeAsync();
             return id;
-        }
-
-        public async Task CreateSchoolLanguageListAsync(List<SchoolLanguages> schoolLanguage)
-        {
-            await _schoolCatalogRepository.CreateSchoolLanguageListAsync(schoolLanguage);
-            await _appStateEntryRepository.UpdateLastChangeTimeAsync();
         }
 
         public async Task<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)> GetSchoolByIdAsync(int id)

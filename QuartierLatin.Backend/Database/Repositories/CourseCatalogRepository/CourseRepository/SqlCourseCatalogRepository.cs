@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.CourseRepository
 {
@@ -32,20 +33,24 @@ namespace QuartierLatin.Backend.Database.Repositories.CourseCatalogRepository.Co
             });
         }
 
-        public async Task<int> CreateCourseAsync(int courseId, int? imageId, int price)
+        public async Task<int> CreateCourseAsync(int schoolId, int? imageId, int price, List<CourseLanguage> courseLanguage)
         {
-            return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new Course
+            return await _db.ExecAsync(db => db.InTransaction(async () =>
             {
-                SchoolId = courseId,
-                ImageId = imageId,
-                Price = price
+                var courseId = await db.InsertWithInt32IdentityAsync(new Course
+                {
+                    SchoolId = schoolId,
+                    ImageId = imageId,
+                    Price = price
+                });
+
+                courseLanguage.ForEach(courseLang => courseLang.CourseId = courseId);
+                await db.BulkCopyAsync(courseLanguage);
+
+                return courseId;
             }));
         }
 
-        public async Task CreateCourseLanguageListAsync(List<CourseLanguage> courseLanguage)
-        {
-            await _db.ExecAsync(db => db.BulkCopyAsync(courseLanguage));
-        }
 
         public async Task<(Course course, Dictionary<int, CourseLanguage> courseLanguage)> GetCourseByIdAsync(int id)
         {

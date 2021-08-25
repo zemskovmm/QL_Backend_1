@@ -64,25 +64,18 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUniversity([FromBody] CreateUniversityDtoAdmin university)
         {
-            var universityId =
-                await _universityAppService.CreateUniversityAsync(university.FoundationYear, university.LogoId, university.BannerId);
-            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+            var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var universityLanguage = university.Languages.Select(university => new UniversityLanguage
             {
-                UniversityId = universityId,
                 Description = university.Value.HtmlDescription,
                 Name = university.Value.Name,
                 Url = university.Value.Url,
                 Metadata = university.Value.Metadata is null ? null : university.Value.Metadata.ToString(),
-                LanguageId = _languageRepository
-                    .GetLanguageIdByShortNameAsync(university.Key)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult()
+                LanguageId = language.FirstOrDefault(language => language.Value == university.Key).Key
             }).ToList();
 
-            await _universityAppService.CreateUniversityLanguageListAsync(universityLanguage);
+            var universityId = await _universityAppService.CreateUniversityAsync(university.FoundationYear, university.LogoId, university.BannerId, universityLanguage);
 
             return Ok(new {id = universityId});
         }
