@@ -20,14 +20,14 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
     
     [Authorize(Roles = "Admin")]
     [Route("/api/admin/courses")]
-    public class AdmincourseController : Controller
+    public class AdminCourseController : Controller
     {
         private readonly ILanguageRepository _languageRepository;
         private readonly ICourseAppService _courseAppService;
         private readonly JObject _definition;
 
 
-        public AdmincourseController(ILanguageRepository languageRepository, ICourseAppService courseAppService)
+        public AdminCourseController(ILanguageRepository languageRepository, ICourseAppService courseAppService)
         {
             var noFields = new IExtraRemoteUiField[0];
 
@@ -50,6 +50,8 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
             {
                 Id = course.course.Id,
                 SchoolId = course.course.SchoolId,
+                ImageId = course.course.ImageId,
+                Price = course.course.Price,
                 Languages = course.courseLanguage.ToDictionary(school => language[school.Key],
                     course => new CourseLanguageAdminDto
                     {
@@ -69,7 +71,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
         [HttpPost]
         public async Task<IActionResult> CreateCourse([FromBody] CourseAdminDto courseDto)
         {
-            var courseId = await _courseAppService.CreateCourseAsync(courseDto.SchoolId);
+            var courseId = await _courseAppService.CreateCourseAsync(courseDto.SchoolId, courseDto.ImageId, courseDto.Price);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var courseLanguage = courseDto.Languages.Select(course => new CourseLanguage
@@ -95,8 +97,9 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
 
             var response = new CourseAdminDto
             {
-                Id = id,
                 SchoolId = course.course.SchoolId,
+                ImageId = course.course.ImageId,
+                Price = course.course.Price,
                 Languages = course.schoolLanguage.ToDictionary(course => language[course.Key],
                     course => new CourseLanguageAdminDto
                     {
@@ -113,7 +116,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCourseById([FromBody] CourseAdminDto courseDto, int id)
         {
-            await _courseAppService.UpdateCourseByIdAsync(id, courseDto.SchoolId);
+            await _courseAppService.UpdateCourseByIdAsync(id, courseDto.SchoolId, courseDto.ImageId, courseDto.Price);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             foreach (var courseLanguage in courseDto.Languages)

@@ -6,6 +6,7 @@ using QuartierLatin.Backend.Dto;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
 using QuartierLatin.Backend.Dto.PageModuleDto;
 using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Enums;
 
 namespace QuartierLatin.Backend.Application.Interfaces
@@ -28,5 +29,6 @@ namespace QuartierLatin.Backend.Application.Interfaces
 
         Task<PageRoot> GetPageRootByIdAsync(int id);
         Task<(int totalItems, List<(PageRoot pageRoot, Page page)>)> GetPagesByFilter(string lang, PageType entityType, Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize);
+        Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByPageIds(IEnumerable<int> ids);
     }
 }

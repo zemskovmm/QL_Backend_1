@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
@@ -6,6 +8,8 @@ using QuartierLatin.Backend.Dto.TraitTypeDto;
 using QuartierLatin.Backend.Models.Enums;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
+using RemoteUi;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -15,13 +19,34 @@ namespace QuartierLatin.Backend.Controllers
     {
         private readonly ICommonTraitAppService _commonTraitAppService;
         private readonly ICommonTraitTypeAppService _commonTraitTypeAppService;
+        private readonly JObject _definition;
+        private readonly JObject _traitTypeDefinition;
 
         public AdminTraitController(ICommonTraitAppService commonTraitAppService,
             ICommonTraitTypeAppService commonTraitTypeAppService)
         {
+            var noFields = Array.Empty<IExtraRemoteUiField>();
+            
             _commonTraitAppService = commonTraitAppService;
             _commonTraitTypeAppService = commonTraitTypeAppService;
+            
+            _definition = new RemoteUiBuilder(typeof(CommonTraitDtoRemoteUI), noFields, null, new CamelCaseNamingStrategy())
+                .Register(typeof(CommonTraitDtoRemoteUI), noFields)
+                .Register(typeof(Dictionary<string, string>), noFields)
+                .Build(null);
+
+            _traitTypeDefinition =
+                new RemoteUiBuilder(typeof(TraitTypeDto), noFields, null, new CamelCaseNamingStrategy())
+                    .Register(typeof(TraitTypeDto), noFields)
+                    .Register(typeof(Dictionary<string, string>), noFields)
+                    .Build(null);
         }
+
+        [HttpGet("trait-type/definition")]
+        public async Task<IActionResult> GetTraitTypeDefinition() => Ok(_traitTypeDefinition);
+        
+        [HttpGet("trait/definition")]
+        public async Task<IActionResult> GetDefinition() => Ok(_definition);
 
         [HttpGet("trait-types")]
         public async Task<IActionResult> GetTraitTypes()
@@ -249,10 +274,10 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(new object());
         }
 
-        [HttpGet("traits/by-type/{typeName}")]
-        public async Task<IActionResult> GetTraitOfTypeByTypeName(string typeName)
+        [HttpGet("traits/by-type/{traitIdentifier}")]
+        public async Task<IActionResult> GetTraitOfTypeByTypeName(string traitIdentifier)
         {
-            var traitList = await _commonTraitAppService.GetTraitOfTypesByTypeNameAsync(typeName);
+            var traitList = await _commonTraitAppService.GetTraitOfTypesByIdentifierAsync(traitIdentifier);
 
             var response = traitList.Select(trait => new CommonTraitListDto
             {

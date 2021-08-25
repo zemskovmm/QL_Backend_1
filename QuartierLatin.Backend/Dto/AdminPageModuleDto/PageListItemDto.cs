@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Dto.AdminPageModuleDto
 {
@@ -11,5 +13,8 @@ namespace QuartierLatin.Backend.Dto.AdminPageModuleDto
         
         public Dictionary<string, int?> SmallPreviewImages { get; set; }
         public Dictionary<string, int?> WidePreviewImages { get; set; }
+
+        public Dictionary<string, JObject?> Metadata { get; set; }
+        public Dictionary<string, DateTime?> Date { get; set; }
     }
 }

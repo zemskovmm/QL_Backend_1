@@ -9,5 +9,7 @@ namespace QuartierLatin.Backend.Dto.CourseCatalogDto.School
         public int? FoundationYear { get; set; }
         [RemoteUiField("languages", "", RemoteUiFieldType.Custom, CustomType = "LanguageDictionary")]
         public Dictionary<string, SchoolLanguageAdminDto> Languages { get; set; }
+        [RemoteUiField("imageId")]
+        public int? ImageId { get; set; }
     }
 }

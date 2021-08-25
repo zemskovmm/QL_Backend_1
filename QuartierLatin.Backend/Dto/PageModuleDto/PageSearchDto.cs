@@ -8,11 +8,11 @@ namespace QuartierLatin.Backend.Dto.PageModuleDto
 {
     public class PageSearchDto
     {
-        [JsonProperty("type")]
+        [JsonProperty("pageType")]
         public PageType PageType { get; set; }
         [JsonProperty("pageSize")]
         public int? PageSize { get; set; }
-        [JsonProperty("page")]
+        [JsonProperty("pageNumber")]
         public int PageNumber { get; set; }
         [JsonProperty("filters")]
         public List<CatalogSearchFilterDto> Filters { get; set; }

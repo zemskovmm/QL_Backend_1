@@ -24,9 +24,9 @@ namespace QuartierLatin.Backend.Application.courseCatalog.SchoolCatalog
             return await _schoolCatalogRepository.GetSchoolListAsync();
         }
 
-        public async Task<int> CreateSchoolAsync(int? schoolDtoFoundationYear)
+        public async Task<int> CreateSchoolAsync(int? schoolDtoFoundationYear, int? imageId)
         {
-            var id = await _schoolCatalogRepository.CreateSchoolAsync(schoolDtoFoundationYear);
+            var id = await _schoolCatalogRepository.CreateSchoolAsync(schoolDtoFoundationYear, imageId);
             await _appStateEntryRepository.UpdateLastChangeTimeAsync();
             return id;
         }
@@ -42,9 +42,9 @@ namespace QuartierLatin.Backend.Application.courseCatalog.SchoolCatalog
             return await _schoolCatalogRepository.GetSchoolByIdAsync(id);
         }
 
-        public async Task UpdateSchoolByIdAsync(int id, int? schoolDtoFoundationYear)
+        public async Task UpdateSchoolByIdAsync(int id, int? schoolDtoFoundationYear, int? imageId)
         {
-            await _schoolCatalogRepository.UpdateSchoolByIdAsync(id, schoolDtoFoundationYear);
+            await _schoolCatalogRepository.UpdateSchoolByIdAsync(id, schoolDtoFoundationYear, imageId);
             await _appStateEntryRepository.UpdateLastChangeTimeAsync();
         }
 
@@ -54,6 +54,11 @@ namespace QuartierLatin.Backend.Application.courseCatalog.SchoolCatalog
             await _schoolCatalogRepository.CreateOrUpdateSchoolLanguageByIdAsync(id, valueHtmlDescription, languageId,
                 valueName, valueUrl, metadata);
             await _appStateEntryRepository.UpdateLastChangeTimeAsync();
+        }
+
+        public async Task<Dictionary<int, (int? schoolImageId, string schoolName)>> GetSchoolImageIdAndNameByIdsAsync(IEnumerable<int> schoolIds, string lang)
+        {
+            return await _schoolCatalogRepository.GetSchoolImageIdAndNameByIdsAsync(schoolIds, lang);
         }
     }
 }

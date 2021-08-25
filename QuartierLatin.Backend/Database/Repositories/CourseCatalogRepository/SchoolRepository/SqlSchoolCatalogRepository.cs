@@ -31,11 +31,12 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
             });
         }
 
-        public async Task<int> CreateSchoolAsync(int? foundationYear)
+        public async Task<int> CreateSchoolAsync(int? foundationYear, int? imageId)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new School
             {
                 FoundationYear = foundationYear,
+                ImageId = imageId
             }));
         }
 
@@ -54,12 +55,13 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
             });
         }
 
-        public async Task UpdateSchoolByIdAsync(int id, int? foundationYear)
+        public async Task UpdateSchoolByIdAsync(int id, int? foundationYear, int? imageId)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new School
             {
                 Id = id,
-                FoundationYear = foundationYear
+                FoundationYear = foundationYear,
+                ImageId = imageId
             }));
         }
 
@@ -85,6 +87,27 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
                     schoolLanguageFilter: schoolLang => schoolLang.LanguageId == languageId && schoolLang.Url == url).First();
 
                 return (school: entity.School, schoolLanguage: entity.SchoolLanguage);
+            });
+        }
+
+        public async Task<Dictionary<int, (int? schoolImageId, string schoolName)>> GetSchoolImageIdAndNameByIdsAsync(IEnumerable<int> schoolIds, string lang)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var langId = db.Languages.FirstOrDefault(language => language.LanguageShortName == lang).Id;
+
+                var schoolWithLanguages = from school in db.Schools.Where(school => schoolIds.Contains(school.Id))
+                    join lang in db.SchoolLanguages.Where(l => l.LanguageId == langId)
+                        on school.Id equals lang.SchoolId
+                    select new
+                    {
+                        school.Id,
+                        school.ImageId,
+                        lang.Name
+                    };
+
+                return await schoolWithLanguages.ToDictionaryAsync(school => school.Id,
+                    school => (school.ImageId, school.Name));
             });
         }
 

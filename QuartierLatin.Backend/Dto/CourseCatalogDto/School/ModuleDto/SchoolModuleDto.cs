@@ -13,5 +13,6 @@ namespace QuartierLatin.Backend.Dto.CourseCatalogDto.School.ModuleDto
         public SchoolModuleTraitsDto Traits { get; set; }
 
         public JObject? Metadata { get; set; }
+        public int? ImageId { get; set; }
     }
 }

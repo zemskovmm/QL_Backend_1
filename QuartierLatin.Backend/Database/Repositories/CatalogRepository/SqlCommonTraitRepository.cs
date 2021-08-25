@@ -94,6 +94,14 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                 .GroupBy(x => x.mapping.UniversityId)
                 .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
 
+        public Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByPageIds(IEnumerable<int> ids) =>
+            _db.ExecAsync(async db =>
+                (await (from mapping in db.CommonTraitsToPages.Where(x => ids.Contains(x.PageId))
+                    join trait in db.CommonTraits on mapping.CommonTraitId equals trait.Id
+                    select new { mapping, trait }).ToListAsync())
+                .GroupBy(x => x.mapping.PageId)
+                .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
+
         public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndSchoolIdAsync(int traitTypeId, int schoolId)
         {
             return await _db.ExecAsync(db =>
@@ -114,16 +122,24 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             );
         }
 
-        public async Task<List<CommonTrait>> GetCommonTraitListByTypeNameAsync(string typeName)
+        public async Task<List<CommonTrait>> GetTraitOfTypesByIdentifierAsync(string traitIdentifier)
         {
             return await _db.ExecAsync(async db =>
             {
                var traitTypes = db.CommonTraitTypes.AsEnumerable();
 
-               var traitTypeId = traitTypes.FirstOrDefault(traitType => traitType.Names.ContainsValue(typeName)).Id;
+               var traitTypeId = traitTypes.FirstOrDefault(traitType => traitType.Identifier == traitIdentifier).Id;
 
                return await GetCommonTraitListByTypeId(traitTypeId);
             });
         }
+
+        public Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByCourseIdsAsync(IEnumerable<int> courseIds) =>
+            _db.ExecAsync(async db =>
+                (await (from mapping in db.CommonTraitToCourses.Where(x => courseIds.Contains(x.CourseId))
+                    join trait in db.CommonTraits on mapping.CommonTraitId equals trait.Id
+                    select new { mapping, trait }).ToListAsync())
+                .GroupBy(x => x.mapping.CourseId)
+                .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
     }
 }

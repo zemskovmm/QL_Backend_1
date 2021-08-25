@@ -8,11 +8,12 @@ namespace QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.Scho
     public interface ISchoolCatalogRepository
     {
         Task<List<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)>> GetSchoolListAsync();
-        Task<int> CreateSchoolAsync(int? foundationYear);
+        Task<int> CreateSchoolAsync(int? foundationYear, int? imageId);
         Task CreateSchoolLanguageListAsync(List<SchoolLanguages> schoolLanguage);
         Task<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)> GetSchoolByIdAsync(int id);
-        Task UpdateSchoolByIdAsync(int id, int? foundationYear);
+        Task UpdateSchoolByIdAsync(int id, int? foundationYear, int? imageId);
         Task CreateOrUpdateSchoolLanguageByIdAsync(int schoolId, string htmlDescription, int languageId, string name, string url, JObject? metadata);
         Task<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)> GetSchoolByUrlWithLanguageAsync(int languageId, string url);
+        Task<Dictionary<int, (int? schoolImageId, string schoolName)>> GetSchoolImageIdAndNameByIdsAsync(IEnumerable<int> schoolIds, string lang);
     }
 }

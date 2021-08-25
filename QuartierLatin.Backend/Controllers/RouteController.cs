@@ -22,6 +22,7 @@ using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRe
 
 namespace QuartierLatin.Backend.Controllers
 {
+    [Route("/api/route")]
     public class RouteController : Controller
     {
         private readonly ICommonTraitAppService _commonTraitAppService;
@@ -53,7 +54,7 @@ namespace QuartierLatin.Backend.Controllers
             _courseCatalogRepository = courseCatalogRepository;
         }
 
-        [HttpGet("/api/route/{lang}/{**route}")]
+        [HttpGet("{lang}/{**route}")]
         public async Task<IActionResult> GetPage(string lang, string route)
         {
             var routeResponse = await _routeAppService.GetPageByUrlAsync(lang, route);
@@ -65,7 +66,7 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [Authorize]
-        [HttpGet("/admin/api/route/{**route}")]
+        [HttpGet("{**route}")]
         public async Task<IActionResult> GetPageAdmin(string route)
         {
             var routeResponse = await _routeAppService.GetPageByUrlAdminAsync(route);
@@ -76,7 +77,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(routeResponse);
         }
 
-        [HttpGet("/api/route/{lang}/university/{**url}")]
+        [HttpGet("{lang}/university/{**url}")]
         public async Task<IActionResult> GetUniversity(string lang, string url)
         {
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
@@ -145,7 +146,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/api/route/{lang}/school/{**url}")]
+        [HttpGet("{lang}/school/{**url}")]
         public async Task<IActionResult> GetSchool(string lang, string url)
         {
             var moduleAndUrls = await GetSchoolModuleDto(lang, url);
@@ -155,7 +156,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/api/route/{lang}/{schoolUrl}/courses/{**url}")]
+        [HttpGet("{lang}/{schoolUrl}/courses/{**url}")]
         public async Task<IActionResult> GetSchoolAndCourse(string lang, string schoolUrl, string url)
         {
             var courseModuleAndUrls = await GetCourseModuleDtoWithUrls(lang, url);
@@ -179,7 +180,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/api/route/{lang}/{schoolUrl}/courses/")]
+        [HttpGet("{lang}/{schoolUrl}/courses/")]
         public async Task<IActionResult> GetSchoolAndCourseList(string lang, string schoolUrl)
         {
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
@@ -203,7 +204,7 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/api/route/{lang}/course/{**url}")]
+        [HttpGet("{lang}/course/{**url}")]
         public async Task<IActionResult> GetCourse(string lang, string url)
         {
             var moduleAndUrls = await GetCourseModuleDtoWithUrls(lang, url);
@@ -253,7 +254,8 @@ namespace QuartierLatin.Backend.Controllers
                 DescriptionHtml = school.schoolLanguage[languageId].Description,
                 FoundationYear = school.school.FoundationYear,
                 Traits = schoolTraits,
-                Metadata = school.schoolLanguage[languageId].Metadata is null ? null : JObject.Parse(school.schoolLanguage[languageId].Metadata)
+                Metadata = school.schoolLanguage[languageId].Metadata is null ? null : JObject.Parse(school.schoolLanguage[languageId].Metadata),
+                ImageId = school.school.ImageId
             };
 
             return (schoolModule: module, urls: urls, schoolId: school.school.Id);
@@ -287,7 +289,7 @@ namespace QuartierLatin.Backend.Controllers
             return (courseModule: module, course);
         }
 
-        public async Task<CourseModuleDto> GetCourseModule(List<CommonTraitType> traitsType,
+        private async Task<CourseModuleDto> GetCourseModule(List<CommonTraitType> traitsType,
             (Course course, Dictionary<int, CourseLanguage> courseLanguage) course,
             Dictionary<int, string> languageIds, string lang, int languageId) 
         {
@@ -317,7 +319,8 @@ namespace QuartierLatin.Backend.Controllers
                 DescriptionHtml = course.courseLanguage[languageId].Description,
                 SchoolId = course.course.SchoolId,
                 Traits = courseTraits,
-                Metadata = course.courseLanguage[languageId].Metadata is null ? null : JObject.Parse(course.courseLanguage[languageId].Metadata)
+                Metadata = course.courseLanguage[languageId].Metadata is null ? null : JObject.Parse(course.courseLanguage[languageId].Metadata),
+                ImageId = course.course.ImageId
             };
 
             return module;

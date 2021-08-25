@@ -6,5 +6,6 @@ namespace QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels
     public class School : BaseModel
     {
         [Column] public int? FoundationYear { get; set; }
+        [Column] public int? ImageId { get; set; }
     }
 }

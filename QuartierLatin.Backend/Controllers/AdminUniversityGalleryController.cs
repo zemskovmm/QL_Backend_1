@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
-using System.Threading.Tasks;
 using QuartierLatin.Backend.Application.Interfaces.Catalog;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -13,13 +12,6 @@ namespace QuartierLatin.Backend.Controllers
         public AdminUniversityGalleryController(IUniversityGalleryAppService universityGalleryAppService)
         {
             _universityGalleryAppService = universityGalleryAppService;
-        }
-
-        [HttpGet("{universityId}")]
-        public async Task<IActionResult> GetGalleryToUniversity(int universityId)
-        {
-            var response = await _universityGalleryAppService.GetGalleryToUniversityAsync(universityId);
-            return Ok(response);
         }
 
         [HttpPost("{universityId}/{imageId}")]
