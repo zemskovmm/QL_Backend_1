@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using NickBuhro.Translit;
+using QuartierLatin.Backend.Cmdlets.Utils;
 using QuartierLatin.Backend.Config;
 using QuartierLatin.Backend.Database;
 using QuartierLatin.Backend.Database.AppDbContextSeed;
@@ -80,50 +81,10 @@ namespace QuartierLatin.Backend.Cmdlets
                 return 0;
             });
 
-
-        private async Task<int> EnsureTraitType(AppDbContext db, string identifier, Dictionary<string, string> names)
-        {
-            var traitType = db.CommonTraitTypes.FirstOrDefault(x => x.Identifier == identifier);
-            if (traitType == null)
-            {
-                Console.WriteLine($"Adding {identifier} trait type");
-                traitType = new CommonTraitType
-                {
-                    Identifier = identifier,
-                    Names = names,
-                };
-                traitType.Id = await db.InsertWithInt32IdentityAsync(traitType);
-                await db.InsertAsync(new CommonTraitTypesForEntity
-                {
-                    EntityType = EntityType.University,
-                    CommonTraitId = traitType.Id
-                });
-            }
-
-            return traitType.Id;
-        }
-
-        private async Task<int> EnsureTraitWithIdentifier(AppDbContext db, int traitTypeId, string identifier,
-            Dictionary<string, string> names)
-        {
-            var trait = db.CommonTraits.FirstOrDefault(x =>
-                x.CommonTraitTypeId == traitTypeId && x.Identifier == identifier);
-            if (trait != null)
-                return trait.Id;
-            
-            Console.WriteLine("Adding " + identifier);
-            return await db.InsertWithInt32IdentityAsync(new CommonTrait
-            {
-                Identifier = identifier,
-                Names = names,
-                CommonTraitTypeId = traitTypeId
-            });
-        }
-
         private  async Task ImportUniversities(ImporterDatabase import, AppDbContext db, Dictionary<string, int> langs)
         {
             var languagesToTraits = new Dictionary<string, int>();
-            var languageTraitId = await EnsureTraitType(db, "instruction-language", new Dictionary<string, string>
+            var languageTraitId = await ImportTraitHelper.EnsureTraitType(db, "instruction-language", new Dictionary<string, string>
             {
                 {"en", "Language"}, {"ru", "Язык обучения"}, {"esp", "Idioma"}, {"fr", "Langue"}
             });
@@ -140,7 +101,7 @@ namespace QuartierLatin.Backend.Cmdlets
                 (lang: "fr/en", names: new Dictionary<string, string>
                     {{"ru", "Французский/Английский"}, {"en", "French/English"}, {"esp", "Francés/Inglés"}, {"fr", "Français/Anglais"}}),
             }) 
-                languagesToTraits[lang.lang] = await EnsureTraitWithIdentifier(db, languageTraitId, lang.lang, lang.names);
+                languagesToTraits[lang.lang] = await ImportTraitHelper.EnsureTraitWithIdentifier(db, languageTraitId, lang.lang, lang.names);
 
 
             foreach (var uni in import.Universities)
@@ -199,7 +160,7 @@ namespace QuartierLatin.Backend.Cmdlets
             Dictionary<string, string> traitNames)
             where TImporter : ImporterNamedEntityBase
         {
-            var traitType = await EnsureTraitType(db, identifier, traitNames);
+            var traitType = await ImportTraitHelper.EnsureTraitType(db, identifier, traitNames);
 
             var itemsDic = new Dictionary<int, int>();
             var dbTraits = db.CommonTraits.Where(ct => ct.CommonTraitTypeId == traitType)
