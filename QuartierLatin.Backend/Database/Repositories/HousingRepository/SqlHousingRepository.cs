@@ -8,6 +8,7 @@ using LinqToDB.Data;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Models.HousingModels;
 using QuartierLatin.Backend.Models.Repositories.HousingRepositories;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Database.Repositories.HousingRepository
 {
@@ -20,17 +21,20 @@ namespace QuartierLatin.Backend.Database.Repositories.HousingRepository
             _db = db;
         }
 
-        public async Task<int> CreateHousingAsync(int? price)
+        public async Task<int> CreateHousingAsync(int? price, List<HousingLanguage> housingLanguage)
         {
-            return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new Housing
+            return await _db.ExecAsync(db => db.InTransaction(async () =>
             {
-                Price = price,
-            }));
-        }
+                var housingId = await db.InsertWithInt32IdentityAsync(new Housing
+                {
+                    Price = price
+                });
 
-        public async Task CreateHousingLanguageListAsync(List<HousingLanguage> housingLanguage)
-        {
-            await _db.ExecAsync(db => db.BulkCopyAsync(housingLanguage));
+                housingLanguage.ForEach(courseLang => courseLang.HousingId = housingId);
+                await db.BulkCopyAsync(housingLanguage);
+
+                return housingId;
+            }));
         }
 
         public async Task<(Housing housing, Dictionary<int, HousingLanguage> housingLanguage)> GetHousingByIdAsync(int id)

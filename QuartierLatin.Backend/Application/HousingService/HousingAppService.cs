@@ -16,14 +16,9 @@ namespace QuartierLatin.Backend.Application.HousingService
             _housingRepository = housingRepository;
         }
 
-        public async Task<int> CreateHousingAsync(int? price)
+        public async Task<int> CreateHousingAsync(int? price, List<HousingLanguage> housingLanguage)
         {
-            return await _housingRepository.CreateHousingAsync(price);
-        }
-
-        public async Task CreateHousingLanguageListAsync(List<HousingLanguage> housingLanguage)
-        {
-            await _housingRepository.CreateHousingLanguageListAsync(housingLanguage);
+            return await _housingRepository.CreateHousingAsync(price, housingLanguage);
         }
 
         public async Task<(Housing housing, Dictionary<int, HousingLanguage> housingLanguage)> GetHousingByIdAsync(int id)
