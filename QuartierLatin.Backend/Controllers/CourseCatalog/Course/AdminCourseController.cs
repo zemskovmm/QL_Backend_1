@@ -71,12 +71,10 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
         [HttpPost]
         public async Task<IActionResult> CreateCourse([FromBody] CourseAdminDto courseDto)
         {
-            var courseId = await _courseAppService.CreateCourseAsync(courseDto.SchoolId, courseDto.ImageId, courseDto.Price);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var courseLanguage = courseDto.Languages.Select(course => new CourseLanguage
             {
-                CourseId = courseId,
                 Description = course.Value.HtmlDescription,
                 Name = course.Value.Name,
                 Url = course.Value.Url,
@@ -84,7 +82,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.course
                 Metadata = course.Value.Metadata is null ? null : course.Value.Metadata.ToString() 
             }).ToList();
 
-            await _courseAppService.CreateCourseLanguageListAsync(courseLanguage);
+            var courseId = await _courseAppService.CreateCourseAsync(courseDto.SchoolId, courseDto.ImageId, courseDto.Price, courseLanguage);
 
             return Ok(new { id = courseId });
         }

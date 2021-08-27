@@ -8,8 +8,7 @@ namespace QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.Cour
     public interface ICourseCatalogRepository
     {
         Task<List<(Course course, Dictionary<int, CourseLanguage> courseLanguage)>> GetCourseListAsync();
-        Task<int> CreateCourseAsync(int schoolId, int? imageId, int price);
-        Task CreateCourseLanguageListAsync(List<CourseLanguage> courseLanguage);
+        Task<int> CreateCourseAsync(int schoolId, int? imageId, int price, List<CourseLanguage> courseLanguage);
         Task<(Course course, Dictionary<int, CourseLanguage> courseLanguage)> GetCourseByIdAsync(int id);
         Task UpdateCourseByIdAsync(int id, int courseId, int? imageId, int price);
         Task CreateOrUpdateCourseLanguageByIdAsync(int id, string htmlDescription, int languageId, string name, string url, JObject? metadata);

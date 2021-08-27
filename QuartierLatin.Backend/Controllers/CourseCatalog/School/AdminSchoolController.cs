@@ -70,12 +70,10 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
         [HttpPost]
         public async Task<IActionResult> CreateSchool([FromBody] SchoolAdminDto schoolDto)
         {
-            var schoolId = await _schoolAppService.CreateSchoolAsync(schoolDto.FoundationYear, schoolDto.ImageId);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var schoolLanguage = schoolDto.Languages.Select(school => new SchoolLanguages
             {
-                SchoolId = schoolId,
                 Description = school.Value.HtmlDescription,
                 Name = school.Value.Name,
                 Url = school.Value.Url,
@@ -83,7 +81,7 @@ namespace QuartierLatin.Backend.Controllers.courseCatalog.School
                 Metadata = school.Value.Metadata is null ? null : school.Value.Metadata.ToString(),
             }).ToList();
 
-            await _schoolAppService.CreateSchoolLanguageListAsync(schoolLanguage);
+            var schoolId = await _schoolAppService.CreateSchoolAsync(schoolDto.FoundationYear, schoolDto.ImageId, schoolLanguage);
 
             return Ok(new { id = schoolId });
         }

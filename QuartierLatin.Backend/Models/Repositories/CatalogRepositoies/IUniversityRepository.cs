@@ -7,12 +7,10 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
 {
     public interface IUniversityRepository
     {
-        Task CreateOrUpdateUniversityLanguageAsync(int universityId, int languageId, string name, string description, string url, JObject? metadata);
+        Task<int> CreateUniversityAsync(int? foundationYear, int? logoId, int? bannerId, List<UniversityLanguage> universityLanguage);
         Task<List<int>> GetUniversityIdListAsync();
         Task<Dictionary<int, UniversityLanguage>> GetUniversityLanguageByUniversityIdAsync(int universityId);
         Task<University> GetUniversityByIdAsync(int id);
-        Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage);
-        Task<int> CreateUniversityAsync(int? foundationYear, int? logoId, int? bannerId);
         Task UpdateUniversityAsync(int id, int? foundationYear, int? logoId, int? bannerId);
         Task<int> GetUniversityIdByUrl(string url);
         Task<List<Specialty>> GetSpecialtiesUniversityByUniversityIdList(int universityId);
@@ -21,5 +19,8 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task<(int totalItems, List<(University university, UniversityLanguage universityLanguage, int cost)>)> GetUniversityPageByFilter(
             List<List<int>> commonTraitGroups, List<int> specialtyCategoriesId, List<int> degreeIds, List<int> priceIds,
             int languageId, int skip, int take);
+
+        Task UpdateUniversityLanguageByIdAsync(int id, string description, int languageId, string name,
+            string url, JObject? metadata);
     }
 }
