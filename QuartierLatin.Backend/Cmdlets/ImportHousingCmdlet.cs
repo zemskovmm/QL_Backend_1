@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System;
+using CommandLine;
 using LinqToDB;
 using LinqToDB.Data;
 using Microsoft.Extensions.Configuration;
@@ -44,6 +45,12 @@ namespace QuartierLatin.Backend.Cmdlets
         {
             MigrationRunner.MigrateDb(_dbConfig.ConnectionString, typeof(Startup).Assembly, _dbConfig.Type);
             AppDbContextSeed.Seed(_db);
+
+            await db.HousingLanguages.TruncateAsync();
+            await db.CommonTraitToHousings.TruncateAsync();
+            await db.HousingGalleries.TruncateAsync();
+            await db.ExecuteAsync("TRUNCATE TABLE \"Housings\" CASCADE");
+
             using var t = await db.BeginTransactionAsync();
 
             var import = JsonConvert.DeserializeObject<List<ImporterHousing>>(
@@ -70,6 +77,8 @@ namespace QuartierLatin.Backend.Cmdlets
                 Price = price
             });
 
+            Console.WriteLine($"Adding housing wit id {housingId}");
+
             if (housingLanguageImport.Count == 0)
                 return housingId;
 
@@ -77,11 +86,11 @@ namespace QuartierLatin.Backend.Cmdlets
             {
                 Description = housingLanguageImport.Value.Description,
                 LanguageId = _language.FirstOrDefault(value => value.Value == housingLanguageImport.Key).Key,
-                Name = housingLanguageImport.Value.Name,
-                Url = housingLanguageImport.Value.Url
+                Name = string.IsNullOrEmpty(housingLanguageImport.Value.Name) ? "" : housingLanguageImport.Value.Name,
+                Url = housingLanguageImport.Value.Url,
+                HousingId = housingId
             }).ToList();
 
-            housingLanguage.ForEach(courseLang => courseLang.HousingId = housingId);
             await db.BulkCopyAsync(housingLanguage);
 
             return housingId;
@@ -102,6 +111,8 @@ namespace QuartierLatin.Backend.Cmdlets
                     Residents = housingAccommodationType.Residents,
                     Square = housingAccommodationType.Square
                 });
+
+                Console.WriteLine($"Adding {housingAccommodationTypeId} HousingAccommodationType");
 
                 await CreateHousingAccommodationTypeTraitsAsync(db, housingAccommodationTypeId,
                     housingAccommodationType.CommonTraits);
@@ -182,6 +193,8 @@ namespace QuartierLatin.Backend.Cmdlets
             };
 
             var blobId = await db.InsertWithInt32IdentityAsync(blob);
+
+            Console.WriteLine($"Adding {blob.OriginalFileName} file with blob Id {blobId}");
 
             return blobId;
         }
