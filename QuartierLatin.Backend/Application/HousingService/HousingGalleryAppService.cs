@@ -28,5 +28,10 @@ namespace QuartierLatin.Backend.Application.HousingService
         {
             await _housingGalleryRepository.DeleteGalleryItemToHousingAsync(housingId, imageId);
         }
+
+        public async Task<Dictionary<int, List<int>>> GetGalleriesByHousingIdsAsync(IEnumerable<int> housingIds)
+        {
+            return await _housingGalleryRepository.GetGalleriesByHousingIdsAsync(housingIds);
+        }
     }
 }

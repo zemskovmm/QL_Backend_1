@@ -9,5 +9,7 @@ namespace QuartierLatin.Backend.Dto.HousingCatalogDto
         public int? Price { get; set; }
         [RemoteUiField("languages", "", RemoteUiFieldType.Custom, CustomType = "LanguageDictionary")]
         public Dictionary<string, HousingLanguageAdminDto> Languages { get; set; }
+        [RemoteUiField("imageId")]
+        public int? ImageId { get; set; }
     }
 }

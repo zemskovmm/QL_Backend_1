@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Application.Interfaces.HousingServices;
+using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.HousingModels;
+using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Models.Repositories.HousingRepositories;
 
 namespace QuartierLatin.Backend.Application.HousingService
@@ -9,10 +11,12 @@ namespace QuartierLatin.Backend.Application.HousingService
     public class HousingAccommodationTypeAppService : IHousingAccommodationTypeAppService
     {
         private readonly IHousingAccommodationTypeRepository _housingAccommodationTypeRepository;
+        private readonly ICommonTraitRepository _commonTraitRepository;
 
-        public HousingAccommodationTypeAppService(IHousingAccommodationTypeRepository housingAccommodationTypeRepository)
+        public HousingAccommodationTypeAppService(IHousingAccommodationTypeRepository housingAccommodationTypeRepository, ICommonTraitRepository commonTraitRepository)
         {
             _housingAccommodationTypeRepository = housingAccommodationTypeRepository;
+            _commonTraitRepository = commonTraitRepository;
         }
 
         public async Task<List<HousingAccommodationType>> GetHousingAccommodationTypeListAsync()
@@ -38,6 +42,11 @@ namespace QuartierLatin.Backend.Application.HousingService
         public async Task<List<HousingAccommodationType>> GetHousingAccommodationTypeListByHousingIdAsync(int housingId)
         {
             return await _housingAccommodationTypeRepository.GetHousingAccommodationTypeListByHousingIdAsync(housingId);
+        }
+
+        public async Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByHousingAccommodationTypeIdsAsync(IEnumerable<int> housingAccommodationIds)
+        {
+            return await _commonTraitRepository.GetCommonTraitListByHousingAccommodationTypeIdsAsync(housingAccommodationIds);
         }
     }
 }

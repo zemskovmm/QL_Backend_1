@@ -21,13 +21,14 @@ namespace QuartierLatin.Backend.Database.Repositories.HousingRepository
             _db = db;
         }
 
-        public async Task<int> CreateHousingAsync(int? price, List<HousingLanguage> housingLanguage)
+        public async Task<int> CreateHousingAsync(int? price, int? imageId, List<HousingLanguage> housingLanguage)
         {
             return await _db.ExecAsync(db => db.InTransaction(async () =>
             {
                 var housingId = await db.InsertWithInt32IdentityAsync(new Housing
                 {
-                    Price = price
+                    Price = price,
+                    ImageId = imageId
                 });
 
                 housingLanguage.ForEach(courseLang => courseLang.HousingId = housingId);
@@ -59,12 +60,13 @@ namespace QuartierLatin.Backend.Database.Repositories.HousingRepository
             });
         }
 
-        public async Task UpdateHousingByIdAsync(int id, int? price)
+        public async Task UpdateHousingByIdAsync(int id, int? price, int? imageId)
         {
             await _db.ExecAsync(db => db.UpdateAsync(new Housing
             {
                 Id = id,
-                Price = price
+                Price = price,
+                ImageId = imageId
             }));
         }
 
@@ -80,6 +82,55 @@ namespace QuartierLatin.Backend.Database.Repositories.HousingRepository
                 Url = url,
                 Metadata = metadata?.ToString()
             }));
+        }
+
+        public async Task<(Housing housing, Dictionary<int, HousingLanguage> housingLanguage)> GetHousingByUrlWithLanguageAsync(int languageId, string url)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var entity = HousingWithLanguages(db,
+                    housingLanguageFilter: housingLang => housingLang.LanguageId == languageId && housingLang.Url == url).First();
+
+                return (housing: entity.Housing, schoolLanguage: entity.HousingLanguage);
+            });
+        }
+
+        public async Task<(int totalItems, List<(Housing housing, HousingLanguage housingLanguage)> housingAndLanguage)> GetHousingPageByFilter(List<List<int>> commonTraitsIds, int langId, int skip, int take)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var housings = db.Housings.AsQueryable();
+
+                if (commonTraitsIds.Any())
+                {
+                    var housingWithTraits = db.CommonTraitToHousings.AsQueryable();
+
+                    foreach (var commonTraitGroup in commonTraitsIds)
+                    {
+                        if (commonTraitGroup.Count != 0)
+                            housingWithTraits =
+                                housingWithTraits.Where(t => commonTraitGroup.Contains(t.CommonTraitId));
+                    }
+
+                    housings = housings.Where(housing =>
+                        housingWithTraits.Select(x => x.HousingId).Contains(housing.Id));
+                }
+
+                var housingWithLanguages = from housing in housings
+                                           join lang in db.HousingLanguages.Where(l => l.LanguageId == langId)
+                                              on housing.Id equals lang.HousingId
+                                          select new
+                                          {
+                                              housing,
+                                              lang
+                                          };
+
+                var totalCount = await housingWithLanguages.CountAsync();
+
+                return (totalCount,
+                    (await housingWithLanguages.OrderBy(x => x.housing.Id).Skip(skip).Take(take).ToListAsync())
+                    .Select(x => (housing: x.housing, housingLanguage: x.lang)).ToList());
+            });
         }
 
         private record HousingAndLanguageTuple

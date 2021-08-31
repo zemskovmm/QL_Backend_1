@@ -6,5 +6,6 @@ namespace QuartierLatin.Backend.Models.HousingModels
     public class Housing : BaseModel
     {
         [Column] public int? Price { get; set; }
+        [Column] public int? ImageId { get; set; }
     }
 }

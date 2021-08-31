@@ -33,6 +33,19 @@ namespace QuartierLatin.Backend.Database.Repositories.HousingRepository
                     .DeleteAsync());
         }
 
+        public async Task<Dictionary<int, List<int>>> GetGalleriesByHousingIdsAsync(IEnumerable<int> housingIds)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var query = from housing in db.Housings where housingIds.Contains(housing.Id)
+                    let gallery = db.HousingGalleries.Where(gallery => gallery.HousingId == housing.Id)
+                    select new { housing.Id, gallery };
+
+                return query.ToDictionary(gallery => gallery.Id, gallery =>
+                    gallery.gallery.Select(gallery => gallery.ImageId).ToList());
+            });
+        }
+
         public async Task<List<int>> GetGalleryToHousingAsync(int housingId)
         {
             return await _db.ExecAsync(db =>

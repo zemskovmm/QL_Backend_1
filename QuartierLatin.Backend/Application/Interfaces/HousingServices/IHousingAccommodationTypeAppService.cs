@@ -1,6 +1,7 @@
 ﻿using QuartierLatin.Backend.Models.HousingModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.CatalogModels;
 
 namespace QuartierLatin.Backend.Application.Interfaces.HousingServices
 {
@@ -11,5 +12,6 @@ namespace QuartierLatin.Backend.Application.Interfaces.HousingServices
         Task<HousingAccommodationType> GetHousingAccommodationTypeByIdAsync(int id);
         Task UpdateHousingAccommodationTypeByIdAsync(int id, Dictionary<string, string> names, int housingId, int price, string residents, string square);
         Task<List<HousingAccommodationType>> GetHousingAccommodationTypeListByHousingIdAsync(int housingId);
+        Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByHousingAccommodationTypeIdsAsync(IEnumerable<int> housingAccommodationIds);
     }
 }

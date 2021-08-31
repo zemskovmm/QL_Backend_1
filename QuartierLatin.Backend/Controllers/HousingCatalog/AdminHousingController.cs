@@ -73,7 +73,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                 Metadata = housing.Value.Metadata is null ? null : housing.Value.Metadata.ToString()
             }).ToList();
 
-            var housingId = await _housingAppService.CreateHousingAsync(housingDto.Price, housingLanguage);
+            var housingId = await _housingAppService.CreateHousingAsync(housingDto.Price, housingDto.ImageId, housingLanguage);
 
             return Ok(new { id = housingId });
         }
@@ -104,7 +104,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateHousingById([FromBody] HousingAdminDto housingDto, int id)
         {
-            await _housingAppService.UpdateHousingByIdAsync(id, housingDto.Price);
+            await _housingAppService.UpdateHousingByIdAsync(id, housingDto.Price, housingDto.ImageId);
             var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             foreach (var housingLanguage in housingDto.Languages)

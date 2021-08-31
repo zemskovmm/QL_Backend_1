@@ -8,6 +8,8 @@ using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRe
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.HousingModels;
+using QuartierLatin.Backend.Models.Repositories.HousingRepositories;
 
 namespace QuartierLatin.Backend.Application.Catalog
 {
@@ -18,16 +20,19 @@ namespace QuartierLatin.Backend.Application.Catalog
         private readonly IUniversityRepository _universityRepository;
         private readonly ILanguageRepository _languageRepository;
         private readonly ICourseCatalogRepository _courseCatalogRepository;
+        private readonly IHousingRepository _housingRepository;
 
         public CatalogAppService(ICommonTraitRepository commonTraitRepository,
             ICommonTraitTypeRepository commonTraitTypeRepository, IUniversityRepository universityRepository,
-            ILanguageRepository languageRepository, ICourseCatalogRepository courseCatalogRepository)
+            ILanguageRepository languageRepository, ICourseCatalogRepository courseCatalogRepository,
+            IHousingRepository housingRepository)
         {
             _commonTraitTypeRepository = commonTraitTypeRepository;
             _commonTraitRepository = commonTraitRepository;
             _universityRepository = universityRepository;
             _languageRepository = languageRepository;
             _courseCatalogRepository = courseCatalogRepository;
+            _housingRepository = housingRepository;
         }
 
         public async Task<List<(CommonTraitType commonTraitType, List<CommonTrait> commonTraits)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType)
@@ -80,14 +85,24 @@ namespace QuartierLatin.Backend.Application.Catalog
                 priceFiltersId, langId, pageSize * pageNumber, pageSize);
         }
 
-        public async Task<(int totalItems, List<(Course course, CourseLanguage courseLanguage)> courseAndLanguage)> GetCatalogCoursePageByFilterAsync(string lang, Dictionary<string, List<int>> commonTraits, int pageNumber,
-            int pageSize)
+        public async Task<(int totalItems, List<(Course course, CourseLanguage courseLanguage)> courseAndLanguage)> GetCatalogCoursePageByFilterAsync(string lang, 
+            Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize)
         {
             var commonTraitsIds = commonTraits
                 .Select(x => x.Value).ToList();
             var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
 
             return await _courseCatalogRepository.GetCoursePageByFilter(commonTraitsIds, langId, pageSize * pageNumber, pageSize);
+        }
+
+        public async Task<(int totalItems, List<(Housing housing, HousingLanguage housingLanguage)> housingAndLanguage)> GetCatalogHousingPageByFilterAsync(string lang,
+            Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize)
+        {
+            var commonTraitsIds = commonTraits
+                .Select(x => x.Value).ToList();
+            var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
+
+            return await _housingRepository.GetHousingPageByFilter(commonTraitsIds, langId, pageSize * pageNumber, pageSize);
         }
     }
 }

@@ -19,6 +19,8 @@ using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.Interfaces.HousingServices;
+using QuartierLatin.Backend.Dto.HousingCatalogDto;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -33,12 +35,15 @@ namespace QuartierLatin.Backend.Controllers
         private readonly ICourseAppService _courseAppService;
         private readonly ICommonTraitTypeAppService _commonTraitTypeAppService;
         private readonly ISchoolAppService _schoolAppService;
+        private readonly IHousingAppService _housingAppService;
+        private readonly IHousingGalleryAppService _housingGalleryAppService;
 
         public CatalogController(ICatalogAppService catalogAppService, ISpecialtyAppService specialtyAppService,
             ICommonTraitAppService commonTraitAppService, IDegreeRepository degreeRepository,
             IOptions<BaseFilterOrderConfig> baseFilterConfig, IUniversityGalleryAppService universityGalleryAppService,
             ICourseAppService courseAppService, ICommonTraitTypeAppService commonTraitTypeAppService,
-            ISchoolAppService schoolAppService)
+            ISchoolAppService schoolAppService, IHousingAppService housingAppService,
+            IHousingGalleryAppService housingGalleryAppService)
         {
             _catalogAppService = catalogAppService;
             _specialtyAppService = specialtyAppService;
@@ -49,6 +54,8 @@ namespace QuartierLatin.Backend.Controllers
             _courseAppService = courseAppService;
             _commonTraitTypeAppService = commonTraitTypeAppService;
             _schoolAppService = schoolAppService;
+            _housingAppService = housingAppService;
+            _housingGalleryAppService = housingGalleryAppService;
         }
         
         private string FormatPriceValue(int from, int? to, string lang)
@@ -244,7 +251,7 @@ namespace QuartierLatin.Backend.Controllers
         
         [AllowAnonymous]
         [HttpGet("/api/catalog/course/filters/{lang}")]
-        public async Task<IActionResult> GetCatalogFiltersTocourseByLangAndEntityType(string lang)
+        public async Task<IActionResult> GetCatalogFiltersToCourseByLangAndEntityType(string lang)
         {
             var entityTypeSchool = EntityType.School;
             var entityTypeCourse = EntityType.Course;
@@ -337,6 +344,103 @@ namespace QuartierLatin.Backend.Controllers
             var response = new CatalogSearchResponseDtoList<CatalogCourseDto>
             {
                 Items = courseDtos,
+                TotalItems = catalogPage.totalItems,
+                TotalPages = FilterHelper.PageCount(catalogPage.totalItems, pageSize)
+            };
+
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("/api/catalog/housing/filters/{lang}")]
+        public async Task<IActionResult> GetCatalogFiltersToHousingByLangAndEntityType(string lang)
+        {
+            var entityTypeHousing = EntityType.Housing;
+
+            var commonTraitsHousing = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityTypeHousing);
+
+            var filters = commonTraitsHousing.OrderBy(trait => trait.commonTraitType.Order)
+                .Select(trait => new CatalogFilterDto
+                {
+                    Name = trait.Item1.Names.GetSuitableName(lang),
+                    Identifier = trait.Item1.Identifier,
+                    Options = trait.Item2.Where(trait => trait.Names.Any(traitNames => !string.IsNullOrEmpty(traitNames.Value)))
+                        .Select(commonTrait => new CatalogOptionsDto
+                    {
+                        Name = commonTrait.Names.GetSuitableName(lang),
+                        Id = commonTrait.Id
+                    }).ToList()
+                }).ToList();
+
+            var response = new CatalogFilterResponseDto
+            {
+                Filters = filters
+            };
+
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("/api/catalog/housing/search/{lang}")]
+        public async Task<IActionResult> SearchInHousingCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
+        {
+            var pageSize = catalogSearchDto.PageSize ?? 1000;
+
+            var commonTraits =
+                catalogSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
+                    filter.Values);
+
+            var catalogPage =
+                await _catalogAppService.GetCatalogHousingPageByFilterAsync(lang, commonTraits,
+                    catalogSearchDto.PageNumber, pageSize);
+
+            var housingIds = catalogPage.housingAndLanguage.Select(x => x.housing.Id);
+
+            var commonTraitsHousing = await _housingAppService.GetCommonTraitListByHousingIdsAsync(housingIds);
+
+            var traitsType = await _commonTraitTypeAppService.GetTraitTypesWithIndetifierAsync();
+
+            var housingGallery = await _housingGalleryAppService.GetGalleriesByHousingIdsAsync(housingIds);
+
+            var housingDtos = new List<CatalogHousingDto>();
+
+            foreach (var housing in catalogPage.Item2)
+            {
+                var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+                foreach (var traitType in traitsType)
+                {
+                    var housingTraitTypedList = commonTraitsHousing.GetValueOrDefault(housing.housing.Id)
+                        ?.Where(type => type.CommonTraitTypeId == traitType.Id);
+
+                    if (housingTraitTypedList is null) continue;
+
+                    var courseTraitList = housingTraitTypedList.Select(courseTrait => new CommonTraitLanguageDto
+                    {
+                        Id = courseTrait.Id,
+                        IconBlobId = courseTrait.IconBlobId,
+                        Identifier = courseTrait.Identifier,
+                        Name = courseTrait.Names.GetSuitableName(lang)
+                    }).ToList();
+
+                    traits.Add(traitType.Identifier, courseTraitList);
+                }
+
+                housingDtos.Add(new CatalogHousingDto()
+                {
+                    Url = $"/{lang}/housing/{housing.housingLanguage.Url}",
+                    LanglessUrl = $"/housing/{housing.housingLanguage.Url}",
+                    Name = housing.housingLanguage.Name,
+                    ImageId = housing.housing.ImageId,
+                    NamedTraits = traits,
+                    Price = housing.housing.Price,
+                    GalleryList = housingGallery.GetValueOrDefault(housing.housing.Id)
+                });
+            };
+
+            var response = new CatalogSearchResponseDtoList<CatalogHousingDto>
+            {
+                Items = housingDtos,
                 TotalItems = catalogPage.totalItems,
                 TotalPages = FilterHelper.PageCount(catalogPage.totalItems, pageSize)
             };
