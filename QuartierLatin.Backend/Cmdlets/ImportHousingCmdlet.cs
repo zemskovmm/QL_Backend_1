@@ -159,6 +159,12 @@ namespace QuartierLatin.Backend.Cmdlets
 
             foreach (var commonTrait in commonTraits)
             {
+                if (commonTrait.Names.All(trait => string.IsNullOrEmpty(trait.Value)))
+                    continue;
+
+                if (string.IsNullOrEmpty(commonTrait.Identifier))
+                    continue;
+
                 var traitTypeNames = _language.ToDictionary(lang => lang.Value, lang => commonTrait.CommonTraitTypeName);
 
                 var traitTypeId =
