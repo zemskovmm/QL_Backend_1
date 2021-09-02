@@ -6,7 +6,7 @@ using QuartierLatin.Backend.Models.Portal;
 
 namespace QuartierLatin.Backend.Application.Interfaces.PortalServices
 {
-    public interface IPersonalAppService
+    public interface IPortalPersonalAppService
     {
         Task<int> CreateApplicationAsync(ApplicationType type, int entityId,
             JObject applicationInfo, JObject entityTypeSpecificApplicationInfo);

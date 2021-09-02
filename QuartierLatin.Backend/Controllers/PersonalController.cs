@@ -10,8 +10,8 @@ namespace QuartierLatin.Backend.Controllers
     [Route("/api/personal")]
     public class PersonalController : Controller
     {
-        private readonly IPersonalAppService _personalAppService;
-        public PersonalController(IPersonalAppService personalAppService)
+        private readonly IPortalPersonalAppService _personalAppService;
+        public PersonalController(IPortalPersonalAppService personalAppService)
         {
             _personalAppService = personalAppService;
         }

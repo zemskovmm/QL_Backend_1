@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Application.PortalServices
 {
-    public class PersonalAppService : IPersonalAppService
+    public class PortalPersonalAppService : IPortalPersonalAppService
     {
         private readonly IPortalPersonalRepository _portalPersonalRepository;
 
-        public PersonalAppService(IPortalPersonalRepository portalPersonalRepository)
+        public PortalPersonalAppService(IPortalPersonalRepository portalPersonalRepository)
         {
             _portalPersonalRepository = portalPersonalRepository;
         }
