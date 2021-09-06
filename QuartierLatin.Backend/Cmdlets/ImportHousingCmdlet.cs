@@ -46,6 +46,12 @@ namespace QuartierLatin.Backend.Cmdlets
             MigrationRunner.MigrateDb(_dbConfig.ConnectionString, typeof(Startup).Assembly, _dbConfig.Type);
             AppDbContextSeed.Seed(_db);
 
+            Console.WriteLine("Truncate Housing, CommonTraitsToHousing, HousingGalleries, HousingLanguages tables ? \n Enter Y or N");
+            var command = Console.ReadLine();
+
+            if (command.ToLower() == "n")
+                return 0;
+
             await db.HousingLanguages.TruncateAsync();
             await db.CommonTraitToHousings.TruncateAsync();
             await db.HousingGalleries.TruncateAsync();
