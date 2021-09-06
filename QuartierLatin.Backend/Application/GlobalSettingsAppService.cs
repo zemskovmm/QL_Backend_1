@@ -33,13 +33,18 @@ namespace QuartierLatin.Backend.Application
                 async () => await _globalSettingRepository.GetGlobalSettingAsync(key, languageId));
         }
 
-        public async Task DeleteGlobalSettingAsync(string key, int languageId)
+        public async Task<bool> DeleteGlobalSettingAsync(string key, int languageId)
         {
             var cacheKey = new GlobalSettingsCacheKey(key, languageId);
 
-            await _globalSettingRepository.DeleteGlobalSettingAsync(key, languageId);
+            var response = await _globalSettingRepository.DeleteGlobalSettingAsync(key, languageId);
+
+            if (!response)
+                return response;
 
             await _globalSettingsCache.RemoveDataInCacheAsync(cacheKey);
+
+            return response;
         }
     }
 }
