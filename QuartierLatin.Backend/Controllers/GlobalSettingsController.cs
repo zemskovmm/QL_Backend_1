@@ -19,27 +19,38 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("/api/global/{key}/{lang}"), ProducesResponseType(typeof(JObject), 200)]
+        [HttpGet("/api/global/{key}/{lang}"),
+         ProducesResponseType(typeof(JObject), 200), 
+         ProducesResponseType(404)]
         public async Task<IActionResult> GetGlobalSetting(string key, string lang)
         {
             var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
             var result = await _globalSettingsAppService.GetGlobalSettingAsync(key, languageId);
 
+            if (result == null)
+                return NotFound();
+
             return Ok(result);
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("/api/admin/global/{key}/{lang}")]
+        [HttpDelete("/api/admin/global/{key}/{lang}"),
+         ProducesResponseType(200),
+         ProducesResponseType(404)]
         public async Task<IActionResult> DeleteGlobalSetting(string key, string lang)
         {
             var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
-            await _globalSettingsAppService.DeleteGlobalSettingAsync(key, languageId);
+            var response = await _globalSettingsAppService.DeleteGlobalSettingAsync(key, languageId);
+
+            if (!response)
+                return NotFound(new object());
 
             return Ok(new object());
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("/api/admin/global/{key}/{lang}")]
+        [HttpPut("/api/admin/global/{key}/{lang}"),
+         ProducesResponseType(200)]
         public async Task<IActionResult> CreateOrUpdateGlobalSetting(string key, string lang, [FromBody] JObject jsonData)
         {
             var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);

@@ -9,6 +9,6 @@ namespace QuartierLatin.Backend.Models.Repositories
 
         Task CreateOrUpdateGlobalSettingAsync(string key, int languageId, JObject jsonData);
 
-        Task DeleteGlobalSettingAsync(string key, int languageId);
+        Task<bool> DeleteGlobalSettingAsync(string key, int languageId);
     }
 }

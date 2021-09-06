@@ -1,9 +1,10 @@
-﻿using LinqToDB;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using LinqToDB;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Models;
 using QuartierLatin.Backend.Models.Repositories;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Database.Repositories
 {
@@ -16,25 +17,43 @@ namespace QuartierLatin.Backend.Database.Repositories
             _db = db;
         }
 
-        public async Task<JObject> GetGlobalSettingAsync(string key, int languageId) =>
-            await _db.ExecAsync(db =>
-            db.GlobalSettings.Where(setting =>
-                setting.Key == key && setting.LanguageId == languageId).Select(setting => JObject.Parse(setting.JsonData)).FirstAsync());
+        public async Task<JObject> GetGlobalSettingAsync(string key, int languageId)
+        {
+            return await _db.ExecAsync(async db =>
+                {
+                    var globalSettings = await
+                        db.GlobalSettings.FirstOrDefaultAsync(setting =>
+                            setting.Key == key && setting.LanguageId == languageId);
 
+                    return globalSettings == null ? null : JObject.Parse(globalSettings.JsonData);
+                }
+            );
+        }
 
         public async Task CreateOrUpdateGlobalSettingAsync(string key, int languageId, JObject jsonData)
         {
             await _db.ExecAsync(db => db.InsertOrReplaceAsync(new GlobalSetting
-                {
-                    Key = key,
-                    LanguageId = languageId,
-                    JsonData = jsonData.ToString(Newtonsoft.Json.Formatting.None)
-                }));
+            {
+                Key = key,
+                LanguageId = languageId,
+                JsonData = jsonData.ToString(Formatting.None)
+            }));
         }
 
-        public async Task DeleteGlobalSettingAsync(string key, int languageId)
+        public async Task<bool> DeleteGlobalSettingAsync(string key, int languageId)
         {
-            await _db.ExecAsync(db => db.GlobalSettings.Where(setting => setting.Key == key && setting.LanguageId == languageId).DeleteAsync());
+            return await _db.ExecAsync(async db =>
+                {
+                    var globalSettings =
+                        db.GlobalSettings.Where(setting => setting.Key == key && setting.LanguageId == languageId);
+
+                    if (!globalSettings.Any())
+                        return false;
+
+                    await globalSettings.DeleteAsync();
+                    return true;
+                }
+            );
         }
     }
 }
