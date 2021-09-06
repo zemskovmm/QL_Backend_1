@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.SchoolRepository
 {
@@ -32,19 +33,23 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
             });
         }
 
-        public async Task<int> CreateSchoolAsync(int? foundationYear, int? imageId)
+        public async Task<int> CreateSchoolAsync(int? foundationYear, int? imageId, List<SchoolLanguages> schoolLanguage)
         {
-            return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new School
+            return await _db.ExecAsync(db => db.InTransaction(async () =>
             {
-                FoundationYear = foundationYear,
-                ImageId = imageId
+                var schoolId = await db.InsertWithInt32IdentityAsync(new School
+                {
+                    FoundationYear = foundationYear,
+                    ImageId = imageId
+                });
+
+                schoolLanguage.ForEach(schoolLang => schoolLang.SchoolId = schoolId);
+                await db.BulkCopyAsync(schoolLanguage);
+
+                return schoolId;
             }));
         }
 
-        public async Task CreateSchoolLanguageListAsync(List<SchoolLanguages> schoolLanguage)
-        {
-            await _db.ExecAsync(db => db.BulkCopyAsync(schoolLanguage));
-        }
 
         public async Task<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)> GetSchoolByIdAsync(int id)
         {

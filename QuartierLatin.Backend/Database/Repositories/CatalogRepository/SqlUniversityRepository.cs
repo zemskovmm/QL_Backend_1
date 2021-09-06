@@ -3,6 +3,7 @@ using LinqToDB.Data;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
+using QuartierLatin.Backend.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +20,22 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             _db = db;
         }
 
-        public async Task CreateOrUpdateUniversityLanguageAsync(int universityId, int languageId, string name,
-            string description, string url, JObject? metadata)
+        public async Task<int> CreateUniversityAsync(int? foundationYear, int? logoId, int? bannerId, List<UniversityLanguage> universityLanguage)
         {
-            await _db.ExecAsync(
-                db => CreateOrUpdateUniversityCore(db, universityId, languageId, name, description, url, metadata));
+            return await _db.ExecAsync(db => db.InTransaction(async () =>
+            {
+                var universityId = await db.InsertWithInt32IdentityAsync(new University
+                {
+                    FoundationYear = foundationYear,
+                    LogoId = logoId,
+                    BannerId = bannerId
+                });
+
+                universityLanguage.ForEach(universityLang => universityLang.UniversityId = universityId);
+                await db.BulkCopyAsync(universityLanguage);
+
+                return universityId;
+            }));
         }
 
         public async Task<List<int>> GetUniversityIdListAsync()
@@ -43,11 +55,6 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
         public async Task<University> GetUniversityByIdAsync(int id)
         {
             return await _db.ExecAsync(db => db.Universities.FirstOrDefaultAsync(university => university.Id == id));
-        }
-
-        public async Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage)
-        {
-            await _db.ExecAsync(db => db.BulkCopyAsync(universityLanguage));
         }
 
         public async Task<int> CreateUniversityAsync(int? foundationYear, int? logoId, int? bannerId)
@@ -159,6 +166,12 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     (await universitiesWithLanguages.OrderBy(x => x.uni.Id).Skip(skip).Take(take).ToListAsync())
                     .Select(x => (university: x.uni, universityLanguage: x.lang, cost: x.costGroup)).ToList());
             });
+        }
+
+        public async Task UpdateUniversityLanguageByIdAsync(int id, string description, int languageId, string name, string url,
+            JObject? metadata)
+        {
+            await _db.ExecAsync(db => CreateOrUpdateUniversityCore(db, id, languageId, name, description, url, metadata));
         }
 
         private static async Task CreateOrUpdateUniversityCore(AppDbContext db, int universityId, int languageId,

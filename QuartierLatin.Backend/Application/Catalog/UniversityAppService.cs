@@ -52,22 +52,16 @@ namespace QuartierLatin.Backend.Application.Catalog
         public async Task UpdateUniversityLanguageByIdAsync(int id, string description, int languageId, string name,
             string url, JObject? metadata)
         {
-            await _universityRepository.CreateOrUpdateUniversityLanguageAsync(id, languageId, name, description, url, metadata);
+            await _universityRepository.UpdateUniversityLanguageByIdAsync(id, description, languageId, name, url, metadata);
             await _appStateEntryRepository.UpdateLastChangeTimeAsync();
         }
 
-        public async Task<int> CreateUniversityAsync(int? universityFoundationYear, int? logoId, int? bannerId)
+        public async Task<int> CreateUniversityAsync(int? foundationYear, int? logoId, int? bannerId, List<UniversityLanguage> universityLanguage)
         {
 
-            var res = await _universityRepository.CreateUniversityAsync(universityFoundationYear, logoId, bannerId);
+            var res = await _universityRepository.CreateUniversityAsync(foundationYear, logoId, bannerId, universityLanguage);
             await _appStateEntryRepository.UpdateLastChangeTimeAsync();
             return res;
-        }
-
-        public async Task CreateUniversityLanguageListAsync(List<UniversityLanguage> universityLanguage)
-        {
-            await _universityRepository.CreateUniversityLanguageListAsync(universityLanguage);
-            await _appStateEntryRepository.UpdateLastChangeTimeAsync();
         }
 
         public Task<List<Specialty>> GetSpecialtiesUniversityByUniversityId(int universityId) =>

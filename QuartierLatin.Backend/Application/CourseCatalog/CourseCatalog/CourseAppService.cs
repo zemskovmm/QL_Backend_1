@@ -29,17 +29,11 @@ namespace QuartierLatin.Backend.Application.CourseCatalog.CourseCatalog
             return await _courseCatalogRepository.GetCourseListAsync();
         }
 
-        public async Task<int> CreateCourseAsync(int schoolId, int? imageId, int price)
+        public async Task<int> CreateCourseAsync(int schoolId, int? imageId, int price, List<CourseLanguage> courseLanguage)
         {
-            var id = await _courseCatalogRepository.CreateCourseAsync(schoolId, imageId, price);
+            var id = await _courseCatalogRepository.CreateCourseAsync(schoolId, imageId, price, courseLanguage);
             await _appStateEntryRepository.UpdateLastChangeTimeAsync();
             return id;
-        }
-
-        public async Task CreateCourseLanguageListAsync(List<CourseLanguage> courseLanguage)
-        {
-            await _courseCatalogRepository.CreateCourseLanguageListAsync(courseLanguage);
-            await _appStateEntryRepository.UpdateLastChangeTimeAsync();
         }
 
         public async Task<(Course course, Dictionary<int, CourseLanguage> schoolLanguage)> GetCourseByIdAsync(int id)
