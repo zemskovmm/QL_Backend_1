@@ -3,7 +3,7 @@ using RemoteUi;
 
 namespace QuartierLatin.Backend.Dto.CourseCatalogDto.School
 {
-    public class SchoolAdminDto 
+    public class SchoolAdminDto : BaseDto
     {
         [RemoteUiField("foundationYear")]
         public int? FoundationYear { get; set; }

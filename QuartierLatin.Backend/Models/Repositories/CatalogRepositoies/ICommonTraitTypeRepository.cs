@@ -31,5 +31,11 @@ namespace QuartierLatin.Backend.Models.Repositories.CatalogRepositoies
         Task<List<int>> GetEntityTraitToPageIdListAsync(int pageId);
         Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId);
         Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId);
+        Task<List<int>> GetEntityTraitToHousingIdListAsync(int housingId);
+        Task CreateEntityTraitToHousingAsync(int housingId, int commonTraitId);
+        Task DeleteEntityTraitToHousingAsync(int housingId, int commonTraitId);
+        Task<List<int>> GetEntityTraitToHousingAccommodationTypeIdListAsync(int housingAccommodationTypeId);
+        Task CreateEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId);
+        Task DeleteEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId);
     }
 }

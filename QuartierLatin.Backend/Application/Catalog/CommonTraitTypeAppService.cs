@@ -134,5 +134,35 @@ namespace QuartierLatin.Backend.Application.Catalog
         {
             await _commonTraitTypeRepository.DeleteEntityTraitToPageAsync(pageId, commonTraitId);
         }
+
+        public async Task<List<int>> GetEntityTraitToHousingIdListAsync(int housingId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToHousingIdListAsync(housingId);
+        }
+
+        public async Task CreateEntityTraitToHousingAsync(int housingId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.CreateEntityTraitToHousingAsync(housingId, commonTraitId);
+        }
+
+        public async Task DeleteEntityTraitToHousingAsync(int housingId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.DeleteEntityTraitToHousingAsync(housingId, commonTraitId);
+        }
+
+        public async Task<List<int>> GetEntityTraitToHousingAccommodationTypeIdListAsync(int housingAccommodationTypeId)
+        {
+            return await _commonTraitTypeRepository.GetEntityTraitToHousingAccommodationTypeIdListAsync(housingAccommodationTypeId);
+        }
+
+        public async Task CreateEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.CreateEntityTraitToHousingAccommodationTypeAsync(housingAccommodationTypeId, commonTraitId);
+        }
+
+        public async Task DeleteEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId)
+        {
+            await _commonTraitTypeRepository.DeleteEntityTraitToHousingAccommodationTypeAsync(housingAccommodationTypeId, commonTraitId);
+        }
     }
 }

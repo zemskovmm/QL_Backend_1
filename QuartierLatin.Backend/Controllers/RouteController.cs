@@ -14,7 +14,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Application.Interfaces.HousingServices;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.RouteDto;
+using QuartierLatin.Backend.Dto.HousingCatalogDto.RouteDto;
+using QuartierLatin.Backend.Dto.RouteDto;
 using QuartierLatin.Backend.Models.CatalogModels;
 using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
 using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
@@ -35,12 +38,17 @@ namespace QuartierLatin.Backend.Controllers
         private readonly IUniversityGalleryAppService _universityGalleryAppService;
         private readonly ISchoolCatalogRepository _schoolCatalogRepository;
         private readonly ICourseCatalogRepository _courseCatalogRepository;
+        private readonly IHousingAppService _housingAppService;
+        private readonly IHousingGalleryAppService _housingGalleryAppService;
+        private readonly IHousingAccommodationTypeAppService _housingAccommodationTypeAppService;
 
         public RouteController(IRouteAppService routeAppService, IUniversityAppService universityAppService,
             ILanguageRepository languageRepository, ICommonTraitAppService commonTraitAppService,
             ICommonTraitTypeAppService traitTypeAppService, ISpecialtyAppService specialtyAppService,
             IDegreeRepository degreeRepository, IUniversityGalleryAppService universityGalleryAppService, 
-            ISchoolCatalogRepository schoolCatalogRepository, ICourseCatalogRepository courseCatalogRepository)
+            ISchoolCatalogRepository schoolCatalogRepository, ICourseCatalogRepository courseCatalogRepository,
+            IHousingAppService housingAppService, IHousingGalleryAppService housingGalleryAppService,
+            IHousingAccommodationTypeAppService housingAccommodationTypeAppService)
         {
             _routeAppService = routeAppService;
             _universityAppService = universityAppService;
@@ -52,6 +60,9 @@ namespace QuartierLatin.Backend.Controllers
             _universityGalleryAppService = universityGalleryAppService;
             _schoolCatalogRepository = schoolCatalogRepository;
             _courseCatalogRepository = courseCatalogRepository;
+            _housingAppService = housingAppService;
+            _housingGalleryAppService = housingGalleryAppService;
+            _housingAccommodationTypeAppService = housingAccommodationTypeAppService;
         }
 
         [HttpGet("{lang}/{**route}")]
@@ -214,6 +225,116 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
+        [HttpGet("{lang}/housing/{**url}")]
+        public async Task<IActionResult> GetHousing(string lang, string url)
+        {
+            var moduleAndUrls = await GetHousingModuleAsync(lang, url);
+
+            var response = new RouteDto<HousingModuleDto>("housing", moduleAndUrls.urls, moduleAndUrls.housingModule, "housing", moduleAndUrls.housingModule.Title);
+
+            return Ok(response);
+        }
+
+        private async Task<(HousingModuleDto housingModule, Dictionary<string, string> urls)> GetHousingModuleAsync(string lang, string url)
+        {
+            var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
+
+            var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
+
+            var housing = await _housingAppService.GetHousingByUrlWithLanguageAsync(languageId, url);
+
+            var urls = housing.housingLanguage.ToDictionary(
+                housing => languageIds[housing.Key],
+                housing => housing.Value.Url);
+
+            var traitsType = await _traitTypeAppService.GetTraitTypesWithIndetifierAsync();
+
+            var housingTraits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+            foreach (var traitType in traitsType)
+            {
+                var commonTraitsHousing = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndHousingIdAsync(traitType.Id, housing.housing.Id);
+
+                housingTraits.Add(traitType.Identifier, commonTraitsHousing.Select(trait => new CommonTraitLanguageDto
+                {
+                    Id = trait.Id,
+                    IconBlobId = trait.IconBlobId,
+                    Identifier = trait.Identifier,
+                    Name = trait.Names[lang]
+                }).ToList());
+            }
+
+            var housingTrait = new NamedTraitsModuleDto
+            {
+                NamedTraits = housingTraits,
+            };
+
+            var housingGallery = await _housingGalleryAppService.GetGalleryToHousingAsync(housing.housing.Id);
+
+            var housingAccommodation =
+                await _housingAccommodationTypeAppService.GetHousingAccommodationTypeListByHousingIdAsync(
+                    housing.housing.Id);
+
+            var housingAccommodationIds = housingAccommodation.Select(housingAcc => housingAcc.Id);
+
+            var housingAccommodationTraits = await 
+                _housingAccommodationTypeAppService.GetCommonTraitListByHousingAccommodationTypeIdsAsync(housingAccommodationIds);
+
+            var housingAccommodationModule = new List<HousingAccommodationTypeModuleDto>();
+
+            foreach (var housingAccommodationEntity in housingAccommodation)
+            {
+                var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+                foreach (var traitType in traitsType)
+                {
+                    var housingTraitTypedList = housingAccommodationTraits.GetValueOrDefault(housing.housing.Id)
+                        ?.Where(type => type.CommonTraitTypeId == traitType.Id);
+
+                    if (housingTraitTypedList is null) continue;
+
+                    var courseTraitList = housingTraitTypedList.Where(trait => 
+                            trait.Names.Any(traitNames => !string.IsNullOrEmpty(traitNames.Value)))
+                        .Select(courseTrait => new CommonTraitLanguageDto
+                    {
+                        Id = courseTrait.Id,
+                        IconBlobId = courseTrait.IconBlobId,
+                        Identifier = courseTrait.Identifier,
+                        Name = courseTrait.Names.GetSuitableName(lang)
+                    }).ToList();
+
+                    traits.Add(traitType.Identifier, courseTraitList);
+                }
+
+                var housingAccommodationTrait = new NamedTraitsModuleDto
+                {
+                    NamedTraits = traits,
+                };
+
+                housingAccommodationModule.Add(new HousingAccommodationTypeModuleDto
+                {
+                    Square = housingAccommodationEntity.Square,
+                    Price = housingAccommodationEntity.Price,
+                    Residents = housingAccommodationEntity.Residents,
+                    Traits = housingAccommodationTrait
+                });
+            }
+
+            var module = new HousingModuleDto
+            {
+                Title = housing.housingLanguage[languageId].Name,
+                HtmlDescription = housing.housingLanguage[languageId].Description,
+                Price = housing.housing.Price,
+                Traits = housingTrait,
+                Metadata = housing.housingLanguage[languageId].Metadata is null ? null : JObject.Parse(housing.housingLanguage[languageId].Metadata),
+                ImageId = housing.housing.ImageId,
+                GalleryList = housingGallery,
+                HousingAccommodationTypes = housingAccommodationModule
+            };
+
+            return (housingModule: module, urls: urls);
+        }
+
         private async Task<(SchoolModuleDto schoolModule, Dictionary<string, string> urls, int schoolId)> GetSchoolModuleDto(string lang, string url)
         {
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
@@ -243,7 +364,7 @@ namespace QuartierLatin.Backend.Controllers
                 }).ToList());
             }
 
-            var schoolTraits = new SchoolModuleTraitsDto
+            var schoolTraits = new NamedTraitsModuleDto
             {
                 NamedTraits = traits,
             };
@@ -308,7 +429,7 @@ namespace QuartierLatin.Backend.Controllers
                 }).ToList());
             }
 
-            var courseTraits = new CourseModuleTraitsDto()
+            var courseTraits = new NamedTraitsModuleDto()
             {
                 NamedTraits = traits,
             };

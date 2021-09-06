@@ -15,6 +15,7 @@ using QuartierLatin.Backend.Models.FolderModels;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.HousingModels;
 using QuartierLatin.Backend.Models.ImageStandardSizeModels;
 
 namespace QuartierLatin.Backend.Database
@@ -54,6 +55,13 @@ namespace QuartierLatin.Backend.Database
         public ITable<AppStateEntry> AppStateEntries => GetTable<AppStateEntry>();
         public ITable<CommonTraitsToPage> CommonTraitsToPages => GetTable<CommonTraitsToPage>();
         public ITable<ImageStandardSize> ImageStandardSizes => GetTable<ImageStandardSize>();
+        public ITable<Housing> Housings => GetTable<Housing>();
+        public ITable<HousingLanguage> HousingLanguages => GetTable<HousingLanguage>();
+        public ITable<HousingAccommodationType> HousingAccommodationTypes => GetTable<HousingAccommodationType>();
+        public ITable<CommonTraitToHousing> CommonTraitToHousings => GetTable<CommonTraitToHousing>();
+        public ITable<CommonTraitToHousingAccommodationType> CommonTraitToHousingAccommodationTypes =>
+            GetTable<CommonTraitToHousingAccommodationType>();
+        public ITable<HousingGallery> HousingGalleries => GetTable<HousingGallery>();
         public ITable<SchoolGallery> SchoolGalleries => GetTable<SchoolGallery>();
         public ITable<CourseGallery> CourseGalleries => GetTable<CourseGallery>();
     }

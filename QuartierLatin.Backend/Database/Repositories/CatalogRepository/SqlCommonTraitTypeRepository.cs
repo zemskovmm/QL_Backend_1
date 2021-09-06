@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Models.HousingModels;
 
 namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
 {
@@ -201,6 +202,54 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
             await _db.ExecAsync(db =>
                 db.CommonTraitsToPages
                     .Where(trait => trait.PageId == pageId && trait.CommonTraitId == commonTraitId)
+                    .DeleteAsync());
+        }
+
+        public async Task<List<int>> GetEntityTraitToHousingIdListAsync(int housingId)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraitToHousings.Where(trait => trait.HousingId == housingId)
+                    .Select(trait => trait.CommonTraitId).ToListAsync());
+        }
+
+        public async Task CreateEntityTraitToHousingAsync(int housingId, int commonTraitId)
+        {
+            await _db.ExecAsync(db => db.InsertAsync(new CommonTraitToHousing
+            {
+                CommonTraitId = commonTraitId,
+                HousingId = housingId
+            }));
+        }
+
+        public async Task DeleteEntityTraitToHousingAsync(int housingId, int commonTraitId)
+        {
+            await _db.ExecAsync(db =>
+                db.CommonTraitToHousings
+                    .Where(trait => trait.HousingId == housingId && trait.CommonTraitId == commonTraitId)
+                    .DeleteAsync());
+        }
+
+        public async Task<List<int>> GetEntityTraitToHousingAccommodationTypeIdListAsync(int housingAccommodationTypeId)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraitToHousingAccommodationTypes.Where(trait => trait.HousingAccommodationTypeId == housingAccommodationTypeId)
+                    .Select(trait => trait.CommonTraitId).ToListAsync());
+        }
+
+        public async Task CreateEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId)
+        {
+            await _db.ExecAsync(db => db.InsertAsync(new CommonTraitToHousingAccommodationType
+            {
+                CommonTraitId = commonTraitId,
+                HousingAccommodationTypeId = housingAccommodationTypeId
+            }));
+        }
+
+        public async Task DeleteEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId)
+        {
+            await _db.ExecAsync(db =>
+                db.CommonTraitToHousingAccommodationTypes
+                    .Where(trait => trait.HousingAccommodationTypeId == housingAccommodationTypeId && trait.CommonTraitId == commonTraitId)
                     .DeleteAsync());
         }
     }

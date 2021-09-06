@@ -141,5 +141,31 @@ namespace QuartierLatin.Backend.Database.Repositories.CatalogRepository
                     select new { mapping, trait }).ToListAsync())
                 .GroupBy(x => x.mapping.CourseId)
                 .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
+
+        public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndHousingIdAsync(int traitTypeId, int housingId)
+        {
+            return await _db.ExecAsync(db =>
+                (from courseTraits in db.CommonTraitToHousings.Where(trait => trait.HousingId == housingId)
+                    join trait in db.CommonTraits.Where(trait => trait.CommonTraitTypeId == traitTypeId) on courseTraits
+                        .CommonTraitId equals trait.Id
+                    select trait).ToListAsync()
+            );
+        }
+
+        public Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByHousingIdsAsync(IEnumerable<int> housingIds) =>
+            _db.ExecAsync(async db =>
+                (await (from mapping in db.CommonTraitToHousings.Where(x => housingIds.Contains(x.HousingId))
+                    join trait in db.CommonTraits on mapping.CommonTraitId equals trait.Id
+                    select new { mapping, trait }).ToListAsync())
+                .GroupBy(x => x.mapping.HousingId)
+                .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
+
+        public Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByHousingAccommodationTypeIdsAsync(IEnumerable<int> housingAccommodationIds) =>
+            _db.ExecAsync(async db =>
+                (await (from mapping in db.CommonTraitToHousingAccommodationTypes.Where(x => housingAccommodationIds.Contains(x.HousingAccommodationTypeId))
+                    join trait in db.CommonTraits on mapping.CommonTraitId equals trait.Id
+                    select new { mapping, trait }).ToListAsync())
+                .GroupBy(x => x.mapping.HousingAccommodationTypeId)
+                .ToDictionary(x => x.Key, x => x.Select(t => t.trait).ToList()));
     }
 }

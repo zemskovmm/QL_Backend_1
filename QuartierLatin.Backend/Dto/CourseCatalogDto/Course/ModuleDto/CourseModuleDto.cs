@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Dto.RouteDto;
 
 namespace QuartierLatin.Backend.Dto.CourseCatalogDto.Course.ModuleDto
 {
@@ -10,7 +11,7 @@ namespace QuartierLatin.Backend.Dto.CourseCatalogDto.Course.ModuleDto
 
         public int SchoolId { get; set; }
 
-        public CourseModuleTraitsDto Traits { get; set; }
+        public NamedTraitsModuleDto Traits { get; set; }
         public JObject? Metadata { get; set; }
         public int? ImageId { get; set; }
     }

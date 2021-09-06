@@ -15,7 +15,6 @@ namespace QuartierLatin.Backend.Database.Repositories.courseCatalogRepository.Sc
     public class SqlSchoolCatalogRepository : ISchoolCatalogRepository
     {
         private readonly AppDbContextManager _db;
-        private (School school, Dictionary<int, SchoolLanguages> schoolLanguage) _test3 { get; set; }
         public SqlSchoolCatalogRepository(AppDbContextManager db)
         {
             _db = db;
