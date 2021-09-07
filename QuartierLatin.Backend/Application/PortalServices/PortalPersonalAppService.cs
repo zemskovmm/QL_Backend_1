@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces.PortalServices;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Models.Portal;
@@ -16,22 +17,27 @@ namespace QuartierLatin.Backend.Application.PortalServices
             _portalPersonalRepository = portalPersonalRepository;
         }
 
-        public async Task<int> CreateApplicationAsync(ApplicationType type, int entityId, JObject applicationInfo,
-            JObject entityTypeSpecificApplicationInfo)
+        public async Task<int> CreateApplicationAsync(ApplicationType? type, int? entityId, JObject? applicationInfo,
+            JObject? entityTypeSpecificApplicationInfo, int userId)
         {
             return await _portalPersonalRepository.CreateApplicationAsync(type, entityId, applicationInfo,
-                entityTypeSpecificApplicationInfo);
+                entityTypeSpecificApplicationInfo, userId);
         }
 
-        public async Task UpdateApplicationAsync(int id, ApplicationType type, int entityId, JObject? applicationInfo,
+        public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject? applicationInfo,
             JObject? entityTypeSpecificApplicationInfo)
         {
-            await _portalPersonalRepository.UpdateApplicationAsync(id, type, entityId, applicationInfo, entityTypeSpecificApplicationInfo);
+            return await _portalPersonalRepository.UpdateApplicationAsync(id, type, entityId, applicationInfo, entityTypeSpecificApplicationInfo);
         }
 
         public async Task<PortalApplication> GetApplicationAsync(int id)
         {
             return await _portalPersonalRepository.GetApplicationAsync(id);
+        }
+
+        public async Task<(int totalItems, List<PortalApplication> portalApplications)> GetApplicationCatalogAsync(ApplicationType? type, ApplicationStatus? status, int page, int pageSize)
+        {
+            return await _portalPersonalRepository.GetApplicationCatalogAsync(type, status, pageSize * page, pageSize);
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Dto.PortalDto;
-using System.Threading.Tasks;
 
-namespace QuartierLatin.Backend.Controllers
+namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
     [Route("/api/portal")]
     public class PortalController : Controller
