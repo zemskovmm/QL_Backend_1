@@ -1,12 +1,16 @@
-﻿namespace QuartierLatin.Backend.Models.Portal
+﻿using LinqToDB;
+using LinqToDB.Mapping;
+
+namespace QuartierLatin.Backend.Models.Portal
 {
+    [Table("PortalUsers")]
     public class PortalUser : BaseModel
     {
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string PasswordHash { get; set; }
-        public string PersonalInfo { get; set; }
+        [Column] public string Email { get; set; }
+        [Column] public string Phone { get; set; }
+        [Column] public string FirstName { get; set; }
+        [Column] public string LastName { get; set; }
+        [Column] public string PasswordHash { get; set; }
+        [Column(DataType = DataType.BinaryJson)] public string PersonalInfo { get; set; }
     }
 }

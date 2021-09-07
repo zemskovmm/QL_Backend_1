@@ -17,15 +17,15 @@ namespace QuartierLatin.Backend.Application.PortalServices
             _portalPersonalRepository = portalPersonalRepository;
         }
 
-        public async Task<int> CreateApplicationAsync(ApplicationType? type, int? entityId, JObject? applicationInfo,
-            JObject? entityTypeSpecificApplicationInfo, int userId)
+        public async Task<int> CreateApplicationAsync(ApplicationType? type, int? entityId, JObject applicationInfo,
+            JObject entityTypeSpecificApplicationInfo, int userId)
         {
             return await _portalPersonalRepository.CreateApplicationAsync(type, entityId, applicationInfo,
                 entityTypeSpecificApplicationInfo, userId);
         }
 
-        public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject? applicationInfo,
-            JObject? entityTypeSpecificApplicationInfo)
+        public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo,
+            JObject entityTypeSpecificApplicationInfo)
         {
             return await _portalPersonalRepository.UpdateApplicationAsync(id, type, entityId, applicationInfo, entityTypeSpecificApplicationInfo);
         }

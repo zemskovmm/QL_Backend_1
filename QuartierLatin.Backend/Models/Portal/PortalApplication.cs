@@ -1,14 +1,16 @@
-﻿using QuartierLatin.Backend.Models.Enums;
+﻿using LinqToDB.Mapping;
+using QuartierLatin.Backend.Models.Enums;
 
 namespace QuartierLatin.Backend.Models.Portal
 {
+    [Table("PortalApplications")]
     public class PortalApplication : BaseModel
     {
-        public int UserId { get; set; }
-        public ApplicationStatus Status { get; set; }
-        public ApplicationType? Type { get; set; }
-        public int? EntityId { get; set; }
-        public string? CommonTypeSpecificApplicationInfo { get; set; }
-        public string? EntityTypeSpecificApplicationInfo { get; set; }
+        [Column] public int UserId { get; set; }
+        [Column] public ApplicationStatus Status { get; set; }
+        [Column] public ApplicationType? Type { get; set; }
+        [Column] public int? EntityId { get; set; }
+        [Column] public string CommonTypeSpecificApplicationInfo { get; set; }
+        [Column] public string EntityTypeSpecificApplicationInfo { get; set; }
     }
 }

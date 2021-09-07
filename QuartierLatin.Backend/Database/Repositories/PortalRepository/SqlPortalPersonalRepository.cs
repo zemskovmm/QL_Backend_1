@@ -9,7 +9,6 @@ using QuartierLatin.Backend.Models.Repositories.PortalRepository;
 
 namespace QuartierLatin.Backend.Database.Repositories.PortalRepository
 {
-    [Authorize]
     public class SqlPortalPersonalRepository : IPortalPersonalRepository
     {
         private readonly AppDbContextManager _db;
@@ -19,22 +18,22 @@ namespace QuartierLatin.Backend.Database.Repositories.PortalRepository
             _db = db;
         }
 
-        public async Task<int> CreateApplicationAsync(ApplicationType? type, int? entityId, JObject? applicationInfo,
-            JObject? entityTypeSpecificApplicationInfo, int userId)
+        public async Task<int> CreateApplicationAsync(ApplicationType? type, int? entityId, JObject applicationInfo,
+            JObject entityTypeSpecificApplicationInfo, int userId)
         {
             return await _db.ExecAsync(db => db.InsertWithInt32IdentityAsync(new PortalApplication
             {
                 UserId = userId,
                 Status = ApplicationStatus.New,
                 Type = type,
-                CommonTypeSpecificApplicationInfo = applicationInfo is null ? null : applicationInfo.ToString(),
+                CommonTypeSpecificApplicationInfo = applicationInfo.ToString(),
                 EntityId = entityId,
-                EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo is null ? null : entityTypeSpecificApplicationInfo.ToString()
+                EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo.ToString()
             }));
         }
 
-        public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject? applicationInfo,
-            JObject? entityTypeSpecificApplicationInfo)
+        public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo,
+            JObject entityTypeSpecificApplicationInfo)
         {
             return await _db.ExecAsync(async db =>
             {
