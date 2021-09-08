@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Models.Constants;
 using QuartierLatin.Backend.Utils;
 using X.Web.Sitemap;
 using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
@@ -91,8 +92,12 @@ namespace QuartierLatin.Backend
             services.AddSingleton<SitemapGeneratorForLinks>();
             services.AddSingleton<GlobalSettingsCache<JObject>>();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
                     options.Cookie.SameSite = SameSiteMode.Strict;
                     options.Events.OnRedirectToAccessDenied = context =>
@@ -105,8 +110,22 @@ namespace QuartierLatin.Backend
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         return Task.CompletedTask;
                     };
+                })
+                .AddCookie(CookieAuthenticationPortal.AuthenticationScheme, options =>
+                {
+                    options.LoginPath = "/api/portal/login/";
+                    options.Cookie.SameSite = SameSiteMode.Strict;
+                    options.Events.OnRedirectToAccessDenied = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return Task.CompletedTask;
+                    };
+                    options.Events.OnRedirectToLogin = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    };
                 });
-
 
             services.AddSwaggerGen(options =>
             {

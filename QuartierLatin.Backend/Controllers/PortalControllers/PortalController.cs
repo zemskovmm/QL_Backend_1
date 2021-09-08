@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
@@ -21,11 +23,12 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             _portalUserAppService = portalUserAppService;
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody]PortalRegisterDto portalRegister)
         {
             var portalUserId = await _portalUserAppService.RegisterAsync(portalRegister.FirstName,
-                portalRegister.LastName, portalRegister.Phone, portalRegister.Email, portalRegister.Password);
+                portalRegister.LastName, portalRegister.Phone, portalRegister.Email, portalRegister.Password, portalRegister.PersonalInfo);
 
             if (portalUserId is 0)
                 return new BadRequestObjectResult("Пользователь с таким email существует");
@@ -57,6 +60,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] PortalLoginModel portalLogin)
         {
@@ -70,6 +74,9 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             {
                 return Forbid();
             }
+
+            if (user is null)
+                return Forbid();
 
             var claims = new List<Claim>
             {
@@ -96,11 +103,12 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             return Ok();
         }
 
+        [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
         [HttpGet("logout")]
-        public async Task<IActionResult> AdminLogout()
+        public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationPortal.AuthenticationScheme);
-            return Redirect("/");
+            return Ok();
         }
     }
 }

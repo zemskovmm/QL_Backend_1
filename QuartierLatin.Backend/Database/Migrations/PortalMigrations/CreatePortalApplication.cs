@@ -10,8 +10,9 @@ namespace QuartierLatin.Backend.Database.Migrations.PortalMigrations
             Create.Table("PortalApplications")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("UserId").AsInt32().ForeignKey("PortalUsers", "Id")
-                .WithColumn("ApplicationStatus").AsInt16()
-                .WithColumn("ApplicationType").AsInt16().Nullable()
+                .WithColumn("EntityId").AsInt32().Nullable()
+                .WithColumn("Status").AsInt16()
+                .WithColumn("Type").AsInt16().Nullable()
                 .WithColumn("CommonTypeSpecificApplicationInfo").AsCustom("jsonb")
                 .WithColumn("EntityTypeSpecificApplicationInfo").AsCustom("jsonb");
         }

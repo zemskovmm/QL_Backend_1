@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using LinqToDB;
+using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Models.Portal;
 using QuartierLatin.Backend.Models.Repositories.PortalRepository;
 
@@ -14,7 +15,7 @@ namespace QuartierLatin.Backend.Database.Repositories.PortalRepository
             _db = db;
         }
 
-        public async Task<int> RegisterAsync(string firstName, string lastName, string phone, string email, string passwordHash)
+        public async Task<int> RegisterAsync(string firstName, string lastName, string phone, string email, string passwordHash, JObject personalInfo)
         {
             return await _db.ExecAsync(async db =>
             {
@@ -27,7 +28,8 @@ namespace QuartierLatin.Backend.Database.Repositories.PortalRepository
                     LastName = lastName,
                     Phone = phone,
                     Email = email,
-                    PasswordHash = passwordHash
+                    PasswordHash = passwordHash,
+                    PersonalInfo = personalInfo.ToString()
                 });
             });
         }
@@ -37,10 +39,10 @@ namespace QuartierLatin.Backend.Database.Repositories.PortalRepository
             return await _db.ExecAsync(db => db.PortalUsers.FirstOrDefaultAsync(user => user.Id == userId));
         }
 
-        public async Task<PortalUser> LoginAsync(string email, string passwordHash)
+        public async Task<PortalUser> LoginAsync(string email)
         {
             return await _db.ExecAsync(db =>
-                db.PortalUsers.FirstOrDefaultAsync(user => user.Email == email && user.PasswordHash == passwordHash));
+                db.PortalUsers.FirstOrDefaultAsync(user => user.Email == email));
         }
     }
 }

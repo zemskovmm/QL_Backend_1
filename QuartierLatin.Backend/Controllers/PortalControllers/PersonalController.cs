@@ -1,15 +1,19 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces.PortalServices;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
 using QuartierLatin.Backend.Dto.PortalApplicationDto;
+using QuartierLatin.Backend.Models.Constants;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
+    [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
     [Route("/api/personal")]
     public class PersonalController : Controller
     {
@@ -23,8 +27,10 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
          ProducesResponseType(200)]
         public async Task<IActionResult> CreateApplication([FromBody] PortalApplicationWithoutIdDto createApplication)
         {
+            var userId = Convert.ToInt32(User.Claims.FirstOrDefault(claim => claim.Type == "sub").Value);
+
             var id = await _personalAppService.CreateApplicationAsync(createApplication.Type, createApplication.EntityId,
-                createApplication.CommonApplicationInfo, createApplication.EntityTypeSpecificApplicationInfo, 0);
+                createApplication.CommonApplicationInfo, createApplication.EntityTypeSpecificApplicationInfo, userId);
 
             return Ok(new { id = id });
         }
