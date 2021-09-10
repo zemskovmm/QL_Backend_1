@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.Interfaces.PortalServices;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
@@ -10,11 +6,14 @@ using QuartierLatin.Backend.Dto.PortalApplicationDto;
 using QuartierLatin.Backend.Models.Constants;
 using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Utils;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
     [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
-    [Route("/api/personal")]
+    [Route("/api/personal/applications")]
     public class PersonalController : Controller
     {
         private readonly IPortalPersonalAppService _personalAppService;
@@ -23,11 +22,14 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             _personalAppService = personalAppService;
         }
 
-        [HttpPost("applications"),
+        [HttpPost(),
          ProducesResponseType(200)]
         public async Task<IActionResult> CreateApplication([FromBody] PortalApplicationWithoutIdDto createApplication)
         {
-            var userId = Convert.ToInt32(User.Claims.FirstOrDefault(claim => claim.Type == "sub").Value);
+            var userClaims = User.Identities.FirstOrDefault(identity =>
+                identity.AuthenticationType == CookieAuthenticationPortal.AuthenticationScheme).Claims;
+
+            var userId = Convert.ToInt32(userClaims.FirstOrDefault(claim => claim.Type == "sub").Value);
 
             var id = await _personalAppService.CreateApplicationAsync(createApplication.Type, createApplication.EntityId,
                 createApplication.CommonApplicationInfo, createApplication.EntityTypeSpecificApplicationInfo, userId);
@@ -35,7 +37,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             return Ok(new { id = id });
         }
 
-        [HttpPost("applications/{id}"),
+        [HttpPost("{id}"),
          ProducesResponseType(200),
          ProducesResponseType(403)]
         public async Task<IActionResult> UpdateApplication(int id, [FromBody]PortalApplicationWithoutIdDto updatePortalApplication)
@@ -50,7 +52,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             return Ok();
         }
 
-        [HttpGet("applications/{id}"),
+        [HttpGet("{id}"),
          ProducesResponseType(typeof(PortalApplicationDto), 200),
          ProducesResponseType( 404)]
         public async Task<IActionResult> GetApplication(int id)
@@ -66,14 +68,14 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
                 Type = application.Type,
                 EntityId = application.EntityId,
                 Status = application.Status,
-                CommonApplicationInfo = application.CommonTypeSpecificApplicationInfo is null ? null : JObject.Parse(application.CommonTypeSpecificApplicationInfo),
-                EntityTypeSpecificApplicationInfo = application.EntityTypeSpecificApplicationInfo is null ? null : JObject.Parse(application.EntityTypeSpecificApplicationInfo)
+                CommonApplicationInfo = JObject.Parse(application.CommonTypeSpecificApplicationInfo),
+                EntityTypeSpecificApplicationInfo = JObject.Parse(application.EntityTypeSpecificApplicationInfo)
             };
 
             return Ok(response);
         }
 
-        [HttpGet("applications"),
+        [HttpGet(),
          ProducesResponseType(typeof(CatalogSearchResponseDtoList<PortalApplicationDto>), 200)]
         public async Task<IActionResult> GetApplicationCatalog([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] ApplicationType? type, [FromQuery] ApplicationStatus? status)
         {
@@ -85,12 +87,8 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
                 Type = application.Type,
                 EntityId = application.EntityId,
                 Status = application.Status,
-                CommonApplicationInfo = application.CommonTypeSpecificApplicationInfo is null
-                    ? null
-                    : JObject.Parse(application.CommonTypeSpecificApplicationInfo),
-                EntityTypeSpecificApplicationInfo = application.EntityTypeSpecificApplicationInfo is null
-                    ? null
-                    : JObject.Parse(application.EntityTypeSpecificApplicationInfo)
+                CommonApplicationInfo = JObject.Parse(application.CommonTypeSpecificApplicationInfo),
+                EntityTypeSpecificApplicationInfo = JObject.Parse(application.EntityTypeSpecificApplicationInfo)
             }).ToList();
 
             var response = new CatalogSearchResponseDtoList<PortalApplicationDto>

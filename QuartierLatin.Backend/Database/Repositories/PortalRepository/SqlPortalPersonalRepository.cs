@@ -42,8 +42,9 @@ namespace QuartierLatin.Backend.Database.Repositories.PortalRepository
                 if (applicationPortal is null)
                     return false;
 
-                if (applicationPortal.Status != ApplicationStatus.New ||
-                    applicationPortal.Status != ApplicationStatus.NeedsResponse)
+                if (applicationPortal.Status == ApplicationStatus.Review ||
+                    applicationPortal.Status == ApplicationStatus.SentToEntity ||
+                    applicationPortal.Status == ApplicationStatus.Fulfilled)
                     return false;
 
                 await db.UpdateAsync(new PortalApplication
@@ -51,6 +52,7 @@ namespace QuartierLatin.Backend.Database.Repositories.PortalRepository
                     Id = id,
                     Type = type,
                     Status = ApplicationStatus.Review,
+                    UserId = applicationPortal.UserId,
                     CommonTypeSpecificApplicationInfo = applicationInfo is null ? null : applicationInfo.ToString(),
                     EntityId = entityId,
                     EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo is null ? null : entityTypeSpecificApplicationInfo.ToString()
