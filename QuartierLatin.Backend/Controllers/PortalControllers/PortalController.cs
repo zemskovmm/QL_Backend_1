@@ -5,13 +5,14 @@ using QuartierLatin.Backend.Models.Constants;
 using QuartierLatin.Backend.Models.Portal;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
 
-namespace QuartierLatin.Backend.Controllers.PortalControllers
+namespace QuartierLatin.Controllers.PortalControllers
 {
     [Route("/api/portal")]
     public class PortalController : Controller
@@ -57,6 +58,13 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
+            return Ok();
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+        [HttpPost("heartbeat")]
+        public async Task<IActionResult> CheckIsValidUserSession()
+        {
             return Ok();
         }
 
