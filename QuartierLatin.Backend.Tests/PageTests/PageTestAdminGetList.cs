@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
-using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.PageTests

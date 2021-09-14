@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Application.Interfaces.PortalServices;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
 using QuartierLatin.Backend.Dto.PortalApplicationDto;
-using QuartierLatin.Backend.Models.Constants;
-using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Utils;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PortalServices;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Constants;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {

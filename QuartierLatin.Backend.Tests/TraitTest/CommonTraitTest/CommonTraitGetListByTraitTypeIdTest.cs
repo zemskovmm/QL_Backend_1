@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
 using QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet;
 using Xunit;

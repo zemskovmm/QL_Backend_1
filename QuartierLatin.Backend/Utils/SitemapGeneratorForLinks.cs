@@ -1,15 +1,15 @@
-﻿using System;
+﻿using LinqToDB;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.AppStateRepository;
+using QuartierLatin.Backend.Application.Infrastructure.Database;
+using QuartierLatin.Backend.Config;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using LinqToDB;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
-using QuartierLatin.Backend.Config;
-using QuartierLatin.Backend.Database;
-using QuartierLatin.Backend.Models.Repositories;
-using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
 using X.Web.Sitemap;
 
 namespace QuartierLatin.Backend.Utils

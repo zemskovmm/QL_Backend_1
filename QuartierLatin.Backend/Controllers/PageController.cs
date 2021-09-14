@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Application.Interfaces;
-using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.CatalogDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
 using QuartierLatin.Backend.Dto.PageModuleDto;
-using QuartierLatin.Backend.Models.Enums;
 using QuartierLatin.Backend.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
 using PageDto = QuartierLatin.Backend.Dto.PageModuleDto.PageDto;
 

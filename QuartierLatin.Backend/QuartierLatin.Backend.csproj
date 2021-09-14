@@ -53,8 +53,4 @@
         <Content Remove="webapp\build\**" />
         <EmbeddedResource Remove="webapp\build\**" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Database\Migrations\Language\" />
-    </ItemGroup>
 </Project>

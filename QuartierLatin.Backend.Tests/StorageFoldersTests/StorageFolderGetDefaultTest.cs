@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto.StorageFoldersDto;
-using QuartierLatin.Backend.Models.Repositories.StorageFoldersRepositories;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.StorageFoldersRepositories;
 using QuartierLatin.Backend.Tests.StorageFoldersTests.StorageFolderDataSets;
 using Xunit;
 

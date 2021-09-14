@@ -3,8 +3,8 @@ using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models.Cache;
-using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Cache;
 using QuartierLatin.Backend.Storages.Cache;
 using Xunit;
 

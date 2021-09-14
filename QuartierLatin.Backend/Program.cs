@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CommandLine;
-using QuartierLatin.Backend.Auth;
 using QuartierLatin.Backend.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using QuartierLatin.Backend.Cmdlets;
+using QuartierLatin.Backend.Managers.Auth;
 using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend

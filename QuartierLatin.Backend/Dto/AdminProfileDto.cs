@@ -1,4 +1,4 @@
-using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Application.ApplicationCore.Models;
 
 namespace QuartierLatin.Backend.Dto
 {

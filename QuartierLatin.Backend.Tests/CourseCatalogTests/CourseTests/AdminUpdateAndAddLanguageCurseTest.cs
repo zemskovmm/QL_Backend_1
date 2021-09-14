@@ -1,16 +1,16 @@
-﻿using LinqToDB.Common;
-using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Repositories;
-using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
-using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
-using QuartierLatin.Backend.Tests.CourseCatalogTests.DataSets;
-using QuartierLatin.Backend.Tests.Infrastructure;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using LinqToDB.Common;
+using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.CourseRepository;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.SchoolRepository;
+using QuartierLatin.Backend.Tests.CourseCatalogTests.DataSets;
+using QuartierLatin.Backend.Tests.Infrastructure;
 using Xunit;
 
-namespace QuartierLatin.Backend.Tests.CourseCatalogTests.courseTests
+namespace QuartierLatin.Backend.Tests.CourseCatalogTests.CourseTests
 {
     public class AdminUpdateAndAddLanguageCourseTest : TestBase
     {

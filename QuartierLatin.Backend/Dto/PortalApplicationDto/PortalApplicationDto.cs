@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Enums;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 
 namespace QuartierLatin.Backend.Dto.PortalApplicationDto
 {

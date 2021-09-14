@@ -1,11 +1,11 @@
-﻿using System;
+﻿using LinqToDB;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CatalogModels;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
+using QuartierLatin.Backend.Application.Infrastructure.Database;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LinqToDB;
-using QuartierLatin.Backend.Database;
-using QuartierLatin.Backend.Models.CatalogModels;
-using QuartierLatin.Backend.Models.Enums;
 
 namespace QuartierLatin.Backend.Cmdlets.Utils
 {

@@ -1,4 +1,4 @@
-using QuartierLatin.Backend.Database;
+using QuartierLatin.Backend.Application.Infrastructure.Database;
 
 namespace QuartierLatin.Backend.Config
 {

@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces.courseCatalog.SchoolCatalog;
-using QuartierLatin.Backend.Dto.CourseCatalogDto.School;
-using QuartierLatin.Backend.Models.CourseCatalogModels.SchoolModels;
-using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.CourseCatalog.SchoolCatalog;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogModels.SchoolModels;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.School;
 using RemoteUi;
 
-namespace QuartierLatin.Backend.Controllers.courseCatalog.School
+namespace QuartierLatin.Backend.Controllers.CourseCatalog.School
 {
 
     public class SchoolAdminDtoResponse

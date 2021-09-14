@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Dto.Media;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
 
 namespace QuartierLatin.Backend.Controllers
 {

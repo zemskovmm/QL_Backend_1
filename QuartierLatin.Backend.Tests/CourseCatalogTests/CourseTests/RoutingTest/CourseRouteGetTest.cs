@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.Course.ModuleDto;
-using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
-using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
 using QuartierLatin.Backend.Tests.CourseCatalogTests.DataSets;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.CourseRepository;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.SchoolRepository;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.CourseCatalogTests.CourseTests.RoutingTest

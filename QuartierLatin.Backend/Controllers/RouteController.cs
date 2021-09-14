@@ -1,27 +1,27 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces;
-using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.Course.ModuleDto;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.School.ModuleDto;
 using QuartierLatin.Backend.Dto.UniversityDto;
-using QuartierLatin.Backend.Models;
-using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Application.Interfaces.HousingServices;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.CourseRepository;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.SchoolRepository;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.HousingServices;
+using QuartierLatin.Backend.Application.ApplicationCore.Models;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CatalogModels;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogModels.CoursesModels;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.RouteDto;
 using QuartierLatin.Backend.Dto.HousingCatalogDto.RouteDto;
 using QuartierLatin.Backend.Dto.RouteDto;
-using QuartierLatin.Backend.Models.CatalogModels;
-using QuartierLatin.Backend.Models.CourseCatalogModels.CoursesModels;
-using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
-using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
 
 namespace QuartierLatin.Backend.Controllers
 {

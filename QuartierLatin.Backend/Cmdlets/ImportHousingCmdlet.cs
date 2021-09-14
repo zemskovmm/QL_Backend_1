@@ -1,22 +1,22 @@
-﻿using System;
-using CommandLine;
+﻿using CommandLine;
 using LinqToDB;
 using LinqToDB.Data;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Models;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.HousingModels;
+using QuartierLatin.Backend.Application.Infrastructure.Database;
+using QuartierLatin.Backend.Application.Infrastructure.Database.AppDbContextSeed;
+using QuartierLatin.Backend.Cmdlets.Utils;
 using QuartierLatin.Backend.Config;
-using QuartierLatin.Backend.Database;
-using QuartierLatin.Backend.Database.AppDbContextSeed;
-using QuartierLatin.Backend.Models.HousingModels;
-using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Importer.DataModel.HousingImport;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Cmdlets.Utils;
-using QuartierLatin.Backend.Models;
-using QuartierLatin.Backend.Models.Enums;
 
 namespace QuartierLatin.Backend.Cmdlets
 {

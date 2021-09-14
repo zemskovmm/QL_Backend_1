@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto.UniversityDto.GetUniversityListDto;
-using QuartierLatin.Backend.Models.Repositories;
-using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Tests.UniversityTest.UniversityTestsDataSet;
 using Xunit;
 

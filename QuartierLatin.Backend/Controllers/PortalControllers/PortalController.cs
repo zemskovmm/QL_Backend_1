@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces.PortalServices;
 using QuartierLatin.Backend.Dto.PortalDto;
-using QuartierLatin.Backend.Models.Constants;
-using QuartierLatin.Backend.Models.Portal;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PortalServices;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Constants;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Portal;
 
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers

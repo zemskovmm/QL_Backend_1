@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using QuartierLatin.Backend.Application.Interfaces.HousingServices;
 using QuartierLatin.Backend.Dto.HousingCatalogDto;
 using QuartierLatin.Backend.Dto.HousingCatalogDto.HousingAccommodationTypeCatalogDto;
 using RemoteUi;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.HousingServices;
 
 namespace QuartierLatin.Backend.Controllers.HousingCatalog
 {

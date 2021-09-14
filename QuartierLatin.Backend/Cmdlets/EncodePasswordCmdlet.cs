@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using CommandLine;
-using QuartierLatin.Backend.Auth;
+using QuartierLatin.Backend.Managers.Auth;
 
 namespace QuartierLatin.Backend.Cmdlets
 {

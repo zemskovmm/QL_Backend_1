@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces;
 using QuartierLatin.Backend.Dto.AdminPageModuleDto;
 using QuartierLatin.Backend.Utils;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Enums;
-using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 
 namespace QuartierLatin.Backend.Controllers
 {

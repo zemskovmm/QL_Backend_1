@@ -1,13 +1,13 @@
 ﻿using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
-using QuartierLatin.Backend.Models.Enums;
-using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet;
 using QuartierLatin.Backend.Tests.UniversityTest.UniversityTestsDataSet;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CatalogRepositoies;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.CatalogTests

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
 using System.Linq;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog;
 
 namespace QuartierLatin.Backend.Controllers
 {

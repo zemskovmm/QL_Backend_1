@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
 
 namespace QuartierLatin.Backend.Controllers
 {

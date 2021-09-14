@@ -7,14 +7,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Auth;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.AppStateRepository;
+using QuartierLatin.Backend.Application.ApplicationCore.Models;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Constants;
+using QuartierLatin.Backend.Application.Infrastructure.Database;
+using QuartierLatin.Backend.Application.Infrastructure.Database.AppDbContextSeed;
 using QuartierLatin.Backend.Config;
-using QuartierLatin.Backend.Database;
-using QuartierLatin.Backend.Database.AppDbContextSeed;
-using QuartierLatin.Backend.Models;
-using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Managers.Auth;
 using QuartierLatin.Backend.Storages;
 using QuartierLatin.Backend.Storages.Cache;
+using QuartierLatin.Backend.Utils;
 using QuartierLatin.Backend.Utils.Swagger;
 using System;
 using System.Collections.Generic;
@@ -22,10 +25,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models.Constants;
-using QuartierLatin.Backend.Utils;
 using X.Web.Sitemap;
-using QuartierLatin.Backend.Models.Repositories.AppStateRepository;
 
 namespace QuartierLatin.Backend
 {

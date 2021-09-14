@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Models.Enums;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CatalogRepositoies;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 using QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet;
 using Xunit;
 

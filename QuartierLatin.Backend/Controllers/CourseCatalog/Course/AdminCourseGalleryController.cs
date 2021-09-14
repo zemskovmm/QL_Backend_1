@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces.CourseCatalog.CourseCatalog;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.CourseCatalog.CourseCatalog;
 
 namespace QuartierLatin.Backend.Controllers.CourseCatalog.Course
 {

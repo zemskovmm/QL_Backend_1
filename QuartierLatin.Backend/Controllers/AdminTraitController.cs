@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
 using QuartierLatin.Backend.Dto.TraitTypeDto;
-using QuartierLatin.Backend.Models.Enums;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 using RemoteUi;
 
 namespace QuartierLatin.Backend.Controllers

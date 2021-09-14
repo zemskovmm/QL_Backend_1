@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Repositories.CatalogRepositoies;
-using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
-using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
-using QuartierLatin.Backend.Tests.Infrastructure;
-using QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CatalogRepositoies;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.CourseRepository;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.SchoolRepository;
 using QuartierLatin.Backend.Tests.CourseCatalogTests.DataSets;
+using QuartierLatin.Backend.Tests.Infrastructure;
+using QuartierLatin.Backend.Tests.TraitTest.TraitTestsDataSet;
 using Xunit;
 
-namespace QuartierLatin.Backend.Tests.courseCatalogTests.courseTests.TraitsTests
+namespace QuartierLatin.Backend.Tests.CourseCatalogTests.CourseTests.TraitsTests
 {
     public class CommonTraitsToCourseCreateAndGetAndDeleteTest : TestBase
     {

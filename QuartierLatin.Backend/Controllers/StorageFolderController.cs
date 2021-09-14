@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces.StorageFolders;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.StorageFolders;
 using QuartierLatin.Backend.Dto.StorageFoldersDto;
-using QuartierLatin.Backend.Models.Repositories;
 
 namespace QuartierLatin.Backend.Controllers
 {

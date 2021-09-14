@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CallRequest;
 using QuartierLatin.Backend.Dto.RequestCallDto;
-using QuartierLatin.Backend.Models.CallRequest;
 
 namespace QuartierLatin.Backend.Controllers
 {

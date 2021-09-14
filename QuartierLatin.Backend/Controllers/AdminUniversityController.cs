@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using QuartierLatin.Backend.Application.Interfaces.Catalog;
 using QuartierLatin.Backend.Dto.UniversityDto;
 using QuartierLatin.Backend.Dto.UniversityDto.GetUniversityListDto;
-using QuartierLatin.Backend.Models.CatalogModels;
-using QuartierLatin.Backend.Models.Repositories;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CatalogModels;
 
 namespace QuartierLatin.Backend.Controllers
 {

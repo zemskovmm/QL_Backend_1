@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces.HousingServices;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.HousingServices;
 
 namespace QuartierLatin.Backend.Controllers.HousingCatalog
 {

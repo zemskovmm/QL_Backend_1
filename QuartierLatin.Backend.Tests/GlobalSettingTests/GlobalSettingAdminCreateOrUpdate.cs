@@ -2,8 +2,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Cache;
-using QuartierLatin.Backend.Models.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Cache;
 using QuartierLatin.Backend.Storages.Cache;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using Xunit;

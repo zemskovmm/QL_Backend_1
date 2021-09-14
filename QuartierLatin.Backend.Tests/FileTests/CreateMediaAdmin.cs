@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Repositories;
 using QuartierLatin.Backend.Tests.Extensions;
 using QuartierLatin.Backend.Tests.Infrastructure;
 using System.Collections.Generic;
@@ -7,6 +6,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using Xunit;
 
 namespace QuartierLatin.Backend.Tests.FileTests

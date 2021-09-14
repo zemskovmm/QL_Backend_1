@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Microsoft.Graph;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
-using QuartierLatin.Backend.Models.Enums;
 
 namespace QuartierLatin.Backend.Dto.PageModuleDto
 {

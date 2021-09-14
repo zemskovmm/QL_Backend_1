@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Models.Repositories.courseCatalogRepository.SchoolRepository;
-using QuartierLatin.Backend.Models.Repositories.CourseCatalogRepository.CourseRepository;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.CourseRepository;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.SchoolRepository;
 using QuartierLatin.Backend.Tests.CourseCatalogTests.DataSets;
 using QuartierLatin.Backend.Tests.Infrastructure;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace QuartierLatin.Backend.Tests.CourseCatalogTests.courseTests
+namespace QuartierLatin.Backend.Tests.CourseCatalogTests.CourseTests
 {
     public class AdminGetByIdcourseTest : TestBase
     {

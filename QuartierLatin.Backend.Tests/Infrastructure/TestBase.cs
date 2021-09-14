@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
-using QuartierLatin.Backend.Models.Repositories;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +15,7 @@ using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Runtime.ExceptionServices;
 using System.Text;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 
 namespace QuartierLatin.Backend.Tests.Infrastructure
 {

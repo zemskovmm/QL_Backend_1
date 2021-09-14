@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application.Interfaces.CourseCatalog.SchoolCatalog;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.CourseCatalog.SchoolCatalog;
 
 namespace QuartierLatin.Backend.Controllers.CourseCatalog.School
 {

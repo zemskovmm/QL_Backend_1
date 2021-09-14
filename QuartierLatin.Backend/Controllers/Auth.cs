@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Application;
+using QuartierLatin.Backend.Application.ApplicationCore.Models;
 using QuartierLatin.Backend.Dto;
-using QuartierLatin.Backend.Models;
+using QuartierLatin.Backend.Services;
 
 namespace QuartierLatin.Backend.Controllers
 {
