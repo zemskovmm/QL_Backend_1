@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Models.HousingModels;
 using QuartierLatin.Backend.Models.ImageStandardSizeModels;
+using QuartierLatin.Backend.Models.Portal;
 
 namespace QuartierLatin.Backend.Database
 {
@@ -64,6 +65,8 @@ namespace QuartierLatin.Backend.Database
         public ITable<HousingGallery> HousingGalleries => GetTable<HousingGallery>();
         public ITable<SchoolGallery> SchoolGalleries => GetTable<SchoolGallery>();
         public ITable<CourseGallery> CourseGalleries => GetTable<CourseGallery>();
+        public ITable<PortalUser> PortalUsers => GetTable<PortalUser>();
+        public ITable<PortalApplication> PortalApplications => GetTable<PortalApplication>();
     }
 
     public interface IAppDbConnectionFactory
