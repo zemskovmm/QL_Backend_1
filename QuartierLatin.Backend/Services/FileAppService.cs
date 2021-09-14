@@ -51,7 +51,7 @@ namespace QuartierLatin.Backend.Services
 
             if (!_blobFileStorage.CheckIfExist(id, dimension)) return null;
 
-            if (fileRecord.FileType == "image/svg+xml")
+            if (fileRecord.FileType == "image/svg+xml" || fileRecord.OriginalFileName.Split('.')[1] == "svg")
             {
                 var streamNotScaled = _blobFileStorage.OpenBlob(id);
                 return (streamNotScaled, fileRecord.FileType, fileRecord.OriginalFileName);
