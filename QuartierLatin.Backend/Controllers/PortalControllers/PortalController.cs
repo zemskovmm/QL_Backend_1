@@ -1,18 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces.PortalServices;
 using QuartierLatin.Backend.Dto.PortalDto;
 using QuartierLatin.Backend.Models.Constants;
 using QuartierLatin.Backend.Models.Portal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 
 
-namespace QuartierLatin.Controllers.PortalControllers
+namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
     [Route("/api/portal")]
     public class PortalController : Controller
