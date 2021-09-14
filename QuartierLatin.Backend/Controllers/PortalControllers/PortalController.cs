@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.Interfaces.PortalServices;
 using QuartierLatin.Backend.Dto.PortalDto;
 using QuartierLatin.Backend.Models.Constants;
@@ -7,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
@@ -57,6 +57,13 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
+            return Ok();
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+        [HttpPost("heartbeat")]
+        public async Task<IActionResult> CheckIsValidUserSession()
+        {
             return Ok();
         }
 
