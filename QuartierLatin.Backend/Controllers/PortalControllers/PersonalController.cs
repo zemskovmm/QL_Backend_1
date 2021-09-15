@@ -4,11 +4,13 @@ using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchRespons
 using QuartierLatin.Backend.Dto.PortalApplicationDto;
 using QuartierLatin.Backend.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PortalServices;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Constants;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
+using QuartierLatin.Backend.Dto.PersonalChatDto;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
@@ -99,6 +101,25 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             };
 
             return Ok(response);
+        }
+
+        [HttpGet("{id}/chat/messages"),
+         ProducesResponseType(typeof(List<PortalChatMessageListDto>), 200),
+         ProducesResponseType(404)]
+        public async Task<IActionResult> GetChatMessages(int id)
+        {
+            
+
+            return Ok();
+        }
+
+        [HttpPost("{id}/chat/messages"),
+         ProducesResponseType(200)]
+        public async Task<IActionResult> SendChatMessages(int id, [FromBody] PortalChatMessageDto messageDto)
+        {
+
+
+            return Ok();
         }
     }
 }

@@ -25,6 +25,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Hubs;
 using X.Web.Sitemap;
 
 namespace QuartierLatin.Backend
@@ -182,6 +183,7 @@ namespace QuartierLatin.Backend
             {
                 o.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
             });
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -247,6 +249,7 @@ namespace QuartierLatin.Backend
             {
                 endpoints.MapControllers();
                 endpoints.MapRazorPages();
+                endpoints.MapHub<ChatHub>("api/chatHub");
             });
 
             var notFound = Encoding.UTF8.GetBytes("Not found");

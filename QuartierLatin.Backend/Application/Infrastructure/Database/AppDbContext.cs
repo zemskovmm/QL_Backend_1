@@ -16,6 +16,7 @@ using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogMode
 using QuartierLatin.Backend.Application.ApplicationCore.Models.FolderModels;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.HousingModels;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.ImageStandardSizeModels;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.PersonalChatModels;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Portal;
 using QuartierLatin.Backend.Config;
 
@@ -67,6 +68,8 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database
         public ITable<CourseGallery> CourseGalleries => GetTable<CourseGallery>();
         public ITable<PortalUser> PortalUsers => GetTable<PortalUser>();
         public ITable<PortalApplication> PortalApplications => GetTable<PortalApplication>();
+        public ITable<ChatMessages> ChatMessages => GetTable<ChatMessages>();
+        public ITable<Chat> Chats => GetTable<Chat>();
     }
 
     public interface IAppDbConnectionFactory

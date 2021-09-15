@@ -13,6 +13,7 @@ namespace QuartierLatin.Backend.Services
         Task RegisterAdmin(AdminRegisterFormDto model, string role);
         AdminProfileDto FindAdmin(string email);
         AdminProfileDto Login(string email, string password);
+        Admin GetAdminById(int adminId);
     }
 
     public class UserAppService : IUserAppService
@@ -65,6 +66,13 @@ namespace QuartierLatin.Backend.Services
                 throw new ArgumentException("Wrong password");
             
             return AdminProfileDto.FromAdmin(admin);
+        }
+
+        public Admin GetAdminById(int adminId)
+        {
+            var admin = _admin.GetById(adminId);
+
+            return admin;
         }
     }
 }
