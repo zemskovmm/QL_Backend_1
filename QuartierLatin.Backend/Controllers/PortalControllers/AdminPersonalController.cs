@@ -4,8 +4,12 @@ using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Pers
 using QuartierLatin.Backend.Dto.PersonalChatDto;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.StaticFiles;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
@@ -14,10 +18,12 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
     public class AdminPersonalController : Controller
     {
         private readonly IChatAppService _chatAppService;
+        private readonly IFileAppService _fileAppService;
 
-        public AdminPersonalController(IChatAppService chatAppService)
+        public AdminPersonalController(IChatAppService chatAppService, IFileAppService fileAppService)
         {
             _chatAppService = chatAppService;
+            _fileAppService = fileAppService;
         }
 
         [HttpGet("{id}/chat/messages"),
@@ -49,7 +55,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         {
             var userId = GetUserId();
 
-            var response = await _chatAppService.SendChatMessageAsync(id, userId, messageDto.Text, messageDto.Type);
+            var response = await _chatAppService.SendChatMessageAsync(id, userId, messageDto.Type, messageDto.Text);
 
             if (response is false)
                 return BadRequest();
@@ -67,6 +73,28 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             return Ok(response);
         }
 
+        [HttpPost("{id}/chat/messages/upload"),
+         ProducesResponseType(200)]
+        public async Task<IActionResult> SendChatMessages(int id, [FromBody] PortalChatSendFileDto mediaDto)
+        {
+            if (!CheckFileType(mediaDto.UploadedFile.FileName))
+                return BadRequest();
+
+            var provider = new FileExtensionContentTypeProvider();
+
+            provider.TryGetContentType(mediaDto.UploadedFile.FileName, out var contentType);
+
+            var blobId = await _fileAppService.UploadChatMediaAsync(mediaDto.UploadedFile.OpenReadStream(),
+                mediaDto.UploadedFile.FileName, contentType);
+
+            var response = await _chatAppService.SendChatMessageAdminAsync(id, MessageType.File, blobId: blobId);
+
+            if (response is false)
+                return BadRequest();
+
+            return Ok();
+        }
+
         private int GetUserId()
         {
             var userClaims = User.Identities.FirstOrDefault(identity =>
@@ -74,6 +102,18 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
 
             var userId = Convert.ToInt32(userClaims.FirstOrDefault(claim => claim.Type == "sub").Value);
             return userId;
+        }
+        private static bool CheckFileType(string fileName)
+        {
+            var ext = Path.GetExtension(fileName);
+            return ext.ToLower() switch
+            {
+                ".gif" => true,
+                ".jpg" => true,
+                ".jpeg" => true,
+                ".png" => true,
+                _ => false
+            };
         }
     }
 }

@@ -44,7 +44,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             });
         }
 
-        public async Task<bool> SendChatMessageAsync(int applicationId, int portalUserId, string text, MessageType type)
+        public async Task<bool> SendChatMessageAsync(int applicationId, int portalUserId, MessageType type, string text = null, int? blobId = null)
         {
             return await _db.ExecAsync(async db =>
             {
@@ -66,16 +66,16 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 
                     var chatId = await db.InsertWithInt32IdentityAsync(newChat);
 
-                    await CreateMessageAsync(db, "User", chatId, text, type);
+                    await CreateMessageAsync(db, "User", chatId, type, text, blobId);
                 }
 
-                await CreateMessageAsync(db, "User", chat.Id, text, type);
+                await CreateMessageAsync(db, "User", chat.Id, type, text, blobId);
 
                 return true;
             });
         }
 
-        public async Task<bool> SendChatMessageAdminAsync(int applicationId, string text, MessageType type)
+        public async Task<bool> SendChatMessageAdminAsync(int applicationId, MessageType type, string text = null, int? blobId = null)
         {
             return await _db.ExecAsync(async db =>
             {
@@ -84,7 +84,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 if (chat is null)
                     return false;
 
-                await CreateMessageAsync(db, "User", chat.Id, text, type);
+                await CreateMessageAsync(db, "User", chat.Id, type, text, blobId);
 
                 return true;
             });
@@ -113,14 +113,15 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             return await db.Chats.FirstOrDefaultAsync(chat => chat.ApplicationId == applicationId);
         }
 
-        private async Task CreateMessageAsync(AppDbContext db, string author, int chatId, string text, MessageType type)
+        private async Task CreateMessageAsync(AppDbContext db, string author, int chatId, MessageType type, string text = null, int? blobId = null)
         {
             var newMessage = new ChatMessages
             {
                 Author = author,
                 ChatId = chatId,
                 Text = text,
-                MessageType = type
+                MessageType = type,
+                BlobId = blobId
             };
 
             await db.InsertWithInt32IdentityAsync(newMessage);

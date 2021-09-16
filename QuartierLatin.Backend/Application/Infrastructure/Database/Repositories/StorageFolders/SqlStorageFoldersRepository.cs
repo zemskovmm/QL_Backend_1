@@ -78,5 +78,26 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 await db.UpdateAsync(storageFolder);
             });
         }
+
+        public async Task<int> GetChatFolderIdAsync()
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var chatFolderName = "ChatMedia";
+
+                var storageFolder =
+                    await db.StorageFolders.FirstOrDefaultAsync(folder => folder.FolderName == chatFolderName);
+
+                if (storageFolder is not null)
+                    return storageFolder.Id;
+
+                var storageFolderId = await db.InsertWithInt32IdentityAsync(new StorageFolder
+                {
+                    FolderName = chatFolderName
+                });
+
+                return storageFolderId;
+            });
+        }
     }
 }

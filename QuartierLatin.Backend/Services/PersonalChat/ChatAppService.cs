@@ -56,14 +56,14 @@ namespace QuartierLatin.Backend.Services.PersonalChat
             return await _chatRepository.GetChatMessagesAsync(applicationId, portalUserId);
         }
 
-        public async Task<bool> SendChatMessageAsync(int applicationId, int portalUserId, string text, MessageType type)
+        public async Task<bool> SendChatMessageAsync(int applicationId, int portalUserId, MessageType type, string text = null, int? blobId = null)
         {
-            var response = await _chatRepository.SendChatMessageAsync(applicationId, portalUserId, text, type);
+            var response = await _chatRepository.SendChatMessageAsync(applicationId, portalUserId, type, text, blobId);
 
             if (response is false)
                 return response;
 
-            await SendMessageToGroup(applicationId, text, type, "User");
+            await SendMessageToGroup(applicationId, type, "User", text);
 
             return response;
         }
@@ -73,14 +73,14 @@ namespace QuartierLatin.Backend.Services.PersonalChat
             return await _chatRepository.GetChatMessagesAdminAsync(applicationId);
         }
 
-        public async Task<bool> SendChatMessageAdminAsync(int applicationId, string text, MessageType type)
+        public async Task<bool> SendChatMessageAdminAsync(int applicationId, MessageType type, string text = null, int? blobId = null)
         {
-            var response = await _chatRepository.SendChatMessageAdminAsync(applicationId, text, type);
+            var response = await _chatRepository.SendChatMessageAdminAsync(applicationId, type, text, blobId);
 
             if (response is false)
                 return response;
 
-            await SendMessageToGroup(applicationId, text, type, "Staff");
+            await SendMessageToGroup(applicationId, type, "Staff", text);
 
             return response;
         }
@@ -103,13 +103,14 @@ namespace QuartierLatin.Backend.Services.PersonalChat
             return _chatPrefix + applicationId;
         }
 
-        private async Task SendMessageToGroup(int applicationId, string text, MessageType type, string author)
+        private async Task SendMessageToGroup(int applicationId, MessageType type, string author, string text = null, int? blobId = null)
         {
             var messageDto = new PortalChatMessageListDto
             {
                 Type = type,
                 Text = text,
-                Author = author
+                Author = author,
+                BlobId = blobId
             };
 
             await _hubContext.Clients.Group(GetGroupName(applicationId)).SendAsync("ReceiveMessage", messageDto);

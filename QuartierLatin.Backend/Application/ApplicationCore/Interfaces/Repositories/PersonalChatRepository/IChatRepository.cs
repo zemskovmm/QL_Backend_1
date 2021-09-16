@@ -10,8 +10,8 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
     {
         Task<List<ChatMessages>> GetChatMessagesAsync(int applicationId, int portalUserId);
         Task<List<ChatMessages>> GetChatMessagesAdminAsync(int applicationId);
-        Task<bool> SendChatMessageAsync(int applicationId, int portalUserId, string text, MessageType type);
-        Task<bool> SendChatMessageAdminAsync(int applicationId, string text, MessageType type);
+        Task<bool> SendChatMessageAsync(int applicationId, int portalUserId, MessageType type, string text = null, int? blobId = null);
+        Task<bool> SendChatMessageAdminAsync(int applicationId, MessageType type, string text = null, int? blobId = null);
         Task<List<(Chat chat, PortalUser user)>> GetChatsAsync();
     }
 }

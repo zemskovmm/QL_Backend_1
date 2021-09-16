@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.ImageStandardSizeService;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.StorageFolders;
 using QuartierLatin.Backend.Storages;
 using QuartierLatin.Backend.Utils;
 
@@ -13,11 +14,14 @@ namespace QuartierLatin.Backend.Services
         private readonly IBlobFileStorage _blobFileStorage;
         private readonly IBlobRepository _blobRepository;
         private readonly IImageStandardSizeAppService _imageStandardSizeAppService;
-        public FileAppService(IBlobFileStorage blobFileStorage, IBlobRepository blobRepository, IImageStandardSizeAppService imageStandardSizeAppService)
+        private readonly IStorageFolderAppService _storageFolderAppService;
+        public FileAppService(IBlobFileStorage blobFileStorage, IBlobRepository blobRepository,
+            IImageStandardSizeAppService imageStandardSizeAppService, IStorageFolderAppService storageFolderAppService)
         {
             _blobFileStorage = blobFileStorage;
             _blobRepository = blobRepository;
             _imageStandardSizeAppService = imageStandardSizeAppService;
+            _storageFolderAppService = storageFolderAppService;
         }
         public async Task<int> UploadFileAsync(Stream file, string fileName, string fileType, int? dimension = null, int? id = null, int? storageFolder = null, int? standardSizeId = null)
         {
@@ -108,6 +112,13 @@ namespace QuartierLatin.Backend.Services
         public async Task DeleteFileAsync(int id)
         {
             await _blobRepository.DeleteBlobAsync(id);
+        }
+
+        public async Task<int> UploadChatMediaAsync(Stream file, string fileName, string fileType)
+        {
+            var chatFolderId = await _storageFolderAppService.GetChatFolderIdAsync();
+
+            return await UploadFileAsync(file, fileName, fileType, storageFolder: chatFolderId);
         }
 
         private async Task<(byte[], string, string)?> CompressAndUploadFile(int id, int? dimension, int? standardSizeId)
