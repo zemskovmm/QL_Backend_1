@@ -313,6 +313,7 @@ namespace QuartierLatin.Backend.Controllers
 
                 housingAccommodationModule.Add(new HousingAccommodationTypeModuleDto
                 {
+                    Name = housingAccommodationEntity.Names.GetSuitableName(lang),
                     Square = housingAccommodationEntity.Square,
                     Price = housingAccommodationEntity.Price,
                     Residents = housingAccommodationEntity.Residents,
