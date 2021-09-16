@@ -39,5 +39,10 @@ namespace QuartierLatin.Backend.Services.PortalServices
         {
             return await _portalPersonalRepository.GetApplicationCatalogAsync(type, status, pageSize * page, pageSize);
         }
+
+        public async Task<bool> CheckIsUserOwnerAsync(int userId, int applicationId)
+        {
+            return await _portalPersonalRepository.CheckIsUserOwnerAsync(userId, applicationId);
+        }
     }
 }

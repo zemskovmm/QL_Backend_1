@@ -2,7 +2,7 @@
 
 namespace QuartierLatin.Backend.Application.Infrastructure.Database.Migrations.PersonalChatMigrations
 {
-    [MigrationDate(2021, 9, 14, 11, 20)]
+    [MigrationDate(2021, 9, 14, 10, 55)]
     public class CreateChatMessages : AutoReversingMigration
     {
         public override void Up()

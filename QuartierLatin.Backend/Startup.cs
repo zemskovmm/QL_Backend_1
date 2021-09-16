@@ -249,7 +249,7 @@ namespace QuartierLatin.Backend
             {
                 endpoints.MapControllers();
                 endpoints.MapRazorPages();
-                endpoints.MapHub<ChatHub>("api/chatHub");
+                endpoints.MapHub<ChatHub>("api/chathub");
             });
 
             var notFound = Encoding.UTF8.GetBytes("Not found");

@@ -83,5 +83,16 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 return (totalCount, await portalApplications.Skip(skip).Take(take).ToListAsync());
             });
         }
+
+        public async Task<bool> CheckIsUserOwnerAsync(int userId, int applicationId)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var portalApplication = await db.PortalApplications.FirstOrDefaultAsync(application =>
+                    application.UserId == userId && application.Id == applicationId);
+
+                return portalApplication is not null;
+            });
+        }
     }
 }

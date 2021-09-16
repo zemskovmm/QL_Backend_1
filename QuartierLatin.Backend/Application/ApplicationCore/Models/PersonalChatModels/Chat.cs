@@ -5,6 +5,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Models.PersonalChatM
     [Table("Chats")]
     public class Chat : BaseModel
     {
-        public int PortalUserId { get; set; }
+        [Column] public int PortalUserId { get; set; }
+        [Column] public int ApplicationId { get; set; }
     }
 }

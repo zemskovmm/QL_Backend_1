@@ -1,37 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
-using QuartierLatin.Backend.Dto.PortalApplicationDto;
-using QuartierLatin.Backend.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PersonalChat;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PortalServices;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Constants;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
+using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
 using QuartierLatin.Backend.Dto.PersonalChatDto;
+using QuartierLatin.Backend.Dto.PortalApplicationDto;
+using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
-    [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+    [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
     [Route("/api/personal/applications")]
     public class PersonalController : Controller
     {
         private readonly IPortalPersonalAppService _personalAppService;
-        public PersonalController(IPortalPersonalAppService personalAppService)
+        private readonly IChatAppService _chatAppService;
+        public PersonalController(IPortalPersonalAppService personalAppService, IChatAppService chatAppService)
         {
             _personalAppService = personalAppService;
+            _chatAppService = chatAppService;
         }
 
         [HttpPost(),
          ProducesResponseType(200)]
         public async Task<IActionResult> CreateApplication([FromBody] PortalApplicationWithoutIdDto createApplication)
         {
-            var userClaims = User.Identities.FirstOrDefault(identity =>
-                identity.AuthenticationType == CookieAuthenticationPortal.AuthenticationScheme).Claims;
-
-            var userId = Convert.ToInt32(userClaims.FirstOrDefault(claim => claim.Type == "sub").Value);
+            var userId = GetUserId();
 
             var id = await _personalAppService.CreateApplicationAsync(createApplication.Type, createApplication.EntityId,
                 createApplication.CommonApplicationInfo, createApplication.EntityTypeSpecificApplicationInfo, userId);
@@ -108,18 +108,45 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
          ProducesResponseType(404)]
         public async Task<IActionResult> GetChatMessages(int id)
         {
-            
+            var userId = GetUserId();
 
-            return Ok();
+            var messages = await _chatAppService.GetChatMessagesAsync(id, userId);
+
+            if (messages is null || messages.Count is 0)
+                return NotFound();
+
+            var response = messages.Select(message => new PortalChatMessageListDto
+            {
+                Author = message.Author,
+                BlobId = message.BlobId,
+                Text = message.Text,
+                Type = message.MessageType
+            });
+
+            return Ok(response);
         }
 
         [HttpPost("{id}/chat/messages"),
          ProducesResponseType(200)]
         public async Task<IActionResult> SendChatMessages(int id, [FromBody] PortalChatMessageDto messageDto)
         {
+            var userId = GetUserId();
 
+            var response = await _chatAppService.SendChatMessageAsync(id, userId, messageDto.Text, messageDto.Type);
+
+            if (response is false)
+                return BadRequest();
 
             return Ok();
         }
+
+        private int GetUserId()
+        {
+            var userClaims = User.Identities.FirstOrDefault(identity =>
+                identity.AuthenticationType == CookieAuthenticationPortal.AuthenticationScheme).Claims;
+
+            var userId = Convert.ToInt32(userClaims.FirstOrDefault(claim => claim.Type == "sub").Value);
+            return userId;
+        } 
     }
 }
