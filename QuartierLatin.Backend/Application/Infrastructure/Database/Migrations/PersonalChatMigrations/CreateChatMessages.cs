@@ -13,7 +13,8 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Migrations.P
                 .WithColumn("Author").AsString()
                 .WithColumn("Text").AsString()
                 .WithColumn("BlobId").AsInt32().ForeignKey("Blobs", "Id")
-                .WithColumn("ChatId").AsInt32().ForeignKey("Chats", "Id");
+                .WithColumn("ChatId").AsInt32().ForeignKey("Chats", "Id")
+                .WithColumn("Date").AsDateTime().Nullable();
         }
     }
 }

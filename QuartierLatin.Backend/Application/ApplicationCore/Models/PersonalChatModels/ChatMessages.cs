@@ -1,4 +1,5 @@
-﻿using LinqToDB.Mapping;
+﻿using System;
+using LinqToDB.Mapping;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 
 namespace QuartierLatin.Backend.Application.ApplicationCore.Models.PersonalChatModels
@@ -11,5 +12,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Models.PersonalChatM
         [Column] public string Text { get; set; }
         [Column] public int? BlobId { get; set; }
         [Column] public int ChatId { get; set; }
+        [Column] public DateTime Date { get; set; }
     }
 }

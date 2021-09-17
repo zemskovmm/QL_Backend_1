@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
@@ -15,6 +10,10 @@ using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchRespons
 using QuartierLatin.Backend.Dto.PersonalChatDto;
 using QuartierLatin.Backend.Dto.PortalApplicationDto;
 using QuartierLatin.Backend.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
@@ -127,7 +126,8 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
                 Author = message.Author,
                 BlobId = message.BlobId,
                 Text = message.Text,
-                Type = message.MessageType
+                Type = message.MessageType,
+                Date = message.Date
             });
 
             return Ok(response);
@@ -153,7 +153,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         {
             var userId = GetUserId();
 
-            if (!CheckFileType(mediaDto.UploadedFile.FileName))
+            if (!FileUtils.CheckFileType(mediaDto.UploadedFile.FileName))
                 return BadRequest();
 
             var provider = new FileExtensionContentTypeProvider();
@@ -178,19 +178,6 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
 
             var userId = Convert.ToInt32(userClaims.FirstOrDefault(claim => claim.Type == "sub").Value);
             return userId;
-        }
-
-        private static bool CheckFileType(string fileName)
-        {
-            var ext = Path.GetExtension(fileName);
-            return ext.ToLower() switch
-            {
-                ".gif" => true,
-                ".jpg" => true,
-                ".jpeg" => true,
-                ".png" => true,
-                _ => false
-            };
         }
     }
 }
