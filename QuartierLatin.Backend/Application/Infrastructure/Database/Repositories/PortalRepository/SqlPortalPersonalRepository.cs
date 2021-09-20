@@ -32,12 +32,12 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             }));
         }
 
-        public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo,
+        public async Task<bool> UpdateApplicationAsync(int id, int userid, ApplicationType? type, int? entityId, JObject applicationInfo,
             JObject entityTypeSpecificApplicationInfo)
         {
             return await _db.ExecAsync(async db =>
             {
-                var applicationPortal = await db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id);
+                var applicationPortal = await db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id && portal.UserId == userid);
 
                 if (applicationPortal is null)
                     return false;
@@ -61,16 +61,16 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             });
         }
 
-        public async Task<PortalApplication> GetApplicationAsync(int id)
+        public async Task<PortalApplication> GetApplicationAsync(int id, int userid)
         {
-            return await _db.ExecAsync(db => db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id));
+            return await _db.ExecAsync(db => db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id && portal.UserId == userid));
         }
 
-        public async Task<(int totalItems, List<PortalApplication> portalApplications)> GetApplicationCatalogAsync(ApplicationType? type, ApplicationStatus? status, int skip, int take)
+        public async Task<(int totalItems, List<PortalApplication> portalApplications)> GetApplicationCatalogAsync(int userid, ApplicationType? type, ApplicationStatus? status, int skip, int take)
         {
             return await _db.ExecAsync(async db =>
             {
-                var portalApplications = db.PortalApplications.AsQueryable();
+                var portalApplications = db.PortalApplications.Where(portal => portal.UserId == userid).AsQueryable();
 
                 if (type is not null)
                     portalApplications = portalApplications.Where(portal => portal.Type == type);
@@ -81,6 +81,17 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 var totalCount = await portalApplications.CountAsync();
 
                 return (totalCount, await portalApplications.Skip(skip).Take(take).ToListAsync());
+            });
+        }
+
+        public async Task<bool> CheckIsUserOwnerAsync(int userId, int applicationId)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var portalApplication = await db.PortalApplications.FirstOrDefaultAsync(application =>
+                    application.UserId == userId && application.Id == applicationId);
+
+                return portalApplication is not null;
             });
         }
     }

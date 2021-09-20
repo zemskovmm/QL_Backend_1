@@ -99,7 +99,7 @@ namespace QuartierLatin.Backend
                 })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
-                    options.Cookie.SameSite = SameSiteMode.Strict;
+                    options.Cookie.SameSite = SameSiteMode.Lax;
                     options.Events.OnRedirectToAccessDenied = context =>
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
@@ -114,7 +114,7 @@ namespace QuartierLatin.Backend
                 .AddCookie(CookieAuthenticationPortal.AuthenticationScheme, options =>
                 {
                     options.LoginPath = "/api/portal/login/";
-                    options.Cookie.SameSite = SameSiteMode.Strict;
+                    options.Cookie.SameSite = SameSiteMode.Lax;
                     options.Events.OnRedirectToAccessDenied = context =>
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;

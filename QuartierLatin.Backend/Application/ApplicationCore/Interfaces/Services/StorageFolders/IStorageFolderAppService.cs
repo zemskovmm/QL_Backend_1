@@ -15,5 +15,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.
         Task<List<StorageFolder>> GetChildFoldersAsync(int storageFolderId);
         Task<List<StorageFolder>> GetDefaultChildFoldersAsync();
         Task UpdateFolderNameAsync(int id, string title);
+        Task<int> GetChatFolderIdAsync();
     }
 }

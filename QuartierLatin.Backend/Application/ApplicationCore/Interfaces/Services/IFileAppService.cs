@@ -12,5 +12,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services
         Task<(byte[], string, string)?> GetCompressedFileAsync(int id, int? dimension, int? standardSizeId = null);
 
         Task DeleteFileAsync(int id);
+        Task<int> UploadChatMediaAsync(Stream file, string fileName, string fileType);
     }
 }

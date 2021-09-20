@@ -55,5 +55,10 @@ namespace QuartierLatin.Backend.Services.StorageFolders
         {
             await _storageFoldersRepository.UpdateFolderNameAsync(id, title);
         }
+
+        public async Task<int> GetChatFolderIdAsync()
+        {
+            return await _storageFoldersRepository.GetChatFolderIdAsync();
+        }
     }
 }
