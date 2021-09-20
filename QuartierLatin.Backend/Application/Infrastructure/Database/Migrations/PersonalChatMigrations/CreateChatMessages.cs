@@ -11,10 +11,10 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Migrations.P
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("MessageType").AsInt16()
                 .WithColumn("Author").AsString()
-                .WithColumn("Text").AsString()
-                .WithColumn("BlobId").AsInt32().ForeignKey("Blobs", "Id")
+                .WithColumn("Text").AsString().Nullable()
+                .WithColumn("BlobId").AsInt32().ForeignKey("Blobs", "Id").Nullable()
                 .WithColumn("ChatId").AsInt32().ForeignKey("Chats", "Id")
-                .WithColumn("Date").AsDateTime().Nullable();
+                .WithColumn("Date").AsDateTime();
         }
     }
 }

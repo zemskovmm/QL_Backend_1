@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
@@ -10,14 +14,10 @@ using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchRespons
 using QuartierLatin.Backend.Dto.PersonalChatDto;
 using QuartierLatin.Backend.Dto.PortalApplicationDto;
 using QuartierLatin.Backend.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
-    [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
     [Route("/api/personal/applications")]
     public class PersonalController : Controller
     {
@@ -50,7 +50,9 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
          ProducesResponseType(403)]
         public async Task<IActionResult> UpdateApplication(int id, [FromBody]PortalApplicationWithoutIdDto updatePortalApplication)
         {
-            var response = await _personalAppService.UpdateApplicationAsync(id, updatePortalApplication.Type,
+            var userId = GetUserId();
+
+            var response = await _personalAppService.UpdateApplicationAsync(id, userId, updatePortalApplication.Type,
                 updatePortalApplication.EntityId, updatePortalApplication.CommonApplicationInfo,
                 updatePortalApplication.EntityTypeSpecificApplicationInfo);
 
@@ -65,7 +67,9 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
          ProducesResponseType( 404)]
         public async Task<IActionResult> GetApplication(int id)
         {
-            var application = await _personalAppService.GetApplicationAsync(id);
+            var userId = GetUserId();
+
+            var application = await _personalAppService.GetApplicationAsync(id, userId);
 
             if (application is null)
                 return NotFound();
@@ -87,7 +91,9 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
          ProducesResponseType(typeof(CatalogSearchResponseDtoList<PortalApplicationDto>), 200)]
         public async Task<IActionResult> GetApplicationCatalog([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] ApplicationType? type, [FromQuery] ApplicationStatus? status)
         {
-            var portalApplicationList = await _personalAppService.GetApplicationCatalogAsync(type, status, page, pageSize);
+            var userId = GetUserId();
+
+            var portalApplicationList = await _personalAppService.GetApplicationCatalogAsync(userId, type, status, page, pageSize);
 
             var portalDtos = portalApplicationList.portalApplications.Select(application => new PortalApplicationDto
             {
@@ -149,7 +155,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
 
         [HttpPost("{id}/chat/messages/upload"),
          ProducesResponseType(200)]
-        public async Task<IActionResult> SendChatMessages(int id, [FromBody] PortalChatSendFileDto mediaDto)
+        public async Task<IActionResult> SendChatMessages(int id, [FromForm] PortalChatSendFileDto mediaDto)
         {
             var userId = GetUserId();
 

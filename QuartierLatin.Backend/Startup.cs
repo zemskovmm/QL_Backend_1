@@ -25,7 +25,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Hubs;
 using X.Web.Sitemap;
 
 namespace QuartierLatin.Backend
@@ -100,7 +99,7 @@ namespace QuartierLatin.Backend
                 })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
-                    options.Cookie.SameSite = SameSiteMode.Strict;
+                    options.Cookie.SameSite = SameSiteMode.Lax;
                     options.Events.OnRedirectToAccessDenied = context =>
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
@@ -115,7 +114,7 @@ namespace QuartierLatin.Backend
                 .AddCookie(CookieAuthenticationPortal.AuthenticationScheme, options =>
                 {
                     options.LoginPath = "/api/portal/login/";
-                    options.Cookie.SameSite = SameSiteMode.Strict;
+                    options.Cookie.SameSite = SameSiteMode.Lax;
                     options.Events.OnRedirectToAccessDenied = context =>
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
@@ -183,7 +182,6 @@ namespace QuartierLatin.Backend
             {
                 o.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
             });
-            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -249,7 +247,6 @@ namespace QuartierLatin.Backend
             {
                 endpoints.MapControllers();
                 endpoints.MapRazorPages();
-                endpoints.MapHub<ChatHub>("api/chathub");
             });
 
             var notFound = Encoding.UTF8.GetBytes("Not found");

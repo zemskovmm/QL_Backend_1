@@ -23,7 +23,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         {
             return await _db.ExecAsync(async db =>
             {
-                var chat = await GetChatByApplicationAndPortalUserIdAsync(db, applicationId, portalUserId);
+                var chat = await GetChatByApplicationAndPortalUserIdAsync(applicationId, portalUserId);
 
                 if (chat is null)
                     return null;
@@ -36,7 +36,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         {
             return await _db.ExecAsync(async db =>
             {
-                var chat = await GetChatByApplicationAndPortalUserIdAsync(db, applicationId);
+                var chat = await GetChatByApplicationAndPortalUserIdAsync(applicationId);
 
                 if (chat is null)
                     return null;
@@ -49,23 +49,21 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         {
             return await _db.ExecAsync(async db =>
             {
-                var chat = await GetChatByApplicationAndPortalUserIdAsync(db, applicationId, portalUserId);
+                var chat = await GetChatByApplicationAndPortalUserIdAsync(applicationId, portalUserId);
 
                 if (chat is null)
                 {
-                    var application = db.PortalApplications.FirstOrDefaultAsync(application =>
+                    var application = await db.PortalApplications.FirstOrDefaultAsync(application =>
                         application.Id == applicationId && application.UserId == portalUserId);
 
                     if (application is null)
                         return false;
 
-                    var newChat = new Chat
+                    var chatId = await db.InsertWithInt32IdentityAsync( new Chat
                     {
-                        ApplicationId = applicationId, 
+                        ApplicationId = application.Id,
                         PortalUserId = portalUserId
-                    };
-
-                    var chatId = await db.InsertWithInt32IdentityAsync(newChat);
+                    });
 
                     await CreateMessageAsync(db, "User", chatId, type, text, blobId);
                 }
@@ -80,7 +78,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         {
             return await _db.ExecAsync(async db =>
             {
-                var chat = await GetChatByApplicationAndPortalUserIdAsync(db, applicationId);
+                var chat = await GetChatByApplicationAndPortalUserIdAsync(applicationId);
 
                 if (chat is null)
                     return false;
@@ -103,30 +101,36 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             });
         }
 
-        private async Task<List<ChatMessages>> GetMessagesByChatIdAsync(AppDbContext db, int chatId)=> 
-            await db.ChatMessages.Where(message => message.ChatId == chatId).ToListAsync();
+        private async Task<List<ChatMessages>> GetMessagesByChatIdAsync(AppDbContext db, int chatId) =>
+            await _db.ExecAsync(db => db.ChatMessages.Where(message => message.ChatId == chatId).ToListAsync());
 
-        private async Task<Chat> GetChatByApplicationAndPortalUserIdAsync(AppDbContext db, int applicationId, int? portalUserId = null)
+        private async Task<Chat> GetChatByApplicationAndPortalUserIdAsync(int applicationId, int? portalUserId = null)
         {
-            if(portalUserId.HasValue)
-                return await db.Chats.FirstOrDefaultAsync(chat => chat.ApplicationId == applicationId && chat.ApplicationId == applicationId);
+            return await _db.ExecAsync(async db =>
+            {
+                if (portalUserId.HasValue)
+                    return await db.Chats.FirstOrDefaultAsync(chat => chat.ApplicationId == applicationId && chat.ApplicationId == applicationId);
 
-            return await db.Chats.FirstOrDefaultAsync(chat => chat.ApplicationId == applicationId);
+                return await db.Chats.FirstOrDefaultAsync(chat => chat.ApplicationId == applicationId);
+            });
         }
 
         private async Task CreateMessageAsync(AppDbContext db, string author, int chatId, MessageType type, string text = null, int? blobId = null)
         {
-            var newMessage = new ChatMessages
+            await _db.ExecAsync(async db =>
             {
-                Author = author,
-                ChatId = chatId,
-                Text = text,
-                MessageType = type,
-                BlobId = blobId,
-                Date = DateTime.Now
-            };
+                var newMessage = new ChatMessages
+                {
+                    Author = author,
+                    ChatId = chatId,
+                    Text = text,
+                    MessageType = type,
+                    BlobId = blobId,
+                    Date = DateTime.Now
+                };
 
-            await db.InsertWithInt32IdentityAsync(newMessage);
+                await db.InsertWithInt32IdentityAsync(newMessage);
+            });
         }
     }
 }

@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PersonalChat;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 using QuartierLatin.Backend.Dto.PersonalChatDto;
 using QuartierLatin.Backend.Utils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,9 +29,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
          ProducesResponseType(404)]
         public async Task<IActionResult> GetChatMessages(int id)
         {
-            var userId = GetUserId();
-
-            var messages = await _chatAppService.GetChatMessagesAsync(id, userId);
+            var messages = await _chatAppService.GetChatMessagesAdminAsync(id);
 
             if (messages is null || messages.Count is 0)
                 return NotFound();
@@ -54,9 +50,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
          ProducesResponseType(200)]
         public async Task<IActionResult> SendChatMessages(int id, [FromBody] PortalChatMessageDto messageDto)
         {
-            var userId = GetUserId();
-
-            var response = await _chatAppService.SendChatMessageAsync(id, userId, messageDto.Type, messageDto.Text);
+            var response = await _chatAppService.SendChatMessageAdminAsync(id, messageDto.Type, messageDto.Text);
 
             if (response is false)
                 return BadRequest();
@@ -94,15 +88,6 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
                 return BadRequest();
 
             return Ok();
-        }
-
-        private int GetUserId()
-        {
-            var userClaims = User.Identities.FirstOrDefault(identity =>
-                identity.AuthenticationType == CookieAuthenticationDefaults.AuthenticationScheme).Claims;
-
-            var userId = Convert.ToInt32(userClaims.FirstOrDefault(claim => claim.Type == "sub").Value);
-            return userId;
         }
     }
 }

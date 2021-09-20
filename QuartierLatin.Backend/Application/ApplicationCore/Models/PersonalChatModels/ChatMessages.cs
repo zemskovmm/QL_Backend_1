@@ -9,7 +9,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Models.PersonalChatM
     {
         [Column] public MessageType MessageType { get; set; }
         [Column] public string Author { get; set; }
-        [Column] public string Text { get; set; }
+        [Column] public string? Text { get; set; }
         [Column] public int? BlobId { get; set; }
         [Column] public int ChatId { get; set; }
         [Column] public DateTime Date { get; set; }
