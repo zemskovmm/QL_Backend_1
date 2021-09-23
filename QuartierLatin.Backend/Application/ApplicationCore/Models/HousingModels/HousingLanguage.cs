@@ -13,5 +13,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Models.HousingModels
         [Column] public string Description { get; set; }
         [Column] public string Url { get; set; }
         [Column(DataType = DataType.BinaryJson)] public string? Metadata { get; set; }
+        [Column(DataType = DataType.BinaryJson)] public string? Location { get; set; }
     }
 }

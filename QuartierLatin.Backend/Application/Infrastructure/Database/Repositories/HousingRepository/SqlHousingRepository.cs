@@ -71,7 +71,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         }
 
         public async Task CreateOrUpdateHousingLanguageByIdAsync(int housingId, string htmlDescription, int languageId, string name, string url,
-            JObject metadata)
+            JObject? metadata, JObject? location)
         {
             await _db.ExecAsync(db => db.InsertOrReplaceAsync(new HousingLanguage
             {
@@ -80,7 +80,8 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 Description = htmlDescription,
                 Name = name,
                 Url = url,
-                Metadata = metadata?.ToString()
+                Metadata = metadata?.ToString(),
+                Location = location?.ToString()
             }));
         }
 

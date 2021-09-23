@@ -330,7 +330,8 @@ namespace QuartierLatin.Backend.Controllers
                 Metadata = housing.housingLanguage[languageId].Metadata is null ? null : JObject.Parse(housing.housingLanguage[languageId].Metadata),
                 ImageId = housing.housing.ImageId,
                 GalleryList = housingGallery,
-                HousingAccommodationTypes = housingAccommodationModule
+                HousingAccommodationTypes = housingAccommodationModule,
+                Location = housing.housingLanguage[languageId].Location is null ? null : JObject.Parse(housing.housingLanguage[languageId].Location)
             };
 
             return (housingModule: module, urls: urls);

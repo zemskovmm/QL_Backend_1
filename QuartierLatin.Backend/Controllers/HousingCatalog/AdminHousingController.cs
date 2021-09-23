@@ -49,7 +49,8 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                         Name = housing.Value.Name,
                         HtmlDescription = housing.Value.Description,
                         Url = housing.Value.Url,
-                        Metadata = housing.Value.Metadata is null ? null : JObject.Parse(housing.Value.Metadata)
+                        Metadata = housing.Value.Metadata is null ? null : JObject.Parse(housing.Value.Metadata),
+                        Location = housing.Value.Location is null ? null : JObject.Parse(housing.Value.Location)
                     })
             }).ToList();
 
@@ -70,7 +71,8 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                 Name = housing.Value.Name,
                 Url = housing.Value.Url,
                 LanguageId = language.FirstOrDefault(language => language.Value == housing.Key).Key,
-                Metadata = housing.Value.Metadata is null ? null : housing.Value.Metadata.ToString()
+                Metadata = housing.Value.Metadata is null ? null : housing.Value.Metadata.ToString(),
+                Location = housing.Value.Location is null ? null : housing.Value.Location.ToString()
             }).ToList();
 
             var housingId = await _housingAppService.CreateHousingAsync(housingDto.Price, housingDto.ImageId, housingLanguage);
@@ -94,7 +96,8 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                         Name = housing.Value.Name,
                         HtmlDescription = housing.Value.Description,
                         Url = housing.Value.Url,
-                        Metadata = housing.Value.Metadata is null ? null : JObject.Parse(housing.Value.Metadata)
+                        Metadata = housing.Value.Metadata is null ? null : JObject.Parse(housing.Value.Metadata),
+                        Location = housing.Value.Location is null ? null : JObject.Parse(housing.Value.Location)
                     })
             };
 
@@ -114,7 +117,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                     housingLanguage.Value.HtmlDescription,
                     languageId,
                     housingLanguage.Value.Name,
-                    housingLanguage.Value.Url, housingLanguage.Value.Metadata);
+                    housingLanguage.Value.Url, housingLanguage.Value.Metadata, housingLanguage.Value.Location);
             }
 
             return Ok(new object());

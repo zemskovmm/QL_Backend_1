@@ -13,6 +13,7 @@ namespace QuartierLatin.Backend.Dto.HousingCatalogDto.RouteDto
         public NamedTraitsModuleDto Traits { get; set; }
         public IEnumerable<int> GalleryList { get; set; }
         public JObject? Metadata { get; set; }
+        public JObject? Location { get; set; }
         public IEnumerable<HousingAccommodationTypeModuleDto> HousingAccommodationTypes { get; set; }
     }
 }
