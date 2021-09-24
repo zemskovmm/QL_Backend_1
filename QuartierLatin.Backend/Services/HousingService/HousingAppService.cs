@@ -39,10 +39,10 @@ namespace QuartierLatin.Backend.Services.HousingService
             await _housingRepository.UpdateHousingByIdAsync(id, price, imageId);
         }
 
-        public async Task CreateOrUpdateHousingLanguageByIdAsync(int housingId, string htmlDescription, int languageId, string name, string url, JObject metadata)
+        public async Task CreateOrUpdateHousingLanguageByIdAsync(int housingId, string htmlDescription, int languageId, string name, string url, JObject? metadata, JObject? location)
         {
             await _housingRepository.CreateOrUpdateHousingLanguageByIdAsync(housingId, htmlDescription, languageId, name, url,
-                metadata);
+                metadata, location);
         }
 
         public async Task<(Housing housing, Dictionary<int, HousingLanguage> housingLanguage)> GetHousingByUrlWithLanguageAsync(int languageId, string url)

@@ -1,5 +1,6 @@
 ﻿using QuartierLatin.Backend.Dto.CommonTraitDto;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace QuartierLatin.Backend.Dto.HousingCatalogDto
 {
@@ -11,6 +12,8 @@ namespace QuartierLatin.Backend.Dto.HousingCatalogDto
         public List<int> GalleryList { get; set; }
         public int? ImageId { get; set; }
         public int? Price { get; set; }
+        public JObject? Metadata { get; set; }
+        public JObject? Location { get; set; }
         public Dictionary<string, List<CommonTraitLanguageDto>>? NamedTraits { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace QuartierLatin.Backend.Cmdlets
         [Verb("import-housing-blob-rename")]
         public class ImportHousingFileRenameOptions{}
 
-        public ImportHousingFileRename(AppDbContextManager db, IConfiguration config, ILanguageRepository languageRepository)
+        public ImportHousingFileRename(AppDbContextManager db, IConfiguration config)
         {
             _db = db;
             _dbConfig = config.GetSection("Database").Get<DatabaseConfig>();

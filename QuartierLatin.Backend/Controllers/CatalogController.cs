@@ -11,6 +11,7 @@ using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog;
@@ -434,7 +435,9 @@ namespace QuartierLatin.Backend.Controllers
                     ImageId = housing.housing.ImageId,
                     NamedTraits = traits,
                     Price = housing.housing.Price,
-                    GalleryList = housingGallery.GetValueOrDefault(housing.housing.Id)
+                    GalleryList = housingGallery.GetValueOrDefault(housing.housing.Id),
+                    Metadata = housing.housingLanguage.Metadata is null ? null : JObject.Parse(housing.housingLanguage.Metadata),
+                    Location = housing.housingLanguage.Location is null ? null : JObject.Parse(housing.housingLanguage.Location)
                 });
             };
 
