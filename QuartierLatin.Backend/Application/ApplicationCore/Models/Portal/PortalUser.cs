@@ -7,10 +7,10 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Models.Portal
     public class PortalUser : BaseModel
     {
         [Column] public string Email { get; set; }
-        [Column] public string Phone { get; set; }
-        [Column] public string FirstName { get; set; }
-        [Column] public string LastName { get; set; }
+        [Column] public string? Phone { get; set; }
+        [Column] public string? FirstName { get; set; }
+        [Column] public string? LastName { get; set; }
         [Column] public string PasswordHash { get; set; }
-        [Column(DataType = DataType.BinaryJson)] public string PersonalInfo { get; set; }
+        [Column(DataType = DataType.BinaryJson)] public string? PersonalInfo { get; set; }
     }
 }

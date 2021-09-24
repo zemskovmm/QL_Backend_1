@@ -6,8 +6,9 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
 {
     public interface IPortalUserRepository
     {
-        Task<int> RegisterAsync(string firstName, string lastName, string phone, string email, string passwordHash, JObject personalInfo);
+        Task<int> RegisterAsync(string email, string passwordHash);
         Task<PortalUser> GetPortalUserByIdAsync(int userId);
         Task<PortalUser> LoginAsync(string email);
+        Task UpdatePortalUserInfo(int portalUserId, string? firstName, string? lastName, string? phone, JObject? personalInfo);
     }
 }

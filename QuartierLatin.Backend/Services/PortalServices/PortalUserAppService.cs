@@ -17,7 +17,7 @@ namespace QuartierLatin.Backend.Services.PortalServices
             _portalUserRepository = portalUserRepository;
         }
 
-        public async Task<int> RegisterAsync(string firstName, string lastName, string phone, string email, string password, JObject personalInfo)
+        public async Task<int> RegisterAsync(string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email) || !Regex.IsMatch(email, @"[\w.-]+@.+\.[a-z]{2,3}"))
                 throw new ArgumentException("Invalid email");
@@ -25,10 +25,7 @@ namespace QuartierLatin.Backend.Services.PortalServices
             if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
                 throw new ArgumentException("Weak password");
 
-            if (string.IsNullOrWhiteSpace(phone) || !Regex.IsMatch(phone, @"\(?\d{3}\)?-? *\d{3}-? *-?\d{4}"))
-                throw new ArgumentException("Invalid phone");
-
-            return await _portalUserRepository.RegisterAsync(firstName, lastName, phone, email, PasswordToolkit.EncodeSshaPassword(password), personalInfo);
+            return await _portalUserRepository.RegisterAsync(email, PasswordToolkit.EncodeSshaPassword(password));
         }
 
         public async Task<PortalUser> GetPortalUserByIdAsync(int userId)
@@ -47,6 +44,14 @@ namespace QuartierLatin.Backend.Services.PortalServices
                throw new ArgumentException("Wrong password");
 
            return user;
+        }
+
+        public async Task UpdateUserInfoAsync(int portalUserId, string? firstName, string? lastName, string? phone, JObject? personalInfo)
+        {
+            if(!string.IsNullOrWhiteSpace(phone) && !Regex.IsMatch(phone, @"\(?\d{3}\)?-? *\d{3}-? *-?\d{4}"))
+                throw new ArgumentException("Invalid phone");
+
+            await _portalUserRepository.UpdatePortalUserInfo(portalUserId, firstName, lastName, phone, personalInfo);
         }
     }
 }

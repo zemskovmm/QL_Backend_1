@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Newtonsoft.Json.Linq;
@@ -14,11 +15,13 @@ using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchRespons
 using QuartierLatin.Backend.Dto.PersonalChatDto;
 using QuartierLatin.Backend.Dto.PortalApplicationDto;
 using QuartierLatin.Backend.Utils;
+using QuartierLatin.Backend.Validations;
 
-namespace QuartierLatin.Backend.Controllers.PortalControllers
+namespace QuartierLatin.Controllers.PortalControllers
 {
     [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
     [Route("/api/personal/applications")]
+    [ServiceFilter(typeof(PortalUserCompleteRegistrationValidationAttribute))]
     public class PersonalController : Controller
     {
         private readonly IPortalPersonalAppService _personalAppService;
@@ -179,8 +182,11 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
 
         private int GetUserId()
         {
-            var userClaims = User.Identities.FirstOrDefault(identity =>
-                identity.AuthenticationType == CookieAuthenticationPortal.AuthenticationScheme).Claims;
+            var userClaims = User?.Identities?.FirstOrDefault(identity =>
+                identity.AuthenticationType == CookieAuthenticationPortal.AuthenticationScheme)?.Claims;
+
+            if (userClaims is null)
+                throw new ArgumentNullException("User is null");
 
             var userId = Convert.ToInt32(userClaims.FirstOrDefault(claim => claim.Type == "sub").Value);
             return userId;

@@ -15,7 +15,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             _db = db;
         }
 
-        public async Task<int> RegisterAsync(string firstName, string lastName, string phone, string email, string passwordHash, JObject personalInfo)
+        public async Task<int> RegisterAsync(string email, string passwordHash)
         {
             return await _db.ExecAsync(async db =>
             {
@@ -24,12 +24,8 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 
                 return await db.InsertWithInt32IdentityAsync(new PortalUser
                 {
-                    FirstName = firstName,
-                    LastName = lastName,
-                    Phone = phone,
                     Email = email,
-                    PasswordHash = passwordHash,
-                    PersonalInfo = personalInfo.ToString()
+                    PasswordHash = passwordHash
                 });
             });
         }
@@ -43,6 +39,22 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         {
             return await _db.ExecAsync(db =>
                 db.PortalUsers.FirstOrDefaultAsync(user => user.Email == email));
+        }
+
+        public async Task UpdatePortalUserInfo(int portalUserId, string? firstName, string? lastName, string? phone, JObject? personalInfo)
+        {
+            var portalUser = await GetPortalUserByIdAsync(portalUserId);
+
+            if (portalUser is null)
+                return;
+
+            portalUser.FirstName = firstName;
+            portalUser.LastName = lastName;
+            portalUser.Phone = phone;
+            portalUser.PersonalInfo = personalInfo?.ToString();
+
+            await _db.ExecAsync(db => db.UpdateAsync(portalUser));
+            return;
         }
     }
 }

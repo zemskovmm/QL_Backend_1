@@ -25,6 +25,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Validations;
 using X.Web.Sitemap;
 
 namespace QuartierLatin.Backend
@@ -91,6 +92,7 @@ namespace QuartierLatin.Backend
             services.AddSingleton<ISitemapIndexGenerator, SitemapIndexGenerator>();
             services.AddSingleton<SitemapGeneratorForLinks>();
             services.AddSingleton<GlobalSettingsCache<JObject>>();
+            services.AddScoped<PortalUserCompleteRegistrationValidationAttribute>();
 
             services.AddAuthentication(options =>
                 {

@@ -4,14 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Dto.PortalDto;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PortalServices;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Constants;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Portal;
 
 
-namespace QuartierLatin.Backend.Controllers.PortalControllers
+namespace QuartierLatin.Controllers.PortalControllers
 {
     [Route("/api/portal")]
     public class PortalController : Controller
@@ -27,8 +29,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody]PortalRegisterDto portalRegister)
         {
-            var portalUserId = await _portalUserAppService.RegisterAsync(portalRegister.FirstName,
-                portalRegister.LastName, portalRegister.Phone, portalRegister.Email, portalRegister.Password, portalRegister.PersonalInfo);
+            var portalUserId = await _portalUserAppService.RegisterAsync(portalRegister.Email, portalRegister.Password);
 
             if (portalUserId is 0)
                 return new BadRequestObjectResult("Пользователь с таким email существует");
@@ -37,7 +38,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.FirstName),
+                new Claim(ClaimTypes.Name, user.FirstName ?? ""),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim("sub", user.Id.ToString()),
             };
@@ -116,6 +117,50 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationPortal.AuthenticationScheme);
             return Ok();
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+        [HttpPut("user")]
+        public async Task<IActionResult> UpdatePortalUser([FromBody] PortalUserDto portalUserDto)
+        {
+            var userId = GetUserId();
+
+            await _portalUserAppService.UpdateUserInfoAsync(userId, portalUserDto.FirstName, portalUserDto.LastName,
+                portalUserDto.Phone, portalUserDto.PersonalInfo);
+
+            return Ok();
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+        [HttpGet("user"),
+         ProducesResponseType(typeof(PortalUserDto), 200)]
+        public async Task<IActionResult> GetPortalUser()
+        {
+            var userId = GetUserId();
+
+            var portalUser = await _portalUserAppService.GetPortalUserByIdAsync(userId);
+
+            var response = new PortalUserDto
+            {
+                FirstName = portalUser.FirstName,
+                LastName = portalUser.LastName,
+                PersonalInfo = portalUser.PersonalInfo is null ? null : JObject.Parse(portalUser.PersonalInfo),
+                Phone = portalUser.Phone
+            };
+
+            return Ok(response);
+        }
+
+        private int GetUserId()
+        {
+            var userClaims = User?.Identities?.FirstOrDefault(identity =>
+                identity.AuthenticationType == CookieAuthenticationPortal.AuthenticationScheme)?.Claims;
+
+            if (userClaims is null)
+                throw new ArgumentNullException("User is null");
+
+            var userId = Convert.ToInt32(userClaims.FirstOrDefault(claim => claim.Type == "sub").Value);
+            return userId;
         }
     }
 }
