@@ -437,7 +437,8 @@ namespace QuartierLatin.Backend.Controllers
                     Price = housing.housing.Price,
                     GalleryList = housingGallery.GetValueOrDefault(housing.housing.Id),
                     Metadata = housing.housingLanguage.Metadata is null ? null : JObject.Parse(housing.housingLanguage.Metadata),
-                    Location = housing.housingLanguage.Location is null ? null : JObject.Parse(housing.housingLanguage.Location)
+                    Location = housing.housingLanguage.Location is null ? null : JObject.Parse(housing.housingLanguage.Location),
+                    HtmlDescription = housing.housingLanguage.Description
                 });
             };
 

@@ -14,6 +14,7 @@ namespace QuartierLatin.Backend.Dto.HousingCatalogDto
         public int? Price { get; set; }
         public JObject? Metadata { get; set; }
         public JObject? Location { get; set; }
+        public string HtmlDescription { get; set; }
         public Dictionary<string, List<CommonTraitLanguageDto>>? NamedTraits { get; set; }
     }
 }
