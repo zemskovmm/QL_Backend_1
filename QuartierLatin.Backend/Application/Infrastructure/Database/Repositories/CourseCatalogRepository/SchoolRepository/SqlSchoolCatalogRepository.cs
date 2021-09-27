@@ -137,11 +137,17 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 schoolQuery = schoolQuery.Where(schoolFilter);
 
             if (schoolLanguageFilter is not null)
+            {
                 schoolLanguageQuery = schoolLanguageQuery.Where(schoolLanguageFilter);
+
+                var schoolIds = schoolLanguageQuery.Select(lang => lang.SchoolId).Distinct();
+
+                schoolQuery = schoolQuery.Where(school => schoolIds.Contains(school.Id));
+            }
 
             var query = from c in schoolQuery
                 let langs = schoolLanguageQuery.Where(lang => lang.SchoolId == c.Id)
-                    select new { c, langs };
+                select new { c, langs };
 
             var response = query.AsEnumerable().Select(q => new SchoolAndLanguageTuple
             {
