@@ -188,8 +188,14 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 courseQuery = courseQuery.Where(courseFilter);
 
             if (languageFilter is not null)
+            {
                 languageQuery = languageQuery.Where(languageFilter);
 
+                var courseIds = languageQuery.Select(lang => lang.CourseId).Distinct();
+
+                courseQuery = courseQuery.Where(course => courseIds.Contains(course.Id));
+            }
+            
             var q = from c in courseQuery
                 let langs = languageQuery.Where(lang => lang.CourseId == c.Id)
                     select new {c, langs};

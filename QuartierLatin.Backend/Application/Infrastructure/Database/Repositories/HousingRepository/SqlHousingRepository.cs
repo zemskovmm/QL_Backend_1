@@ -89,10 +89,10 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         {
             return await _db.ExecAsync(async db =>
             {
-                var entity = HousingWithLanguages(db,
-                    housingLanguageFilter: housingLang => housingLang.LanguageId == languageId && housingLang.Url == url).First();
+                var entity = HousingWithLanguages(db, null,
+                    housingLang => housingLang.LanguageId == languageId && housingLang.Url == url).First();
 
-                return (housing: entity.Housing, schoolLanguage: entity.HousingLanguage);
+                return (housing: entity.Housing, housingLanguage: entity.HousingLanguage);
             });
         }
 
@@ -155,11 +155,17 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 housingQuery = housingQuery.Where(housingFilter);
 
             if (housingLanguageFilter is not null)
+            {
                 housingLanguageQuery = housingLanguageQuery.Where(housingLanguageFilter);
 
+                var housingIds = housingLanguageQuery.Select(lang => lang.HousingId).Distinct();
+
+                housingQuery = housingQuery.Where(housing => housingIds.Contains(housing.Id));
+            }
+            
             var query = from c in housingQuery
                         let langs = housingLanguageQuery.Where(lang => lang.HousingId == c.Id)
-                select new { c, langs };
+                        select new { c, langs };
 
             var response = query.AsEnumerable().Select(q => new HousingAndLanguageTuple
             {
