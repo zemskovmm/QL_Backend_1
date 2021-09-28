@@ -36,6 +36,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPost("search/{lang}")]
         public async Task<IActionResult> SearchInPages(string lang, [FromBody] PageSearchDto pageSearchDto)
         {
+            lang = lang.ToLower();
+
             var entityType = pageSearchDto.PageType;
             var pageSize = pageSearchDto.PageSize ?? 1000;
             var commonTraits =
@@ -95,6 +97,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("filters/{lang}")]
         public async Task<IActionResult> GetPageFiltersByLang(string lang)
         {
+            lang = lang.ToLower();
+
             var entityType = EntityType.Page;
 
             var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
