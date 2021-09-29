@@ -83,6 +83,7 @@ namespace QuartierLatin.Backend.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public Task<IActionResult> GetCatalogByLangAndEntityTypeCompat(string lang)
         {
+            lang = lang.ToLower();
             return GetCatalogByLangAndEntityType(lang);
         }
 
@@ -92,6 +93,7 @@ namespace QuartierLatin.Backend.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public Task<IActionResult> SearchInCatalogCompat(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
+            lang = lang.ToLower();
             return SearchInCatalog(lang, catalogSearchDto);
         }
 
@@ -99,6 +101,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/api/catalog/university/filters/{lang}")]
         public async Task<IActionResult> GetCatalogByLangAndEntityType(string lang)
         {
+            lang = lang.ToLower();
+
             var entityType = EntityType.University;
 
             var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
@@ -194,6 +198,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPost("/api/catalog/university/search/{lang}")]
         public async Task<IActionResult> SearchInCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
+            lang = lang.ToLower();
+
             var entityType = EntityType.University;
             var pageSize = catalogSearchDto.PageSize ?? 1000;
             var commonTraits =
@@ -254,6 +260,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/api/catalog/course/filters/{lang}")]
         public async Task<IActionResult> GetCatalogFiltersToCourseByLangAndEntityType(string lang)
         {
+            lang = lang.ToLower();
+
             var entityTypeSchool = EntityType.School;
             var entityTypeCourse = EntityType.Course;
 
@@ -286,6 +294,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPost("/api/catalog/course/search/{lang}")]
         public async Task<IActionResult> SearchInCourseCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
+            lang = lang.ToLower();
+
             var pageSize = catalogSearchDto.PageSize ?? 1000;
 
             var commonTraits =
@@ -356,6 +366,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("/api/catalog/housing/filters/{lang}")]
         public async Task<IActionResult> GetCatalogFiltersToHousingByLangAndEntityType(string lang)
         {
+            lang = lang.ToLower();
+
             var entityTypeHousing = EntityType.Housing;
 
             var commonTraitsHousing = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityTypeHousing);
@@ -385,6 +397,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPost("/api/catalog/housing/search/{lang}")]
         public async Task<IActionResult> SearchInHousingCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
         {
+            lang = lang.ToLower();
+
             var pageSize = catalogSearchDto.PageSize ?? 1000;
 
             var commonTraits =

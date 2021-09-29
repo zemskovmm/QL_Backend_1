@@ -68,6 +68,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/{**route}")]
         public async Task<IActionResult> GetPage(string lang, string route)
         {
+            lang = lang.ToLower();
+
             var routeResponse = await _routeAppService.GetPageByUrlAsync(lang, route);
 
             if (routeResponse is null)
@@ -91,6 +93,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/university/{**url}")]
         public async Task<IActionResult> GetUniversity(string lang, string url)
         {
+            lang = lang.ToLower();
+
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
@@ -160,6 +164,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/school/{**url}")]
         public async Task<IActionResult> GetSchool(string lang, string url)
         {
+            lang = lang.ToLower();
+
             var moduleAndUrls = await GetSchoolModuleDto(lang, url);
 
             var response = new RouteDto<SchoolModuleDto>("school", moduleAndUrls.urls, moduleAndUrls.schoolModule, "school", moduleAndUrls.schoolModule.Title);
@@ -170,6 +176,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/{schoolUrl}/courses/{**url}")]
         public async Task<IActionResult> GetSchoolAndCourse(string lang, string schoolUrl, string url)
         {
+            lang = lang.ToLower();
+
             var courseModuleAndUrls = await GetCourseModuleDtoWithUrls(lang, url);
 
             var schoolModuleAndUrls = await GetSchoolModuleDto(lang, schoolUrl);
@@ -194,6 +202,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/{schoolUrl}/courses/")]
         public async Task<IActionResult> GetSchoolAndCourseList(string lang, string schoolUrl)
         {
+            lang = lang.ToLower();
+
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var schoolModuleAndUrls = await GetSchoolModuleDto(lang, schoolUrl);
@@ -218,6 +228,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/course/{**url}")]
         public async Task<IActionResult> GetCourse(string lang, string url)
         {
+            lang = lang.ToLower();
+
             var moduleAndUrls = await GetCourseModuleDtoWithUrls(lang, url);
 
             var response = new RouteDto<CourseModuleDto>("course", moduleAndUrls.urls, moduleAndUrls.courseModule, "course", moduleAndUrls.courseModule.Title);
@@ -228,6 +240,8 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/housing/{**url}")]
         public async Task<IActionResult> GetHousing(string lang, string url)
         {
+            lang = lang.ToLower();
+
             var moduleAndUrls = await GetHousingModuleAsync(lang, url);
 
             var response = new RouteDto<HousingModuleDto>("housing", moduleAndUrls.urls, moduleAndUrls.housingModule, "housing", moduleAndUrls.housingModule.Title);
