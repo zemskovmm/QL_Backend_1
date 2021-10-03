@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
-using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.AppStateRepository;
 using QuartierLatin.Backend.Application.ApplicationCore.Models;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Constants;
@@ -19,13 +18,13 @@ using QuartierLatin.Backend.Storages;
 using QuartierLatin.Backend.Storages.Cache;
 using QuartierLatin.Backend.Utils;
 using QuartierLatin.Backend.Utils.Swagger;
+using QuartierLatin.Backend.Validations;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using QuartierLatin.Backend.Validations;
 using X.Web.Sitemap;
 
 namespace QuartierLatin.Backend
@@ -85,6 +84,15 @@ namespace QuartierLatin.Backend
                     });
             });
 
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.OnAppendCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+            });
+
             services.AddControllers();
             AutoRegisterByTypeName(services);
             services.AddSingleton<UserAuthManager>();
@@ -101,7 +109,7 @@ namespace QuartierLatin.Backend
                 })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
-                    options.Cookie.SameSite = SameSiteMode.None;
+                    options.Cookie.SameSite = SameSiteMode.Strict;
                     options.Events.OnRedirectToAccessDenied = context =>
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
@@ -116,7 +124,7 @@ namespace QuartierLatin.Backend
                 .AddCookie(CookieAuthenticationPortal.AuthenticationScheme, options =>
                 {
                     options.LoginPath = "/api/portal/login/";
-                    options.Cookie.SameSite = SameSiteMode.None;
+                    options.Cookie.SameSite = SameSiteMode.Strict;
                     options.Events.OnRedirectToAccessDenied = context =>
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
@@ -189,8 +197,6 @@ namespace QuartierLatin.Backend
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var roleRepository = app.ApplicationServices.GetRequiredService<IRoleRepository>();
-            var userAuthManager = app.ApplicationServices.GetRequiredService<UserAuthManager>();
             app.UseCors(builder => builder
                 .AllowAnyHeader()
                 .AllowAnyMethod()
@@ -269,7 +275,6 @@ namespace QuartierLatin.Backend
                 return next();
             });
 
-            
             StaticFiles();
             MigrationRunner.MigrateDb(DatabaseConfig.ConnectionString, typeof(Startup).Assembly, DatabaseConfig.Type);
             AppDbContextSeed.Seed(app.ApplicationServices.GetRequiredService<AppDbContextManager>());
@@ -291,6 +296,18 @@ namespace QuartierLatin.Backend
             });
 
             StartUpdater();
+        }
+
+        private void CheckSameSite(HttpContext httpContext, CookieOptions options)
+        {
+            if (options.SameSite == SameSiteMode.None)
+            {
+                var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+                if (DisallowsSameSiteNone.DisallowsSameSiteNoneByUserAgent(userAgent))
+                {
+                    options.SameSite = SameSiteMode.Unspecified;
+                }
+            }
         }
     }
 }
