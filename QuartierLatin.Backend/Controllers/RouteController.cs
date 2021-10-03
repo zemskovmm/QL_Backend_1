@@ -233,19 +233,6 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{lang}/course/{**url}")]
-        public async Task<IActionResult> GetCourse(string lang, string url)
-        {
-            url = WebUtility.UrlDecode(url);
-            lang = lang.ToLower();
-
-            var moduleAndUrls = await GetCourseModuleDtoWithUrls(lang, url);
-
-            var response = new RouteDto<CourseModuleDto>("course", moduleAndUrls.urls, moduleAndUrls.courseModule, "course", moduleAndUrls.courseModule.Title);
-
-            return Ok(response);
-        }
-
         [HttpGet("{lang}/housing/{**url}")]
         public async Task<IActionResult> GetHousing(string lang, string url)
         {
@@ -451,7 +438,7 @@ namespace QuartierLatin.Backend.Controllers
                     Id = trait.Id,
                     IconBlobId = trait.IconBlobId,
                     Identifier = trait.Identifier,
-                    Name = trait.Names[lang]
+                    Name = trait.Names.GetSuitableName(lang)
                 }).ToList());
             }
 

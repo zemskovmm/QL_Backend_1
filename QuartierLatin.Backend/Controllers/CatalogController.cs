@@ -309,7 +309,7 @@ namespace QuartierLatin.Backend.Controllers
             var courseIds = catalogPage.courseAndLanguage.Select(x => x.course.Id);
             var schoolIds = catalogPage.courseAndLanguage.Select(x => x.course.SchoolId).Distinct();
 
-            var schoolImageIdAndName = await _schoolAppService.GetSchoolImageIdAndNameByIdsAsync(schoolIds, lang);
+            var schoolImageIdAndName = await _schoolAppService.GetSchoolImageIdAndNameAndUrlByIdsAsync(schoolIds, lang);
 
             var commonTraitsCourse = await _courseAppService.GetCommonTraitListByCourseIdsAsync(courseIds);
 
@@ -341,8 +341,8 @@ namespace QuartierLatin.Backend.Controllers
 
                 courseDtos.Add(new CatalogCourseDto()
                 {
-                    Url = $"/{lang}/course/{course.courseLanguage.Url}",
-                    LanglessUrl = $"/course/{course.courseLanguage.Url}",
+                    Url = $"/{lang}/{schoolImageIdAndName[course.course.SchoolId].schoolUrl}/courses/{course.courseLanguage.Url}",
+                    LanglessUrl = $"{schoolImageIdAndName[course.course.SchoolId].schoolUrl}/courses/{course.courseLanguage.Url}",
                     Name = course.courseLanguage.Name,
                     CourseImageId = course.course.ImageId,
                     NamedTraits = traits,

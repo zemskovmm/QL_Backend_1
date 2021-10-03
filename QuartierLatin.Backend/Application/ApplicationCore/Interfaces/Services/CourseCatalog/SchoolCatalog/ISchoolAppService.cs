@@ -12,6 +12,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.
         Task<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)> GetSchoolByIdAsync(int id);
         Task UpdateSchoolByIdAsync(int id, int? schoolDtoFoundationYear, int? imageId);
         Task UpdateSchoolLanguageByIdAsync(int id, string htmlDescription, int languageId, string name, string url, JObject? metadata);
-        Task<Dictionary<int, (int? schoolImageId, string schoolName)>> GetSchoolImageIdAndNameByIdsAsync(IEnumerable<int> schoolIds, string lang);
+        Task<Dictionary<int, (int? schoolImageId, string schoolName, string schoolUrl)>> GetSchoolImageIdAndNameAndUrlByIdsAsync(IEnumerable<int> schoolIds, string lang);
     }
 }
