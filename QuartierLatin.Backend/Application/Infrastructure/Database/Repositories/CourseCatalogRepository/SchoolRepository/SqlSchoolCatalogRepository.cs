@@ -95,7 +95,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             });
         }
 
-        public async Task<Dictionary<int, (int? schoolImageId, string schoolName)>> GetSchoolImageIdAndNameByIdsAsync(IEnumerable<int> schoolIds, string lang)
+        public async Task<Dictionary<int, (int? schoolImageId, string schoolName, string schoolUrl)>> GetSchoolImageIdAndNameAndUrlByIdsAsync(IEnumerable<int> schoolIds, string lang)
         {
             return await _db.ExecAsync(async db =>
             {
@@ -108,14 +108,15 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                     {
                         school.Id,
                         school.ImageId,
-                        lang.Name
+                        lang.Name,
+                        lang.Url
                     };
 
                 return await schoolWithLanguages.ToDictionaryAsync(school => school.Id,
-                    school => (school.ImageId, school.Name));
+                    school => (school.ImageId, school.Name, school.Url));
             });
         }
-
+        
         private record SchoolAndLanguageTuple
         {
             public School School { get; set; }

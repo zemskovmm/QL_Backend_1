@@ -13,6 +13,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
         Task UpdateSchoolByIdAsync(int id, int? foundationYear, int? imageId);
         Task CreateOrUpdateSchoolLanguageByIdAsync(int schoolId, string htmlDescription, int languageId, string name, string url, JObject? metadata);
         Task<(School school, Dictionary<int, SchoolLanguages> schoolLanguage)> GetSchoolByUrlWithLanguageAsync(int languageId, string url);
-        Task<Dictionary<int, (int? schoolImageId, string schoolName)>> GetSchoolImageIdAndNameByIdsAsync(IEnumerable<int> schoolIds, string lang);
+        Task<Dictionary<int, (int? schoolImageId, string schoolName, string schoolUrl)>> GetSchoolImageIdAndNameAndUrlByIdsAsync(IEnumerable<int> schoolIds, string lang);
     }
 }
