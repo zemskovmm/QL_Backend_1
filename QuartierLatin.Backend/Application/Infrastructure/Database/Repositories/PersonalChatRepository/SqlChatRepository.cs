@@ -67,8 +67,10 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 
                     await CreateMessageAsync(db, "User", chatId, type, text, blobId);
                 }
-
-                await CreateMessageAsync(db, "User", chat.Id, type, text, blobId);
+                else
+                {
+                    await CreateMessageAsync(db, "User", chat.Id, type, text, blobId);
+                }
 
                 return true;
             });

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Newtonsoft.Json.Linq;
@@ -17,7 +16,7 @@ using QuartierLatin.Backend.Dto.PortalApplicationDto;
 using QuartierLatin.Backend.Utils;
 using QuartierLatin.Backend.Validations;
 
-namespace QuartierLatin.Controllers.PortalControllers
+namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
     [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
     [Route("/api/personal/applications")]
@@ -128,7 +127,7 @@ namespace QuartierLatin.Controllers.PortalControllers
             var messages = await _chatAppService.GetChatMessagesAsync(id, userId);
 
             if (messages is null || messages.Count is 0)
-                return NotFound();
+                return Ok(new List<PortalChatMessageListDto>());
 
             var response = messages.Select(message => new PortalChatMessageListDto
             {
