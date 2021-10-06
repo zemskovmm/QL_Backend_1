@@ -18,7 +18,7 @@ using QuartierLatin.Backend.Validations;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
-    [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+    [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
     [Route("/api/personal/applications")]
     [ServiceFilter(typeof(PortalUserCompleteRegistrationValidationAttribute))]
     public class PersonalController : Controller
