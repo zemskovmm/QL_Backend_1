@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogModels.SchoolModels;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -460,12 +461,50 @@ namespace QuartierLatin.Backend.Controllers
             return module;
         }
 
-        private async Task<List<CourseModuleDto>> GetCourseModuleDtoList(
+        private async Task<CourseListModuleDto> GetCourseListModule(List<CommonTraitType> traitsType,
+            (Course course, Dictionary<int, CourseLanguage> courseLanguage, Dictionary<int, SchoolLanguages> schoolLanguage) course,
+            Dictionary<int, string> languageIds, string lang, int languageId)
+        {
+            var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+            foreach (var traitType in traitsType)
+            {
+                var commonTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndCourseIdAsync(traitType.Id, course.course.Id);
+
+                traits.Add(traitType.Identifier, commonTraits.Select(trait => new CommonTraitLanguageDto
+                {
+                    Id = trait.Id,
+                    IconBlobId = trait.IconBlobId,
+                    Identifier = trait.Identifier,
+                    Name = trait.Names.GetSuitableName(lang)
+                }).ToList());
+            }
+
+            var courseTraits = new NamedTraitsModuleDto()
+            {
+                NamedTraits = traits,
+            };
+
+            var module = new CourseListModuleDto()
+            {
+                Url = $"/{lang}/{course.schoolLanguage[languageId].Url}/courses/{course.courseLanguage[languageId].Url}",
+                LanglessUrl = $"/{course.schoolLanguage[languageId].Url}/courses/{course.courseLanguage[languageId].Url}",
+                Name = course.courseLanguage[languageId].Name,
+                ImageId = course.course.ImageId,
+                Price = course.course.Price,
+                SchoolName = course.schoolLanguage[languageId].Name,
+                Traits = courseTraits,
+            };
+
+            return module;
+        }
+
+        private async Task<List<CourseListModuleDto>> GetCourseModuleDtoList(
             string lang, int schoolId, Dictionary<int, string> languageIds)
         {
             var courses = await _courseCatalogRepository.GetCoursesListAsync(schoolId);
 
-            var response = new List<CourseModuleDto>();
+            var response = new List<CourseListModuleDto>();
 
             var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
 
@@ -473,7 +512,7 @@ namespace QuartierLatin.Backend.Controllers
 
             foreach (var course in courses)
             {
-                response.Add(await GetCourseModule(traitsType, course, languageIds, lang, languageId));
+                response.Add(await GetCourseListModule(traitsType, course, languageIds, lang, languageId));
             }
 
             return response;

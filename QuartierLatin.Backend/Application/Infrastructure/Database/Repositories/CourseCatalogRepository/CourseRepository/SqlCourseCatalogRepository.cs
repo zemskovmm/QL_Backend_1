@@ -8,6 +8,7 @@ using LinqToDB.Data;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.CourseRepository;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogModels.CoursesModels;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogModels.SchoolModels;
 using QuartierLatin.Backend.Utils;
 
 namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories.CourseCatalogRepository.CourseRepository
@@ -155,12 +156,24 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             });
         }
 
-        public async Task<List<(Course course, Dictionary<int, CourseLanguage> courseLanguage)>> GetCoursesListAsync(int schoolId)
+        public async Task<List<(Course course, Dictionary<int, CourseLanguage> courseLanguage, Dictionary<int, SchoolLanguages> schoolLanguage)>> GetCoursesListAsync(int schoolId)
         {
             return await _db.ExecAsync(async db =>
             {
                 var entity =  CourseWithLanguages(db, course => course.SchoolId == schoolId);
-                var response = entity.Select(resp => (resp.Course, resp.CourseLanguage)).ToList();
+
+                var courseSchool = from course in entity
+                    let langs = db.SchoolLanguages.Where(lang => lang.SchoolId == course.Course.SchoolId)
+                    select new
+                    {
+                        course, 
+                        langs
+                    };
+
+                var response = courseSchool.Select(resp =>
+                    (resp.course.Course, 
+                        resp.course.CourseLanguage,
+                        resp.langs.ToDictionary(school => school.LanguageId, school => school))).ToList();
 
                 return response;
             });
