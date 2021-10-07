@@ -7,6 +7,6 @@ namespace QuartierLatin.Backend.Dto.CourseCatalogDto.RouteDto
     public class SchoolCourseListModuleDto
     {
         public SchoolModuleDto School { get; set; }
-        public List<CourseModuleDto> Courses { get; set; }
+        public List<CourseListModuleDto> Courses { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogModels.CoursesModels;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogModels.SchoolModels;
 
 namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.CourseRepository
 {
@@ -15,6 +16,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
         Task<(Course course, Dictionary<int, CourseLanguage> courseLanguage)> GetCourseByUrlWithLanguageAsync(int languageId, string url);
         Task<(int totalItems, List<(Course course, CourseLanguage courseLanguage)>)> GetCoursePageByFilter(List<List<int>> commonTraitsIds, int langId, int skip, int take);
         Task<List<string>> GetCourseUrlsListAsync(int schoolId);
-        Task<List<(Course course, Dictionary<int, CourseLanguage> courseLanguage)>> GetCoursesListAsync(int schoolId);
+        Task<List<(Course course, Dictionary<int, CourseLanguage> courseLanguage, Dictionary<int, SchoolLanguages> schoolLanguage)>> GetCoursesListAsync(int schoolId);
     }
 }
