@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
@@ -28,7 +29,10 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 Type = type,
                 CommonTypeSpecificApplicationInfo = applicationInfo.ToString(),
                 EntityId = entityId,
-                EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo.ToString()
+                EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo.ToString(),
+                Date = DateTime.Now,
+                IsAnswered = false,
+                IsNewMessages = false
             }));
         }
 
@@ -55,7 +59,10 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                     UserId = applicationPortal.UserId,
                     CommonTypeSpecificApplicationInfo = applicationInfo is null ? null : applicationInfo.ToString(),
                     EntityId = entityId,
-                    EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo is null ? null : entityTypeSpecificApplicationInfo.ToString()
+                    EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo is null ? null : entityTypeSpecificApplicationInfo.ToString(),
+                    Date = applicationPortal.Date,
+                    IsAnswered = false,
+                    IsNewMessages = applicationPortal.IsNewMessages
                 });
                 return true;
             });
