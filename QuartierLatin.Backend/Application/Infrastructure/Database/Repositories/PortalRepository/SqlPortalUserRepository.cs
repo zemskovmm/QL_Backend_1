@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using LinqToDB;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.PortalRepository;
@@ -25,7 +28,8 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 return await db.InsertWithInt32IdentityAsync(new PortalUser
                 {
                     Email = email,
-                    PasswordHash = passwordHash
+                    PasswordHash = passwordHash,
+                    RegistrationDate = DateTime.Now
                 });
             });
         }
@@ -55,6 +59,30 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 
             await _db.ExecAsync(db => db.UpdateAsync(portalUser));
             return;
+        }
+
+        public async Task<(int totalItems, List<PortalUser> users)> GetPortalUserAdminListAsync(string? firstName, string? lastName, string? email, string? phone, int skip, int take)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var users = db.PortalUsers.AsQueryable();
+
+                if (firstName is not null)
+                    users = users.Where(user => user.FirstName.StartsWith(firstName));
+
+                if (lastName is not null)
+                    users = users.Where(user => user.LastName.StartsWith(lastName));
+
+                if (email is not null)
+                    users = users.Where(user => user.Email.StartsWith(email));
+
+                if (phone is not null)
+                    users = users.Where(user => user.Phone.StartsWith(phone));
+
+                var totalCount = await users.CountAsync();
+
+                return (totalItems: totalCount, await users.Skip(skip).Take(take).ToListAsync());
+            });
         }
     }
 }

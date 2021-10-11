@@ -101,5 +101,45 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 return portalApplication is not null;
             });
         }
+
+        public async Task<(int totalItems, List<(PortalApplication application, PortalUser user)> portalApplications)> GetApplicationCatalogAdminAsync(ApplicationType? type, ApplicationStatus? status, bool? isAnswered,
+            string? firstName, string? lastName, string? email, string? phone, int skip, int take)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var portalApplications = from application in db.PortalApplications
+                    join user in db.PortalUsers on application.UserId equals user.Id
+                    select new
+                    {
+                        application,
+                        user
+                    };
+
+                if (type is not null)
+                    portalApplications = portalApplications.Where(portal => portal.application.Type == type);
+
+                if (status is not null)
+                    portalApplications = portalApplications.Where(portal => portal.application.Status == status);
+
+                if (isAnswered is not null)
+                    portalApplications = portalApplications.Where(portal => portal.application.IsAnswered == isAnswered);
+
+                if (firstName is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.FirstName.StartsWith(firstName));
+
+                if (lastName is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.LastName.StartsWith(lastName));
+
+                if (email is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.Email.StartsWith(email));
+
+                if (phone is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.Phone.StartsWith(phone));
+
+                var totalCount = await portalApplications.CountAsync();
+
+                return (totalCount, portalApplications.Skip(skip).Take(take).ToList().Select(application => (application: application.application, user: application.user)).ToList());
+            });
+        }
     }
 }

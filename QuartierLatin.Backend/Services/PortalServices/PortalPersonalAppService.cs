@@ -44,5 +44,11 @@ namespace QuartierLatin.Backend.Services.PortalServices
         {
             return await _portalPersonalRepository.CheckIsUserOwnerAsync(userId, applicationId);
         }
+
+        public async Task<(int totalItems, List<(PortalApplication application, PortalUser user)> portalApplications)> GetApplicationCatalogAdminAsync(ApplicationType? type, ApplicationStatus? status, bool? isAnswered,
+            string? firstName, string? lastName, string? email, string? phone, int page, int pageSize)
+        {
+            return await _portalPersonalRepository.GetApplicationCatalogAdminAsync(type, status, isAnswered, firstName, lastName, email, phone, pageSize * page, pageSize);
+        }
     }
 }

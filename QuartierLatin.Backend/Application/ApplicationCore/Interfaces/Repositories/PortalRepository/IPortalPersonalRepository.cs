@@ -13,5 +13,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
         Task<PortalApplication> GetApplicationAsync(int id, int userid);
         Task<(int totalItems, List<PortalApplication> portalApplications)> GetApplicationCatalogAsync(int userid, ApplicationType? type, ApplicationStatus? status, int skip, int take);
         Task<bool> CheckIsUserOwnerAsync(int userId, int applicationId);
+        Task<(int totalItems, List<(PortalApplication application, PortalUser user)> portalApplications)> GetApplicationCatalogAdminAsync(ApplicationType? type, ApplicationStatus? status, bool? isAnswered,
+            string? firstName, string? lastName, string? email, string? phone, int skip, int take);
     }
 }

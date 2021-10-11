@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -52,6 +53,13 @@ namespace QuartierLatin.Backend.Services.PortalServices
                 throw new ArgumentException("Invalid phone");
 
             await _portalUserRepository.UpdatePortalUserInfo(portalUserId, firstName, lastName, phone, personalInfo);
+        }
+
+        public async Task<(int totalItems, List<PortalUser> users)> GetPortalUserAdminListAsync(string? firstName, string? lastName, string? email, string? phone, int page,
+            int pageSize)
+        {
+            return await _portalUserRepository.GetPortalUserAdminListAsync(firstName, lastName, email, phone,
+                pageSize * page, pageSize);
         }
     }
 }

@@ -8,6 +8,10 @@ using QuartierLatin.Backend.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PortalServices;
+using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
+using QuartierLatin.Backend.Dto.PortalApplicationDto;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
@@ -17,11 +21,14 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
     {
         private readonly IChatAppService _chatAppService;
         private readonly IFileAppService _fileAppService;
+        private readonly IPortalPersonalAppService _personalAppService;
 
-        public AdminPersonalController(IChatAppService chatAppService, IFileAppService fileAppService)
+        public AdminPersonalController(IChatAppService chatAppService, IFileAppService fileAppService,
+            IPortalPersonalAppService portalPersonalAppService)
         {
             _chatAppService = chatAppService;
             _fileAppService = fileAppService;
+            _personalAppService = portalPersonalAppService;
         }
 
         [HttpGet("{id}/chat/messages"),
@@ -88,6 +95,38 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
                 return BadRequest();
 
             return Ok();
+        }
+
+        [HttpGet(),
+         ProducesResponseType(typeof(CatalogSearchResponseDtoList<PortalApplicationAdminDto>), 200),
+         ProducesResponseType(404)]
+        public async Task<IActionResult> GetApplicationCatalog([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] ApplicationType? type, 
+            [FromQuery] ApplicationStatus? status, [FromQuery] bool? isAnswered, [FromQuery] string? firstName, [FromQuery] string? lastName,
+            [FromQuery] string? email, [FromQuery] string? phone)
+        {
+            var portalApplicationList = await _personalAppService.GetApplicationCatalogAdminAsync(type, status, isAnswered, firstName, lastName, email, phone, page, pageSize);
+
+            var portalDtos = portalApplicationList.portalApplications.Select(application => new PortalApplicationAdminDto
+            {
+                Id = application.application.Id,
+                Type = application.application.Type,
+                EntityId = application.application.EntityId,
+                Status = application.application.Status,
+                CommonApplicationInfo = JObject.Parse(application.application.CommonTypeSpecificApplicationInfo),
+                EntityTypeSpecificApplicationInfo = JObject.Parse(application.application.EntityTypeSpecificApplicationInfo),
+                FirstName = application.user.FirstName,
+                LastName = application.user.LastName,
+                UserId = application.user.Id
+            }).ToList();
+
+            var response = new CatalogSearchResponseDtoList<PortalApplicationAdminDto>
+            {
+                Items = portalDtos,
+                TotalItems = portalApplicationList.totalItems,
+                TotalPages = FilterHelper.PageCount(portalApplicationList.totalItems, pageSize)
+            };
+
+            return Ok(response);
         }
     }
 }
