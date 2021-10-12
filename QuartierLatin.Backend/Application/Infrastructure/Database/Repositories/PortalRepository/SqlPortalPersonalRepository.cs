@@ -36,12 +36,12 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             }));
         }
 
-        public async Task<bool> UpdateApplicationAsync(int id, int userid, ApplicationType? type, int? entityId, JObject applicationInfo,
+        public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo,
             JObject entityTypeSpecificApplicationInfo)
         {
             return await _db.ExecAsync(async db =>
             {
-                var applicationPortal = await db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id && portal.UserId == userid);
+                var applicationPortal = await db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id);
 
                 if (applicationPortal is null)
                     return false;
@@ -68,9 +68,9 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             });
         }
 
-        public async Task<PortalApplication> GetApplicationAsync(int id, int userid)
+        public async Task<PortalApplication> GetApplicationAsync(int id)
         {
-            return await _db.ExecAsync(db => db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id && portal.UserId == userid));
+            return await _db.ExecAsync(db => db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id));
         }
 
         public async Task<(int totalItems, List<PortalApplication> portalApplications)> GetApplicationCatalogAsync(int userid, ApplicationType? type, ApplicationStatus? status, int skip, int take)
@@ -103,7 +103,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         }
 
         public async Task<(int totalItems, List<(PortalApplication application, PortalUser user)> portalApplications)> GetApplicationCatalogAdminAsync(ApplicationType? type, ApplicationStatus? status, bool? isAnswered,
-            string? firstName, string? lastName, string? email, string? phone, int skip, int take)
+            string? firstName, string? lastName, string? email, string? phone, int? userId, int skip, int take)
         {
             return await _db.ExecAsync(async db =>
             {
@@ -135,6 +135,9 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 
                 if (phone is not null)
                     portalApplications = portalApplications.Where(portal => portal.user.Phone.StartsWith(phone));
+
+                if (userId is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.Id == userId);
 
                 var totalCount = await portalApplications.CountAsync();
 

@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Dto.PortalDto;
 using QuartierLatin.Backend.Utils;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QuartierLatin.Backend.Controllers.PortalControllers
 {

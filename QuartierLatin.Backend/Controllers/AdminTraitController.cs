@@ -6,6 +6,7 @@ using QuartierLatin.Backend.Dto.CommonTraitDto;
 using QuartierLatin.Backend.Dto.TraitTypeDto;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Serialization;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;

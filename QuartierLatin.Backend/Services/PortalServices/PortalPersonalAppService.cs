@@ -24,15 +24,15 @@ namespace QuartierLatin.Backend.Services.PortalServices
                 entityTypeSpecificApplicationInfo, userId);
         }
 
-        public async Task<bool> UpdateApplicationAsync(int id, int userid, ApplicationType? type, int? entityId, JObject applicationInfo,
+        public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo,
             JObject entityTypeSpecificApplicationInfo)
         {
-            return await _portalPersonalRepository.UpdateApplicationAsync(id, userid, type, entityId, applicationInfo, entityTypeSpecificApplicationInfo);
+            return await _portalPersonalRepository.UpdateApplicationAsync(id, type, entityId, applicationInfo, entityTypeSpecificApplicationInfo);
         }
 
-        public async Task<PortalApplication> GetApplicationAsync(int id, int userid)
+        public async Task<PortalApplication> GetApplicationAsync(int id)
         {
-            return await _portalPersonalRepository.GetApplicationAsync(id, userid);
+            return await _portalPersonalRepository.GetApplicationAsync(id);
         }
 
         public async Task<(int totalItems, List<PortalApplication> portalApplications)> GetApplicationCatalogAsync(int userid, ApplicationType? type, ApplicationStatus? status, int page, int pageSize)
@@ -46,9 +46,9 @@ namespace QuartierLatin.Backend.Services.PortalServices
         }
 
         public async Task<(int totalItems, List<(PortalApplication application, PortalUser user)> portalApplications)> GetApplicationCatalogAdminAsync(ApplicationType? type, ApplicationStatus? status, bool? isAnswered,
-            string? firstName, string? lastName, string? email, string? phone, int page, int pageSize)
+            string? firstName, string? lastName, string? email, string? phone, int? userId, int page, int pageSize)
         {
-            return await _portalPersonalRepository.GetApplicationCatalogAdminAsync(type, status, isAnswered, firstName, lastName, email, phone, pageSize * page, pageSize);
+            return await _portalPersonalRepository.GetApplicationCatalogAdminAsync(type, status, isAnswered, firstName, lastName, email, phone, userId, pageSize * page, pageSize);
         }
     }
 }

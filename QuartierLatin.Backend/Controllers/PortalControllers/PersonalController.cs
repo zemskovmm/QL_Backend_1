@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Newtonsoft.Json.Linq;
@@ -54,7 +55,12 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         {
             var userId = GetUserId();
 
-            var response = await _personalAppService.UpdateApplicationAsync(id, userId, updatePortalApplication.Type,
+            var isOwner = await _personalAppService.CheckIsUserOwnerAsync(userId, id);
+
+            if (isOwner is false)
+                return Forbid();
+
+            var response = await _personalAppService.UpdateApplicationAsync(id, updatePortalApplication.Type,
                 updatePortalApplication.EntityId, updatePortalApplication.CommonApplicationInfo,
                 updatePortalApplication.EntityTypeSpecificApplicationInfo);
 
@@ -71,7 +77,12 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         {
             var userId = GetUserId();
 
-            var application = await _personalAppService.GetApplicationAsync(id, userId);
+            var isOwner = await _personalAppService.CheckIsUserOwnerAsync(userId, id);
+
+            if (isOwner is false)
+                return Forbid();
+
+            var application = await _personalAppService.GetApplicationAsync(id);
 
             if (application is null)
                 return NotFound();
