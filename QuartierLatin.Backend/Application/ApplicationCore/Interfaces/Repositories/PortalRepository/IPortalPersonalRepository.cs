@@ -9,7 +9,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
     public interface IPortalPersonalRepository
     {
         Task<int> CreateApplicationAsync(ApplicationType? type, int? entityId, JObject applicationInfo, JObject entityTypeSpecificApplicationInfo, int userId);
-        Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo, JObject entityTypeSpecificApplicationInfo);
+        Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo, JObject entityTypeSpecificApplicationInfo, bool? isActive = null);
         Task<PortalApplication> GetApplicationAsync(int id);
         Task<(int totalItems, List<PortalApplication> portalApplications)> GetApplicationCatalogAsync(int userid, ApplicationType? type, ApplicationStatus? status, int skip, int take);
         Task<bool> CheckIsUserOwnerAsync(int userId, int applicationId);

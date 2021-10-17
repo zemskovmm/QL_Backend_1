@@ -35,9 +35,9 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         [HttpGet("{id}/chat/messages"),
          ProducesResponseType(typeof(List<PortalChatMessageListDto>), 200),
          ProducesResponseType(404)]
-        public async Task<IActionResult> GetChatMessages(int id)
+        public async Task<IActionResult> GetChatMessages(int id, [FromQuery] int? beforeMessageId, [FromQuery] int? afterMessageId, [FromQuery] int count)
         {
-            var messages = await _chatAppService.GetChatMessagesAdminAsync(id);
+            var messages = await _chatAppService.GetChatMessagesAsync(id, count, beforeMessageId, afterMessageId);
 
             if (messages is null || messages.Count is 0)
                 return NotFound();
@@ -188,7 +188,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         [HttpPut("{id}"),
          ProducesResponseType(200),
          ProducesResponseType(403)]
-        public async Task<IActionResult> UpdateApplication(int id, [FromBody] PortalApplicationWithoutIdDto updatePortalApplication)
+        public async Task<IActionResult> UpdateApplication(int id, [FromBody] PortalApplicationAdminUpdateDto updatePortalApplication)
         {
             var response = await _personalAppService.UpdateApplicationAsync(id, updatePortalApplication.Type,
                 updatePortalApplication.EntityId, updatePortalApplication.CommonApplicationInfo,

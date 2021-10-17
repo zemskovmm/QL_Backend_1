@@ -37,7 +37,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         }
 
         public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo,
-            JObject entityTypeSpecificApplicationInfo)
+            JObject entityTypeSpecificApplicationInfo, bool? isActive = null)
         {
             return await _db.ExecAsync(async db =>
             {
@@ -61,7 +61,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                     EntityId = entityId,
                     EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo is null ? null : entityTypeSpecificApplicationInfo.ToString(),
                     Date = applicationPortal.Date,
-                    IsAnswered = false,
+                    IsAnswered = isActive is null ? false : isActive.Value,
                     IsNewMessages = applicationPortal.IsNewMessages
                 });
                 return true;

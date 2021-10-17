@@ -19,20 +19,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             _db = db;
         }
 
-        public async Task<List<ChatMessages>> GetChatMessagesAsync(int applicationId, int portalUserId)
-        {
-            return await _db.ExecAsync(async db =>
-            {
-                var chat = await GetChatByApplicationAndPortalUserIdAsync(applicationId, portalUserId);
-
-                if (chat is null)
-                    return null;
-
-                return await GetMessagesByChatIdAsync(chat.Id);
-            });
-        }
-
-        public async Task<List<ChatMessages>> GetChatMessagesAdminAsync(int applicationId)
+        public async Task<List<ChatMessages>> GetChatMessagesAsync(int applicationId, int count, int? beforeMessageId = null, int? afterMessageId = null)
         {
             return await _db.ExecAsync(async db =>
             {
@@ -41,7 +28,18 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 if (chat is null)
                     return null;
 
-                return await GetMessagesByChatIdAsync(chat.Id);
+                var messages = db.ChatMessages.Where(message => message.ChatId == chat.Id).AsQueryable();
+
+                if (beforeMessageId is not null)
+                    messages = messages.Where(message => message.Id <= beforeMessageId).TakeLast(count);
+
+                if (afterMessageId is not null)
+                    messages = messages.Where(message => message.Id >= afterMessageId).TakeLast(count);
+
+                if (beforeMessageId is null && afterMessageId is null)
+                    messages = messages.TakeLast(count);
+
+                return await messages.ToListAsync();
             });
         }
 
@@ -90,7 +88,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 if (chat is null)
                     return false;
 
-                await CreateMessageAsync(db, "User", chat.Id, type, applicationId, text, blobId);
+                await CreateMessageAsync(db, "Manager", chat.Id, type, applicationId, text, blobId);
 
                 return true;
             });
@@ -107,9 +105,6 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 return query.Select(queryItem => (chat: queryItem.map, user: queryItem.user)).ToList();
             });
         }
-
-        private async Task<List<ChatMessages>> GetMessagesByChatIdAsync(int chatId) =>
-            await _db.ExecAsync(db => db.ChatMessages.Where(message => message.ChatId == chatId).ToListAsync());
 
         private async Task<Chat> GetChatByApplicationAndPortalUserIdAsync(int applicationId, int? portalUserId = null)
         {

@@ -70,6 +70,8 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database
         public ITable<PortalApplication> PortalApplications => GetTable<PortalApplication>();
         public ITable<ChatMessages> ChatMessages => GetTable<ChatMessages>();
         public ITable<Chat> Chats => GetTable<Chat>();
+        public ITable<PortalApplicationFileStorage> PortalApplicationFileStorages =>
+            GetTable<PortalApplicationFileStorage>();
     }
 
     public interface IAppDbConnectionFactory

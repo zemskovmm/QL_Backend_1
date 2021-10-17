@@ -25,9 +25,9 @@ namespace QuartierLatin.Backend.Services.PortalServices
         }
 
         public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo,
-            JObject entityTypeSpecificApplicationInfo)
+            JObject entityTypeSpecificApplicationInfo, bool? isActive = null)
         {
-            return await _portalPersonalRepository.UpdateApplicationAsync(id, type, entityId, applicationInfo, entityTypeSpecificApplicationInfo);
+            return await _portalPersonalRepository.UpdateApplicationAsync(id, type, entityId, applicationInfo, entityTypeSpecificApplicationInfo, isActive);
         }
 
         public async Task<PortalApplication> GetApplicationAsync(int id)
