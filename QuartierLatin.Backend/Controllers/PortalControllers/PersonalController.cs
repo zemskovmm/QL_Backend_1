@@ -131,17 +131,23 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         [HttpGet("{id}/chat/messages"),
          ProducesResponseType(typeof(List<PortalChatMessageListDto>), 200),
          ProducesResponseType(404)]
-        public async Task<IActionResult> GetChatMessages(int id)
+        public async Task<IActionResult> GetChatMessages(int id, [FromQuery] int? beforeMessageId, [FromQuery] int? afterMessageId, [FromQuery] int count)
         {
             var userId = GetUserId();
 
-            var messages = await _chatAppService.GetChatMessagesAsync(id, userId);
+            var isOwner = await _personalAppService.CheckIsUserOwnerAsync(userId, id);
+
+            if (isOwner is false)
+                return Forbid();
+
+            var messages = await _chatAppService.GetChatMessagesAsync(id, count, beforeMessageId, afterMessageId);
 
             if (messages is null || messages.Count is 0)
                 return Ok(new List<PortalChatMessageListDto>());
 
             var response = messages.Select(message => new PortalChatMessageListDto
             {
+                Id = message.Id,
                 Author = message.Author,
                 BlobId = message.BlobId,
                 Text = message.Text,

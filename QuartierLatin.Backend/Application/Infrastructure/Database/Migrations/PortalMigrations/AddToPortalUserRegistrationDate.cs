@@ -8,8 +8,8 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Migrations.P
     {
         public override void Up()
         {
-            Alter.Table("PortalApplications")
-                .AlterColumn("RegistrationDate").AsDateTime().WithDefaultValue(DateTime.Now);
+            Alter.Table("PortalUsers")
+                .AddColumn("RegistrationDate").AsDateTime().WithDefaultValue(DateTime.Now);
         }
     }
 }

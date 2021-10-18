@@ -44,6 +44,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
 
             var response = messages.Select(message => new PortalChatMessageListDto
             {
+                Id = message.Id,
                 Author = message.Author,
                 BlobId = message.BlobId,
                 Text = message.Text,

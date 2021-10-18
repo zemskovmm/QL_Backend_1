@@ -31,15 +31,14 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 var messages = db.ChatMessages.Where(message => message.ChatId == chat.Id).AsQueryable();
 
                 if (beforeMessageId is not null)
-                    messages = messages.Where(message => message.Id <= beforeMessageId).TakeLast(count);
+                    messages = messages.Where(message => message.Id <= beforeMessageId);
 
                 if (afterMessageId is not null)
-                    messages = messages.Where(message => message.Id >= afterMessageId).TakeLast(count);
+                    messages = messages.Where(message => message.Id >= afterMessageId);
 
-                if (beforeMessageId is null && afterMessageId is null)
-                    messages = messages.TakeLast(count);
+                messages = messages.OrderByDescending(message => message.Id).Take(count);
 
-                return await messages.ToListAsync();
+                return await messages.OrderBy(message => message.Id).ToListAsync();
             });
         }
 

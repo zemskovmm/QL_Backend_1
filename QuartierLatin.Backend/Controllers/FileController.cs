@@ -16,7 +16,6 @@ namespace QuartierLatin.Backend.Controllers
             _fileAppService = fileAppService;
         }
 
-        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMedia(int id)
         {

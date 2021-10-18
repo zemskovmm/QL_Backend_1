@@ -9,9 +9,9 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Migrations.P
         public override void Up()
         {
             Alter.Table("PortalApplications")
-                .AlterColumn("Date").AsDateTime().WithDefaultValue(DateTime.Now)
-                .AlterColumn("IsAnswered").AsBoolean().WithDefaultValue(false)
-                .AlterColumn("IsNewMessages").AsBoolean().WithDefaultValue(false);
+                .AddColumn("Date").AsDateTime().WithDefaultValue(DateTime.Now)
+                .AddColumn("IsAnswered").AsBoolean().WithDefaultValue(false)
+                .AddColumn("IsNewMessages").AsBoolean().WithDefaultValue(false);
         }
     }
 }
