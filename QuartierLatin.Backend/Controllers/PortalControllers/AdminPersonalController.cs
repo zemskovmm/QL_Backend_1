@@ -74,7 +74,16 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
         {
             var response = await _chatAppService.GetChatsAsync();
 
-            return Ok(response);
+            var chatDto = response.Select(chat => new ChatDto
+            {
+                ApplicationId = chat.chat.ApplicationId,
+                Email = chat.user.Email,
+                FirstName = chat.user.FirstName,
+                LastName = chat.user.LastName,
+                Phone = chat.user.Phone
+            }).ToList();
+
+            return Ok(chatDto);
         }
 
         [HttpPost("{id}/chat/messages/upload"),
