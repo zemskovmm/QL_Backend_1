@@ -5,10 +5,12 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Models
     public static class Roles
     {
         public const string Admin = "Admin";
+        public const string Manager = "Manager";
 
         public static readonly string[] ValidRolesList =
         {
-            Admin
+            Admin,
+            Manager
         };
     }
 

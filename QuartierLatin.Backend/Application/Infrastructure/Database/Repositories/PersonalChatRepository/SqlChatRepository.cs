@@ -19,20 +19,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             _db = db;
         }
 
-        public async Task<List<ChatMessages>> GetChatMessagesAsync(int applicationId, int portalUserId)
-        {
-            return await _db.ExecAsync(async db =>
-            {
-                var chat = await GetChatByApplicationAndPortalUserIdAsync(applicationId, portalUserId);
-
-                if (chat is null)
-                    return null;
-
-                return await GetMessagesByChatIdAsync(db, chat.Id);
-            });
-        }
-
-        public async Task<List<ChatMessages>> GetChatMessagesAdminAsync(int applicationId)
+        public async Task<List<ChatMessages>> GetChatMessagesAsync(int applicationId, int count, int? beforeMessageId = null, int? afterMessageId = null)
         {
             return await _db.ExecAsync(async db =>
             {
@@ -41,7 +28,17 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 if (chat is null)
                     return null;
 
-                return await GetMessagesByChatIdAsync(db, chat.Id);
+                var messages = db.ChatMessages.Where(message => message.ChatId == chat.Id).AsQueryable();
+
+                if (beforeMessageId is not null)
+                    messages = messages.Where(message => message.Id <= beforeMessageId);
+
+                if (afterMessageId is not null)
+                    messages = messages.Where(message => message.Id >= afterMessageId);
+
+                messages = messages.OrderByDescending(message => message.Id).Take(count);
+
+                return await messages.OrderBy(message => message.Id).ToListAsync();
             });
         }
 
@@ -51,26 +48,31 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             {
                 var chat = await GetChatByApplicationAndPortalUserIdAsync(applicationId, portalUserId);
 
+                var application = await db.PortalApplications.FirstOrDefaultAsync(application =>
+                    application.Id == applicationId);
+
+                if (application is null)
+                    return false;
+
                 if (chat is null)
                 {
-                    var application = await db.PortalApplications.FirstOrDefaultAsync(application =>
-                        application.Id == applicationId && application.UserId == portalUserId);
-
-                    if (application is null)
-                        return false;
-
                     var chatId = await db.InsertWithInt32IdentityAsync( new Chat
                     {
                         ApplicationId = application.Id,
                         PortalUserId = portalUserId
                     });
 
-                    await CreateMessageAsync(db, "User", chatId, type, text, blobId);
+                    await CreateMessageAsync(db, "User", chatId, type, applicationId, text, blobId);
                 }
                 else
                 {
-                    await CreateMessageAsync(db, "User", chat.Id, type, text, blobId);
+                    await CreateMessageAsync(db, "User", chat.Id, type, applicationId, text, blobId);
                 }
+
+                application.IsNewMessages = true;
+                application.IsAnswered = false;
+
+                await db.UpdateAsync(application);
 
                 return true;
             });
@@ -85,7 +87,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 if (chat is null)
                     return false;
 
-                await CreateMessageAsync(db, "User", chat.Id, type, text, blobId);
+                await CreateMessageAsync(db, "Manager", chat.Id, type, applicationId, text, blobId);
 
                 return true;
             });
@@ -99,12 +101,9 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                     join user in db.PortalUsers on map.ApplicationId equals user.Id
                     select new {map, user}).ToListAsync();
 
-                return query.Select(queryItem => (chat: queryItem.map, user: queryItem.user)).ToList(); ;
+                return query.Select(queryItem => (chat: queryItem.map, user: queryItem.user)).ToList();
             });
         }
-
-        private async Task<List<ChatMessages>> GetMessagesByChatIdAsync(AppDbContext db, int chatId) =>
-            await _db.ExecAsync(db => db.ChatMessages.Where(message => message.ChatId == chatId).ToListAsync());
 
         private async Task<Chat> GetChatByApplicationAndPortalUserIdAsync(int applicationId, int? portalUserId = null)
         {
@@ -117,21 +116,39 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             });
         }
 
-        private async Task CreateMessageAsync(AppDbContext db, string author, int chatId, MessageType type, string text = null, int? blobId = null)
+        private async Task CreateMessageAsync(AppDbContext db, string author, int chatId, MessageType type, int applicationId, string text = null, int? blobId = null)
         {
+            var application = await db.PortalApplications.FirstOrDefaultAsync(application =>
+                application.Id == applicationId);
+
             await _db.ExecAsync(async db =>
             {
-                var newMessage = new ChatMessages
-                {
-                    Author = author,
-                    ChatId = chatId,
-                    Text = text,
-                    MessageType = type,
-                    BlobId = blobId,
-                    Date = DateTime.Now
-                };
+                await db.BeginTransactionAsync();
 
-                await db.InsertWithInt32IdentityAsync(newMessage);
+                try
+                {
+                    var newMessage = new ChatMessages
+                    {
+                        Author = author,
+                        ChatId = chatId,
+                        Text = text,
+                        MessageType = type,
+                        BlobId = blobId,
+                        Date = DateTime.Now
+                    };
+
+                    await db.InsertWithInt32IdentityAsync(newMessage);
+
+                    application.IsAnswered = false;
+                    application.IsNewMessages = true;
+                    await db.UpdateAsync(application);
+                }
+                catch
+                {
+                    await db.RollbackTransactionAsync();
+                }
+
+                await db.CommitTransactionAsync();
             });
         }
     }

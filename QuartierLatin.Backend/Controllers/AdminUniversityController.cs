@@ -3,6 +3,7 @@ using QuartierLatin.Backend.Dto.UniversityDto;
 using QuartierLatin.Backend.Dto.UniversityDto.GetUniversityListDto;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;

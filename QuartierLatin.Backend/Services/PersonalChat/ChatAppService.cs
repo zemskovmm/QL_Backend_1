@@ -1,6 +1,5 @@
 ﻿using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.PersonalChatRepository;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PersonalChat;
-using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PortalServices;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.PersonalChatModels;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Portal;
@@ -11,24 +10,11 @@ namespace QuartierLatin.Backend.Services.PersonalChat
 {
     public class ChatAppService : IChatAppService
     {
-        private readonly IPortalUserAppService _portalUserAppService;
-        private readonly IUserAppService _adminUserAppService;
         private readonly IChatRepository _chatRepository;
-        private readonly IPortalPersonalAppService _portalPersonalAppService;
-        private readonly string _chatPrefix = "personal-chat-";
 
-        public ChatAppService(IPortalUserAppService portalUserAppService, IUserAppService userAppService, IChatRepository chatRepository, 
-            IPortalPersonalAppService portalPersonalAppService)
+        public ChatAppService(IChatRepository chatRepository)
         {
-            _portalUserAppService = portalUserAppService;
-            _adminUserAppService = userAppService;
             _chatRepository = chatRepository;
-            _portalPersonalAppService = portalPersonalAppService;
-        }
-
-        public async Task<List<ChatMessages>> GetChatMessagesAsync(int applicationId, int portalUserId)
-        {
-            return await _chatRepository.GetChatMessagesAsync(applicationId, portalUserId);
         }
 
         public async Task<bool> SendChatMessageAsync(int applicationId, int portalUserId, MessageType type, string text = null, int? blobId = null)
@@ -38,9 +24,9 @@ namespace QuartierLatin.Backend.Services.PersonalChat
             return response;
         }
 
-        public async Task<List<ChatMessages>> GetChatMessagesAdminAsync(int applicationId)
+        public async Task<List<ChatMessages>> GetChatMessagesAsync(int applicationId, int count, int? beforeMessageId = null, int? afterMessageId = null)
         {
-            return await _chatRepository.GetChatMessagesAdminAsync(applicationId);
+            return await _chatRepository.GetChatMessagesAsync(applicationId, count, beforeMessageId, afterMessageId);
         }
 
         public async Task<bool> SendChatMessageAdminAsync(int applicationId, MessageType type, string text = null, int? blobId = null)

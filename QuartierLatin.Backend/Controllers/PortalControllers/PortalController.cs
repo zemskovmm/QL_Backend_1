@@ -60,7 +60,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             return Ok();
         }
 
-        [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
         [HttpPost("heartbeat")]
         public async Task<IActionResult> CheckIsValidUserSession()
         {
@@ -110,7 +110,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             return Ok();
         }
 
-        [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
         [HttpGet("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -118,7 +118,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             return Ok();
         }
 
-        [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
         [HttpPut("user")]
         public async Task<IActionResult> UpdatePortalUser([FromBody] PortalUserDto portalUserDto)
         {
@@ -130,7 +130,7 @@ namespace QuartierLatin.Backend.Controllers.PortalControllers
             return Ok();
         }
 
-        [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
         [HttpGet("user"),
          ProducesResponseType(typeof(PortalUserDto), 200)]
         public async Task<IActionResult> GetPortalUser()

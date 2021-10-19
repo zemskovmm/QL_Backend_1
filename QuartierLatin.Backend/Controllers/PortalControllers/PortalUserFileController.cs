@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Dto.Media;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.Constants;
+using QuartierLatin.Backend.Dto.Media;
 
-namespace QuartierLatin.Backend.Controllers
+namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
-    [Authorize(Roles = "Admin")]
-    [Route("/api/admin/media")]
-    public class AdminFileController : Controller
+    [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
+    [Route("/api/personal/media")]
+    public class PortalUserFileController : Controller
     {
         private readonly IFileAppService _fileAppService;
-        public AdminFileController(IFileAppService fileAppService)
+        public PortalUserFileController(IFileAppService fileAppService)
         {
             _fileAppService = fileAppService;
         }
