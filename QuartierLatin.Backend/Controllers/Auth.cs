@@ -16,7 +16,6 @@ namespace QuartierLatin.Backend.Controllers
     public record AdminLoginModel(string Username, string Password, bool RememberMe);
     
     [Route("/api/admin/auth")]
-    [AllowAnonymous]
     public class Auth : Controller
     {
 
@@ -46,7 +45,7 @@ namespace QuartierLatin.Backend.Controllers
             
             var roles = await _roles.GetUserRolesByIds(new List<int> {user.Id});
             
-            if (!roles.Any(x => x.Role == Roles.Admin))
+            if (!roles.Any(x => x.Role == Roles.Admin || x.Role == Roles.Manager))
                 return Forbid();
             
             var claims = roles
@@ -77,6 +76,54 @@ namespace QuartierLatin.Backend.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost("manager/register")]
+        public async Task<IActionResult> ManagerRegister([FromBody] AdminRegisterFormDto model)
+        {
+            AdminProfileDto user;
+
+            try
+            {
+                await _user.RegisterAdmin(model, Roles.Manager);
+                user = _user.Login(model.Email, model.Password);
+            }
+            catch (Exception e)
+            {
+                return Forbid();
+            }
+
+            var roles = await _roles.GetUserRolesByIds(new List<int> { user.Id });
+
+            if (!roles.Any(x => x.Role == Roles.Admin || x.Role == Roles.Manager))
+                return Forbid();
+
+            var claims = roles
+                .Select(x => new Claim(ClaimTypes.Role, x.Role))
+                .Concat(new[]
+                {
+                    new Claim(ClaimTypes.Name, user.Name ?? ""),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim("sub", user.Id.ToString())
+                })
+                .ToList();
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
+            {
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1),
+                IsPersistent = true,
+                IssuedUtc = DateTimeOffset.Now
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+
+            return Ok();
+        }
+
         [HttpGet("logout")]
         public async Task<IActionResult> AdminLogout()
         {
@@ -85,10 +132,17 @@ namespace QuartierLatin.Backend.Controllers
         }
         
         [HttpGet("check")]
-        [Authorize(Policy = "Admin")]
+        [Authorize(Roles = "Admin")]
         public Task PulseAdmin()
         {
             return Task.CompletedTask;
+        }
+
+        [HttpGet("roles")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RoleList()
+        {
+            return Ok(Roles.ValidRolesList);
         }
     }
 }

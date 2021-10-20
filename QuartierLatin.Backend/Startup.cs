@@ -23,9 +23,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Validations;
+using Microsoft.AspNetCore.Authorization;
+using QuartierLatin.Backend.Utils.CustomAuth;
 using X.Web.Sitemap;
 
 namespace QuartierLatin.Backend
@@ -139,10 +142,16 @@ namespace QuartierLatin.Backend
             {
                 options.AddPolicy("Admin", policy =>
                 {
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireRole(Roles.Admin);
+                    policy.UserRequireCustomClaim(ClaimTypes.Role, Roles.Admin);
+                });
+                options.AddPolicy("Manager", policy =>
+                {
+                    policy.UserRequireCustomClaim(ClaimTypes.Role, Roles.Manager);
                 });
             });
+
+            services.AddScoped<IAuthorizationHandler, PoliciesAuthorizationHandler>();
+            services.AddScoped<IAuthorizationHandler, RolesAuthorizationHandler>();
 
             var blobType = new BlobConfig();
             Configuration.GetSection("Blob").Bind(blobType);
