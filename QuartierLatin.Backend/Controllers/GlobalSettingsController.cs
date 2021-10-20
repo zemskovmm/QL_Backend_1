@@ -24,6 +24,8 @@ namespace QuartierLatin.Backend.Controllers
          ProducesResponseType(404)]
         public async Task<IActionResult> GetGlobalSetting(string key, string lang)
         {
+            lang = lang.ToLower();
+
             var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
             var result = await _globalSettingsAppService.GetGlobalSettingAsync(key, languageId);
 
@@ -39,6 +41,8 @@ namespace QuartierLatin.Backend.Controllers
          ProducesResponseType(404)]
         public async Task<IActionResult> DeleteGlobalSetting(string key, string lang)
         {
+            lang = lang.ToLower();
+
             var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
             var response = await _globalSettingsAppService.DeleteGlobalSettingAsync(key, languageId);
 
@@ -53,6 +57,8 @@ namespace QuartierLatin.Backend.Controllers
          ProducesResponseType(200)]
         public async Task<IActionResult> CreateOrUpdateGlobalSetting(string key, string lang, [FromBody] JObject jsonData)
         {
+            lang = lang.ToLower();
+
             var languageId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
             await _globalSettingsAppService.CreateOrUpdateGlobalSettingAsync(key, languageId, jsonData);
 

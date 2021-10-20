@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
@@ -28,16 +29,19 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 Type = type,
                 CommonTypeSpecificApplicationInfo = applicationInfo.ToString(),
                 EntityId = entityId,
-                EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo.ToString()
+                EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo.ToString(),
+                Date = DateTime.Now,
+                IsAnswered = false,
+                IsNewMessages = false
             }));
         }
 
-        public async Task<bool> UpdateApplicationAsync(int id, int userid, ApplicationType? type, int? entityId, JObject applicationInfo,
-            JObject entityTypeSpecificApplicationInfo)
+        public async Task<bool> UpdateApplicationAsync(int id, ApplicationType? type, int? entityId, JObject applicationInfo,
+            JObject entityTypeSpecificApplicationInfo, bool? isActive = null)
         {
             return await _db.ExecAsync(async db =>
             {
-                var applicationPortal = await db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id && portal.UserId == userid);
+                var applicationPortal = await db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id);
 
                 if (applicationPortal is null)
                     return false;
@@ -55,15 +59,18 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                     UserId = applicationPortal.UserId,
                     CommonTypeSpecificApplicationInfo = applicationInfo is null ? null : applicationInfo.ToString(),
                     EntityId = entityId,
-                    EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo is null ? null : entityTypeSpecificApplicationInfo.ToString()
+                    EntityTypeSpecificApplicationInfo = entityTypeSpecificApplicationInfo is null ? null : entityTypeSpecificApplicationInfo.ToString(),
+                    Date = applicationPortal.Date,
+                    IsAnswered = isActive is null ? false : isActive.Value,
+                    IsNewMessages = applicationPortal.IsNewMessages
                 });
                 return true;
             });
         }
 
-        public async Task<PortalApplication> GetApplicationAsync(int id, int userid)
+        public async Task<PortalApplication> GetApplicationAsync(int id)
         {
-            return await _db.ExecAsync(db => db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id && portal.UserId == userid));
+            return await _db.ExecAsync(db => db.PortalApplications.FirstOrDefaultAsync(portal => portal.Id == id));
         }
 
         public async Task<(int totalItems, List<PortalApplication> portalApplications)> GetApplicationCatalogAsync(int userid, ApplicationType? type, ApplicationStatus? status, int skip, int take)
@@ -92,6 +99,49 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                     application.UserId == userId && application.Id == applicationId);
 
                 return portalApplication is not null;
+            });
+        }
+
+        public async Task<(int totalItems, List<(PortalApplication application, PortalUser user)> portalApplications)> GetApplicationCatalogAdminAsync(ApplicationType? type, ApplicationStatus? status, bool? isAnswered,
+            string? firstName, string? lastName, string? email, string? phone, int? userId, int skip, int take)
+        {
+            return await _db.ExecAsync(async db =>
+            {
+                var portalApplications = from application in db.PortalApplications
+                    join user in db.PortalUsers on application.UserId equals user.Id
+                    select new
+                    {
+                        application,
+                        user
+                    };
+
+                if (type is not null)
+                    portalApplications = portalApplications.Where(portal => portal.application.Type == type);
+
+                if (status is not null)
+                    portalApplications = portalApplications.Where(portal => portal.application.Status == status);
+
+                if (isAnswered is not null)
+                    portalApplications = portalApplications.Where(portal => portal.application.IsAnswered == isAnswered);
+
+                if (firstName is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.FirstName.StartsWith(firstName));
+
+                if (lastName is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.LastName.StartsWith(lastName));
+
+                if (email is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.Email.StartsWith(email));
+
+                if (phone is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.Phone.StartsWith(phone));
+
+                if (userId is not null)
+                    portalApplications = portalApplications.Where(portal => portal.user.Id == userId);
+
+                var totalCount = await portalApplications.CountAsync();
+
+                return (totalCount, portalApplications.Skip(skip).Take(take).ToList().Select(application => (application: application.application, user: application.user)).ToList());
             });
         }
     }

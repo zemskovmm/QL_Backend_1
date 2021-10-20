@@ -1,19 +1,18 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Dto.PortalDto;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.PortalServices;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Constants;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Portal;
+using QuartierLatin.Backend.Dto.PortalDto;
 
-
-namespace QuartierLatin.Controllers.PortalControllers
+namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
     [Route("/api/portal")]
     public class PortalController : Controller
@@ -145,7 +144,8 @@ namespace QuartierLatin.Controllers.PortalControllers
                 FirstName = portalUser.FirstName,
                 LastName = portalUser.LastName,
                 PersonalInfo = portalUser.PersonalInfo is null ? null : JObject.Parse(portalUser.PersonalInfo),
-                Phone = portalUser.Phone
+                Phone = portalUser.Phone,
+                Email = portalUser.Email
             };
 
             return Ok(response);

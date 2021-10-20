@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog;
 
 namespace QuartierLatin.Backend.Controllers

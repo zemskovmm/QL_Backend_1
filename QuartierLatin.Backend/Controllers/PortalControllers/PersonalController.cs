@@ -17,7 +17,7 @@ using QuartierLatin.Backend.Dto.PortalApplicationDto;
 using QuartierLatin.Backend.Utils;
 using QuartierLatin.Backend.Validations;
 
-namespace QuartierLatin.Controllers.PortalControllers
+namespace QuartierLatin.Backend.Controllers.PortalControllers
 {
     [Authorize(AuthenticationSchemes = CookieAuthenticationPortal.AuthenticationScheme)]
     [Route("/api/personal/applications")]
@@ -55,7 +55,12 @@ namespace QuartierLatin.Controllers.PortalControllers
         {
             var userId = GetUserId();
 
-            var response = await _personalAppService.UpdateApplicationAsync(id, userId, updatePortalApplication.Type,
+            var isOwner = await _personalAppService.CheckIsUserOwnerAsync(userId, id);
+
+            if (isOwner is false)
+                return Forbid();
+
+            var response = await _personalAppService.UpdateApplicationAsync(id, updatePortalApplication.Type,
                 updatePortalApplication.EntityId, updatePortalApplication.CommonApplicationInfo,
                 updatePortalApplication.EntityTypeSpecificApplicationInfo);
 
@@ -72,7 +77,12 @@ namespace QuartierLatin.Controllers.PortalControllers
         {
             var userId = GetUserId();
 
-            var application = await _personalAppService.GetApplicationAsync(id, userId);
+            var isOwner = await _personalAppService.CheckIsUserOwnerAsync(userId, id);
+
+            if (isOwner is false)
+                return Forbid();
+
+            var application = await _personalAppService.GetApplicationAsync(id);
 
             if (application is null)
                 return NotFound();
@@ -121,17 +131,23 @@ namespace QuartierLatin.Controllers.PortalControllers
         [HttpGet("{id}/chat/messages"),
          ProducesResponseType(typeof(List<PortalChatMessageListDto>), 200),
          ProducesResponseType(404)]
-        public async Task<IActionResult> GetChatMessages(int id)
+        public async Task<IActionResult> GetChatMessages(int id, [FromQuery] int? beforeMessageId, [FromQuery] int? afterMessageId, [FromQuery] int count)
         {
             var userId = GetUserId();
 
-            var messages = await _chatAppService.GetChatMessagesAsync(id, userId);
+            var isOwner = await _personalAppService.CheckIsUserOwnerAsync(userId, id);
+
+            if (isOwner is false)
+                return Forbid();
+
+            var messages = await _chatAppService.GetChatMessagesAsync(id, count, beforeMessageId, afterMessageId);
 
             if (messages is null || messages.Count is 0)
-                return NotFound();
+                return Ok(new List<PortalChatMessageListDto>());
 
             var response = messages.Select(message => new PortalChatMessageListDto
             {
+                Id = message.Id,
                 Author = message.Author,
                 BlobId = message.BlobId,
                 Text = message.Text,

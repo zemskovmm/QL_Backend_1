@@ -1,14 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using QuartierLatin.Backend.Dto;
-using QuartierLatin.Backend.Dto.CommonTraitDto;
-using QuartierLatin.Backend.Dto.CourseCatalogDto.Course.ModuleDto;
-using QuartierLatin.Backend.Dto.CourseCatalogDto.School.ModuleDto;
-using QuartierLatin.Backend.Dto.UniversityDto;
-using QuartierLatin.Backend.Utils;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CourseCatalogRepository.CourseRepository;
@@ -19,9 +9,22 @@ using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Hous
 using QuartierLatin.Backend.Application.ApplicationCore.Models;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.CatalogModels;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogModels.CoursesModels;
+using QuartierLatin.Backend.Dto;
+using QuartierLatin.Backend.Dto.CommonTraitDto;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.Course.ModuleDto;
 using QuartierLatin.Backend.Dto.CourseCatalogDto.RouteDto;
+using QuartierLatin.Backend.Dto.CourseCatalogDto.School.ModuleDto;
 using QuartierLatin.Backend.Dto.HousingCatalogDto.RouteDto;
 using QuartierLatin.Backend.Dto.RouteDto;
+using QuartierLatin.Backend.Dto.UniversityDto;
+using QuartierLatin.Backend.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.CourseCatalogModels.SchoolModels;
 
 namespace QuartierLatin.Backend.Controllers
 {
@@ -68,6 +71,9 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/{**route}")]
         public async Task<IActionResult> GetPage(string lang, string route)
         {
+            route = WebUtility.UrlDecode(route);
+            lang = lang.ToLower();
+
             var routeResponse = await _routeAppService.GetPageByUrlAsync(lang, route);
 
             if (routeResponse is null)
@@ -80,6 +86,7 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{**route}")]
         public async Task<IActionResult> GetPageAdmin(string route)
         {
+            route = WebUtility.UrlDecode(route);
             var routeResponse = await _routeAppService.GetPageByUrlAdminAsync(route);
 
             if (routeResponse is null)
@@ -91,6 +98,9 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/university/{**url}")]
         public async Task<IActionResult> GetUniversity(string lang, string url)
         {
+            url = WebUtility.UrlDecode(url);
+            lang = lang.ToLower();
+
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
@@ -160,6 +170,9 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/school/{**url}")]
         public async Task<IActionResult> GetSchool(string lang, string url)
         {
+            url = WebUtility.UrlDecode(url);
+            lang = lang.ToLower();
+
             var moduleAndUrls = await GetSchoolModuleDto(lang, url);
 
             var response = new RouteDto<SchoolModuleDto>("school", moduleAndUrls.urls, moduleAndUrls.schoolModule, "school", moduleAndUrls.schoolModule.Title);
@@ -170,6 +183,10 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/{schoolUrl}/courses/{**url}")]
         public async Task<IActionResult> GetSchoolAndCourse(string lang, string schoolUrl, string url)
         {
+            schoolUrl = WebUtility.UrlDecode(schoolUrl);
+            url = WebUtility.UrlDecode(url);
+            lang = lang.ToLower();
+
             var courseModuleAndUrls = await GetCourseModuleDtoWithUrls(lang, url);
 
             var schoolModuleAndUrls = await GetSchoolModuleDto(lang, schoolUrl);
@@ -194,6 +211,9 @@ namespace QuartierLatin.Backend.Controllers
         [HttpGet("{lang}/{schoolUrl}/courses/")]
         public async Task<IActionResult> GetSchoolAndCourseList(string lang, string schoolUrl)
         {
+            schoolUrl = WebUtility.UrlDecode(schoolUrl);
+            lang = lang.ToLower();
+
             var languageIds = await _languageRepository.GetLanguageIdWithShortNameAsync();
 
             var schoolModuleAndUrls = await GetSchoolModuleDto(lang, schoolUrl);
@@ -215,19 +235,12 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{lang}/course/{**url}")]
-        public async Task<IActionResult> GetCourse(string lang, string url)
-        {
-            var moduleAndUrls = await GetCourseModuleDtoWithUrls(lang, url);
-
-            var response = new RouteDto<CourseModuleDto>("course", moduleAndUrls.urls, moduleAndUrls.courseModule, "course", moduleAndUrls.courseModule.Title);
-
-            return Ok(response);
-        }
-
         [HttpGet("{lang}/housing/{**url}")]
         public async Task<IActionResult> GetHousing(string lang, string url)
         {
+            url = WebUtility.UrlDecode(url);
+            lang = lang.ToLower();
+
             var moduleAndUrls = await GetHousingModuleAsync(lang, url);
 
             var response = new RouteDto<HousingModuleDto>("housing", moduleAndUrls.urls, moduleAndUrls.housingModule, "housing", moduleAndUrls.housingModule.Title);
@@ -427,7 +440,7 @@ namespace QuartierLatin.Backend.Controllers
                     Id = trait.Id,
                     IconBlobId = trait.IconBlobId,
                     Identifier = trait.Identifier,
-                    Name = trait.Names[lang]
+                    Name = trait.Names.GetSuitableName(lang)
                 }).ToList());
             }
 
@@ -449,12 +462,50 @@ namespace QuartierLatin.Backend.Controllers
             return module;
         }
 
-        private async Task<List<CourseModuleDto>> GetCourseModuleDtoList(
+        private async Task<CourseListModuleDto> GetCourseListModule(List<CommonTraitType> traitsType,
+            (Course course, Dictionary<int, CourseLanguage> courseLanguage, Dictionary<int, SchoolLanguages> schoolLanguage) course,
+            Dictionary<int, string> languageIds, string lang, int languageId)
+        {
+            var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
+
+            foreach (var traitType in traitsType)
+            {
+                var commonTraits = await _commonTraitAppService.GetTraitOfTypesByTypeIdAndCourseIdAsync(traitType.Id, course.course.Id);
+
+                traits.Add(traitType.Identifier, commonTraits.Select(trait => new CommonTraitLanguageDto
+                {
+                    Id = trait.Id,
+                    IconBlobId = trait.IconBlobId,
+                    Identifier = trait.Identifier,
+                    Name = trait.Names.GetSuitableName(lang)
+                }).ToList());
+            }
+
+            var courseTraits = new NamedTraitsModuleDto()
+            {
+                NamedTraits = traits,
+            };
+
+            var module = new CourseListModuleDto()
+            {
+                Url = $"/{lang}/{course.schoolLanguage[languageId].Url}/courses/{course.courseLanguage[languageId].Url}",
+                LanglessUrl = $"/{course.schoolLanguage[languageId].Url}/courses/{course.courseLanguage[languageId].Url}",
+                Name = course.courseLanguage[languageId].Name,
+                ImageId = course.course.ImageId,
+                Price = course.course.Price,
+                SchoolName = course.schoolLanguage[languageId].Name,
+                Traits = courseTraits,
+            };
+
+            return module;
+        }
+
+        private async Task<List<CourseListModuleDto>> GetCourseModuleDtoList(
             string lang, int schoolId, Dictionary<int, string> languageIds)
         {
             var courses = await _courseCatalogRepository.GetCoursesListAsync(schoolId);
 
-            var response = new List<CourseModuleDto>();
+            var response = new List<CourseListModuleDto>();
 
             var languageId = languageIds.FirstOrDefault(language => language.Value == lang).Key;
 
@@ -462,7 +513,7 @@ namespace QuartierLatin.Backend.Controllers
 
             foreach (var course in courses)
             {
-                response.Add(await GetCourseModule(traitsType, course, languageIds, lang, languageId));
+                response.Add(await GetCourseListModule(traitsType, course, languageIds, lang, languageId));
             }
 
             return response;

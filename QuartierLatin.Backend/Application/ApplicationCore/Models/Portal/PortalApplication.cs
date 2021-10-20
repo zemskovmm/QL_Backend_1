@@ -1,4 +1,5 @@
-﻿using LinqToDB;
+﻿using System;
+using LinqToDB;
 using LinqToDB.Mapping;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 
@@ -13,5 +14,8 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Models.Portal
         [Column] public int? EntityId { get; set; }
         [Column(DataType = DataType.BinaryJson)] public string CommonTypeSpecificApplicationInfo { get; set; }
         [Column(DataType = DataType.BinaryJson)] public string EntityTypeSpecificApplicationInfo { get; set; }
+        [Column] public DateTime Date { get; set; }
+        [Column] public bool IsAnswered { get; set; }
+        [Column] public bool IsNewMessages { get; set; }
     }
 }

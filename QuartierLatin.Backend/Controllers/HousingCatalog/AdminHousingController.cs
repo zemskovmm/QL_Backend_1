@@ -6,6 +6,7 @@ using RemoteUi;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.HousingServices;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.HousingModels;

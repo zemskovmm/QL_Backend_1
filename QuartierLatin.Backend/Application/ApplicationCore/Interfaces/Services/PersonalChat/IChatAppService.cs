@@ -8,9 +8,8 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.
 {
     public interface IChatAppService
     {
-        Task<List<ChatMessages>> GetChatMessagesAsync(int applicationId, int portalUserId);
         Task<bool> SendChatMessageAsync(int applicationId, int portalUserId, MessageType type, string text = null, int? blobId = null);
-        Task<List<ChatMessages>> GetChatMessagesAdminAsync(int applicationId);
+        Task<List<ChatMessages>> GetChatMessagesAsync(int applicationId, int count, int? beforeMessageId = null, int? afterMessageId = null);
         Task<bool> SendChatMessageAdminAsync(int applicationId, MessageType type, string text = null, int? blobId = null);
         Task<List<(Chat chat, PortalUser user)>> GetChatsAsync();
     }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using QuartierLatin.Backend.Dto.ImageStandardSizeDto;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.ImageStandardSizeService;
 
 namespace QuartierLatin.Backend.Controllers

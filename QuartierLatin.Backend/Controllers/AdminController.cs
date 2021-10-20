@@ -3,6 +3,7 @@ using QuartierLatin.Backend.Dto.AdminPageModuleDto;
 using QuartierLatin.Backend.Utils;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services;

@@ -6,6 +6,7 @@ using QuartierLatin.Backend.Dto.HousingCatalogDto.HousingAccommodationTypeCatalo
 using RemoteUi;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.HousingServices;
 
 namespace QuartierLatin.Backend.Controllers.HousingCatalog
