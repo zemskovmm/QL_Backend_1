@@ -128,7 +128,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> AdminLogout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Redirect("/");
+            return Ok();
         }
         
         [HttpGet("check")]
