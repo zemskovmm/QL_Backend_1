@@ -301,7 +301,7 @@ namespace QuartierLatin.Backend.Controllers
 
                 foreach (var traitType in traitsType)
                 {
-                    var housingTraitTypedList = housingAccommodationTraits.GetValueOrDefault(housing.housing.Id)
+                    var housingTraitTypedList = housingAccommodationTraits.GetValueOrDefault(housingAccommodationEntity.Id)
                         ?.Where(type => type.CommonTraitTypeId == traitType.Id);
 
                     if (housingTraitTypedList is null) continue;
