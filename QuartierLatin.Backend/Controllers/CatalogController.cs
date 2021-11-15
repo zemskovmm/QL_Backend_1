@@ -259,6 +259,39 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(response);
         }
+		
+		
+         [AllowAnonymous]
+        [HttpGet("/api/catalog/housing/filters/{lang}")]
+        public async Task<IActionResult> GetCatalogFiltersTohousingByLangAndEntityType(string lang)
+        {
+            var entityType = EntityType.Housing;
+
+            var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
+
+            var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
+                .Select(trait => new CatalogFilterDto
+                {
+                    Name = trait.Item1.Names.GetSuitableName(lang),
+                    Identifier = trait.Item1.Identifier,
+                    Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
+                    {
+                        Name = commonTrait.Names.GetSuitableName(lang),
+                        Id = commonTrait.Id
+                    }).ToList()
+                }).ToList();
+
+            var response = new CatalogFilterResponseDto
+            {
+                Filters = filters
+            };
+
+            return Ok(response);
+        }
+		
+		
+		
+		
 
         [AllowAnonymous]
         [HttpPost("/api/catalog/course/search/{lang}")]
