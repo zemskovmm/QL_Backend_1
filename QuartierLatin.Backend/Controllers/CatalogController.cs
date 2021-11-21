@@ -261,13 +261,188 @@ namespace QuartierLatin.Backend.Controllers
         }
 		
 		
+	/*	
+        [AllowAnonymous]
+        [HttpPost("/api/catalog/housing/search/{lang}")]
+        public async Task<IActionResult> SearchHousingInCatalog(string lang, [FromBody] CatalogSearchDto catalogSearchDto)
+        {
+            var entityType = EntityType.Housing;
+            var pageSize = catalogSearchDto.PageSize ?? 1000;
+            var commonTraits =
+                catalogSearchDto.Filters.ToDictionary(filter => filter.Identifier, filter =>
+                    filter.Values);
+
+            var catalogPage =
+                await _catalogAppService.GetCatalogPageByFilter(lang, entityType, commonTraits,
+                    catalogSearchDto.PageNumber, pageSize);
+
+            var housingIds = catalogPage.Item2.Select(x => x.Item1.Id).ToList();
+            var traitDic = await _commonTraitAppService.GetTraitsForEntityIds(EntityType.Housing,
+                housingIds);
+
+
+            List<CommonTrait> GetTraits(string identifier, int id)
+            {
+                if (!traitDic.TryGetValue(id, out var traits))
+                    return new List<CommonTrait>();
+                return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
+            }
+
+            var housingDtos = new List<CatalogHousingDto>();
+
+            foreach(var housing in catalogPage.Item2)
+            {
+              //  var gallery = await _universityGalleryAppService.GetGalleryToUniversityAsync(university.Item1.Id);
+
+                housingDtos.Add(new CatalogHousingDto
+                {
+                    Url = $"/{lang}/university/{university.Item2.Url}",
+                    LanglessUrl = $"/university/{university.Item2.Url}",
+                    Name = university.Item2.Name,
+                    PriceFrom = CostGroup.GetCostGroup(university.costGroup).from,
+                    PriceTo = CostGroup.GetCostGroup(university.costGroup).to,
+                    Degrees = degreeDic.GetValueOrDefault(university.Item2.UniversityId)
+                        ?.Select(x => x.Names.GetSuitableName(lang)).ToList() ?? new List<string>(),
+                    InstructionLanguages = GetTraits("instruction-language", university.Item1.Id).Select(x => x.Identifier)
+                        .ToList(),
+                    LogoId = university.Item1.LogoId,
+                    BannerId = university.Item1.BannerId,
+                    GalleryList = gallery
+                });
+            }
+
+            var response = new CatalogSearchResponseDtoList<CatalogUniversityDto>
+            {
+                Items = universityDtos,
+                TotalItems = catalogPage.totalItems,
+                TotalPages = FilterHelper.PageCount(catalogPage.totalItems, pageSize)
+            };
+
+            return Ok(response);
+        }		*/
+		
          [AllowAnonymous]
         [HttpGet("/api/catalog/housing/filters/{lang}")]
         public async Task<IActionResult> GetCatalogFiltersTohousingByLangAndEntityType(string lang)
         {
+
+            var priceLangs = new Dictionary<string, string>
+            {
+                {"en", "Price"},
+                {"ru", "Стоимость"},
+                {"fr", "Le coût"},
+                {"esp", "El costo"}
+            };
+
+           var entityType = EntityType.Housing;
+
+            var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
+                        commonTraits.Add((new CommonTraitType
+            {
+                Identifier = "price",
+                Names = priceLangs,
+                Order = _baseFilterConfig.Value.PriceOrder
+            },
+                CostGroup.CostGroups.Select(g =>
+                    new CommonTrait
+                    {
+                        Id = g,
+                        Names = new Dictionary<string, string>
+                        {
+                            [lang] = FormatPrice(g, lang)
+                        }
+                    }).ToList()));
+            var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
+                .Select(trait => new CatalogFilterDto
+                {
+                    Name = trait.Item1.Names.GetSuitableName(lang),
+                    Identifier = trait.Item1.Identifier,
+                    Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
+                    {
+                        Name = commonTrait.Names.GetSuitableName(lang),
+                        Id = commonTrait.Id
+                    }).ToList()
+                }).ToList();
+
+            var response = new CatalogFilterResponseDto
+            {
+                Filters = filters
+            };  
+
+            return Ok(response);
+			
+			
+/* 
             var entityType = EntityType.Housing;
 
             var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
+
+            var priceLangs = new Dictionary<string, string>
+            {
+                {"en", "Price"},
+                {"ru", "Стоимость"},
+                {"fr", "Le coût"},
+                {"esp", "El costo"}
+            };
+
+            var specLangs = new Dictionary<string, string>
+            {
+                {"en", "Course"},
+                {"ru", "Направление"},
+                {"fr", "Les cours"},
+                {"esp", "Curso"}
+            };
+
+            var degreeLangs = new Dictionary<string, string>
+            {
+                {"en", "Degree"}, {"ru", "Образование"}, {"esp", "Grado"}, {"fr", "Degré"}
+            };
+
+            var degrees = await _degreeRepository.GetAll();
+            var specialCategories = await _specialtyAppService.GetSpecialCategoriesList();
+
+            commonTraits.Add((new CommonTraitType
+            {
+                Identifier = "price",
+                Names = priceLangs,
+                Order = _baseFilterConfig.Value.PriceOrder
+            },
+                CostGroup.CostGroups.Select(g =>
+                    new CommonTrait
+                    {
+                        Id = g,
+                        Names = new Dictionary<string, string>
+                        {
+                            [lang] = FormatPrice(g, lang)
+                        }
+                    }).ToList()));
+
+            commonTraits.Add((new CommonTraitType
+            {
+                Identifier = "degree",
+                Names = degreeLangs,
+                Order = _baseFilterConfig.Value.DegreeOrder
+            },
+                degrees.Select(degree =>
+                    new CommonTrait
+                    {
+                        Id = degree.Id,
+                        Names = degree.Names
+                    }).ToList()));
+
+            commonTraits.Add((new CommonTraitType
+            {
+                Identifier = "specialty-category",
+                Names = specLangs,
+                Order = _baseFilterConfig.Value.CourseOrder
+            },
+                specialCategories.Select(category =>
+                    new CommonTrait
+                    {
+                        Id = category.Id,
+                        Names = category.Names
+                    }).ToList()));
+
 
             var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
                 .Select(trait => new CatalogFilterDto
@@ -287,6 +462,9 @@ namespace QuartierLatin.Backend.Controllers
             };
 
             return Ok(response);
+        }			
+			*/
+			
         }
 		
 		

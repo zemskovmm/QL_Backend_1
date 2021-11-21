@@ -45,6 +45,26 @@ namespace QuartierLatin.Backend.Application.Catalog
 
             return response;
         }
+		
+		
+		/*
+        public async Task<List<(CommonTraitType commonTraitType, List<CommonTrait> commonTraits)>> GetNamedCommonTraitsAndTraitTypeByTypeId(int type_id)
+        {
+            var traitType = await _commonTraitTypeRepository.GetCommonTraitTypeAsync(type_id);
+
+            var traits =
+                (await _commonTraitRepository.GetCommonTraitListByTypeId(traitType.id))
+                .GroupBy(x => x.CommonTraitTypeId).ToDictionary(x => x.Key, x => x.ToList());
+
+
+            var response =
+                traitType.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id))).Where(x => x.commonTraits != null)
+                    .ToList();
+
+            return response;
+        }
+
+*/		
 
         public async Task<(int totalItems, List<(University, UniversityLanguage, int costGroup)>)> GetCatalogPageByFilter(
             string lang, EntityType entityType,
