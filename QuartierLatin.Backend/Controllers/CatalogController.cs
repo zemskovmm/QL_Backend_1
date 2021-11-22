@@ -496,6 +496,7 @@ namespace QuartierLatin.Backend.Controllers
                 return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
             }
 
+
             var courseDtos = catalogPage.Item2.Select(course => new CatalogCourseDto()
             {
                 Url = $"/{lang}/course/{course.Item2.Url}",
