@@ -115,12 +115,7 @@ namespace QuartierLatin.Backend.Controllers
                 IsPersistent = true,
                 IssuedUtc = DateTimeOffset.Now
             };
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                authProperties);
-
+            
             return Ok();
         }
 
