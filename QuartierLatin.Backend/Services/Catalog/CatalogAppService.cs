@@ -38,7 +38,12 @@ namespace QuartierLatin.Backend.Services.Catalog
         public async Task<List<(CommonTraitType commonTraitType, List<CommonTrait> commonTraits)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType)
         {
             var traitTypes = await _commonTraitTypeRepository.GetTraitTypesWithIndetifierByEntityTypeAsync(entityType);
-
+			if(entityType==EntityType.Housing){
+			  var extra_city_trait_type=await _commonTraitTypeRepository.GetCommonTraitTypeAsync(2);	
+              traitTypes.Add(extra_city_trait_type);
+			  var extra_city_trait_type=await _commonTraitTypeRepository.GetCommonTraitTypeAsync(22);	
+              traitTypes.Add(extra_city_trait_type);
+			}
             var traits =
                 (await _commonTraitRepository.GetCommonTraitListByTypeIds(traitTypes.Select(x => x.Id).ToArray()))
                 .GroupBy(x => x.CommonTraitTypeId).ToDictionary(x => x.Key, x => x.ToList());
