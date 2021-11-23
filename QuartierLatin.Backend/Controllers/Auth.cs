@@ -127,11 +127,8 @@ namespace QuartierLatin.Backend.Controllers
         }
         
         [HttpGet("check")]
-        [Authorize(Roles = "Admin")]
-        public Task PulseAdmin()
-        {
-            return Task.CompletedTask;
-        }
+        [Authorize(Roles = Roles.Admin + "," + Roles.Manager)]
+        public Task Pulse() => Task.CompletedTask;
 
         [HttpGet("roles")]
         [Authorize(Roles = "Admin")]
