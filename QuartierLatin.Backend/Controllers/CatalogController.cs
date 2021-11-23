@@ -362,23 +362,44 @@ namespace QuartierLatin.Backend.Controllers
             return Ok(response);
         }
 
-        [AllowAnonymous]
+        		
+		[AllowAnonymous]
         [HttpGet("/api/catalog/housing/filters/{lang}")]
-        public async Task<IActionResult> GetCatalogFiltersToHousingByLangAndEntityType(string lang)
+        public async Task<IActionResult> GetCatalogFiltersTohousingByLangAndEntityType(string lang)
         {
-            lang = lang.ToLower();
 
-            var entityTypeHousing = EntityType.Housing;
+            var priceLangs = new Dictionary<string, string>
+            {
+                {"en", "Price"},
+                {"ru", "Стоимость"},
+                {"fr", "Le coût"},
+                {"esp", "El costo"}
+            };
 
-            var commonTraitsHousing = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityTypeHousing);
+           var entityType = EntityType.Housing;
 
-            var filters = commonTraitsHousing.OrderBy(trait => trait.commonTraitType.Order)
+            var commonTraits = await _catalogAppService.GetNamedCommonTraitsAndTraitTypeByEntityType(entityType);
+                        commonTraits.Add((new CommonTraitType
+            {
+                Identifier = "price",
+                Names = priceLangs,
+                Order = _baseFilterConfig.Value.PriceOrder
+            },
+                CostGroup.CostGroups.Select(g =>
+                    new CommonTrait
+                    {
+                        Id = g,
+                        Names = new Dictionary<string, string>
+                        {
+                            [lang] = FormatPrice(g, lang)
+                        }
+                    }).ToList()));
+            var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
                 .Select(trait => new CatalogFilterDto
                 {
                     Name = trait.Item1.Names.GetSuitableName(lang),
                     Identifier = trait.Item1.Identifier,
-                    Options = trait.Item2.Where(trait => trait.Names.Any(traitNames => !string.IsNullOrEmpty(traitNames.Value)))
-                        .Select(commonTrait => new CatalogOptionsDto
+                    Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
                     {
                         Name = commonTrait.Names.GetSuitableName(lang),
                         Id = commonTrait.Id
@@ -388,10 +409,15 @@ namespace QuartierLatin.Backend.Controllers
             var response = new CatalogFilterResponseDto
             {
                 Filters = filters
-            };
+            };  
 
             return Ok(response);
+			
+			
+
+			
         }
+		
 
         [AllowAnonymous]
         [HttpPost("/api/catalog/housing/search/{lang}")]
