@@ -76,6 +76,12 @@ namespace QuartierLatin.Backend.Controllers
         {
             return FormatPriceValue(CostGroup.GetCostGroup(group).from, CostGroup.GetCostGroup(group).to, lang);
         }
+		
+		
+        private string FormatHousingPrice(int group, string lang)
+        {
+            return FormatPriceValue(CostHousingGroup.GetCostHousingGroup(group).from, CostHousingGroup.GetCostHousingGroup(group).to, lang);
+        }		
 
         // Compatibility with old urls
         [AllowAnonymous]
@@ -386,13 +392,13 @@ namespace QuartierLatin.Backend.Controllers
                 Names = priceLangs,
                 Order = _baseFilterConfig.Value.PriceOrder
             },
-                CostGroup.CostGroups.Select(g =>
+                CostHousingGroup.CostHousingGroups.Select(g =>
                     new CommonTrait
                     {
                         Id = g,
                         Names = new Dictionary<string, string>
                         {
-                            [lang] = FormatPrice(g, lang)
+                            [lang] = FormatHousingPrice(g, lang)
                         }
                     }).ToList()));
             var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)

@@ -41,8 +41,8 @@ namespace QuartierLatin.Backend.Services.Catalog
 			if(entityType==EntityType.Housing){
 			  var extra_city_trait_type=await _commonTraitTypeRepository.GetCommonTraitTypeAsync(2);	
               traitTypes.Add(extra_city_trait_type);
-			  var extra_acommodation_trait_type=await _commonTraitTypeRepository.GetCommonTraitTypeAsync(22);	
-              traitTypes.Add(extra_acommodation_trait_type);
+		/*	  var extra_acommodation_trait_type=await _commonTraitTypeRepository.GetCommonTraitTypeAsync(22);	
+              traitTypes.Add(extra_acommodation_trait_type);*/
 			}
             var traits =
                 (await _commonTraitRepository.GetCommonTraitListByTypeIds(traitTypes.Select(x => x.Id).ToArray()))
