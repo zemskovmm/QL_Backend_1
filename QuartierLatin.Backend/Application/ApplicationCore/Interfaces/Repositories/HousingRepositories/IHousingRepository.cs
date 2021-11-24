@@ -13,6 +13,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
         Task UpdateHousingByIdAsync(int id, int? price, int? imageId);
         Task CreateOrUpdateHousingLanguageByIdAsync(int housingId, string htmlDescription, int languageId, string name, string url, JObject? metadata, JObject? location);
         Task<(Housing housing, Dictionary<int, HousingLanguage> housingLanguage)> GetHousingByUrlWithLanguageAsync(int languageId, string url);
-        Task<(int totalItems, List<(Housing housing, HousingLanguage housingLanguage)> housingAndLanguage)> GetHousingPageByFilter(List<List<int>> commonTraitsIds, int langId, int skip, int take);
+        Task<(int totalItems, List<(Housing housing, HousingLanguage housingLanguage)> housingAndLanguage)> GetHousingPageByFilter(List<List<int>> commonTraitsIds, int langId, List<int> priceIds, int skip, int take);
     }
 }

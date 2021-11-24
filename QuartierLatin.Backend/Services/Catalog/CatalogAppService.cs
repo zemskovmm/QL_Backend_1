@@ -103,11 +103,22 @@ namespace QuartierLatin.Backend.Services.Catalog
         public async Task<(int totalItems, List<(Housing housing, HousingLanguage housingLanguage)> housingAndLanguage)> GetCatalogHousingPageByFilterAsync(string lang,
             Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize)
         {
+			
+
+      /*      var commonTraitsIds = commonTraits
+                .Select(x => x.Value).ToList();*/
+			var priceFiltersId = new List<int>();	
             var commonTraitsIds = commonTraits
-                .Select(x => x.Value).ToList();
+                .Where(trait => trait.Key != "price")
+                .Select(x => x.Value).ToList();		
+            var priceFilters = commonTraits
+                .FirstOrDefault(price => price.Key == "price");
+
+            if (priceFilters.Value != null)
+                priceFiltersId = priceFilters.Value.ToList();				
             var langId = await _languageRepository.GetLanguageIdByShortNameAsync(lang);
 
-            return await _housingRepository.GetHousingPageByFilter(commonTraitsIds, langId, pageSize * pageNumber, pageSize);
+            return await _housingRepository.GetHousingPageByFilter(commonTraitsIds, langId, priceFiltersId, pageSize * pageNumber, pageSize);
         }
     }
 }
