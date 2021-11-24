@@ -139,7 +139,7 @@ housings = housings.Where(Lambda(predicate, arg));
 						if(to_price is null){
 							to_price=10000000;
 						}
-						Expression<Func<Housing, bool>> filterExpression = housing => housing.Price<to_price && housing.Price>from_price;
+						Expression<Func<Housing, bool>> filterExpression = housing => housing.Price<=to_price && housing.Price>from_price;
                         if(housings2==housings){
 	
 
