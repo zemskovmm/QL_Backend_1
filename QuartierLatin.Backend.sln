@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuartierLatin.Importer.Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteUi", "remoteui\RemoteUi\RemoteUi.csproj", "{F1C429D3-2049-46DB-A199-DBBA987ABE38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuartierLatin.CityMapper", "QuartierLatin.CityMapper\QuartierLatin.CityMapper.csproj", "{53C181E8-328F-44C5-9D30-BB7345A5F786}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{F1C429D3-2049-46DB-A199-DBBA987ABE38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1C429D3-2049-46DB-A199-DBBA987ABE38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1C429D3-2049-46DB-A199-DBBA987ABE38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53C181E8-328F-44C5-9D30-BB7345A5F786}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53C181E8-328F-44C5-9D30-BB7345A5F786}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53C181E8-328F-44C5-9D30-BB7345A5F786}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53C181E8-328F-44C5-9D30-BB7345A5F786}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
