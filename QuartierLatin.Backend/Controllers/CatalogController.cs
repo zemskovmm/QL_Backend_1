@@ -421,7 +421,8 @@ namespace QuartierLatin.Backend.Controllers
 				
 			 foreach (var curFilter in filters)
              {	
-			     foreach (var curOption in curFilter.Options){
+			     if(curFilter.Identifier=="city"){ 
+			       foreach (var curOption in curFilter.Options){
 					 var items=await _catalogAppService.GetChildCommonTraitsByParentId(curOption.Id);
 			         var childDtoItems=items.Select(commonChildTrait =>  new CatalogOptionsChildDto
                               {
@@ -429,7 +430,9 @@ namespace QuartierLatin.Backend.Controllers
 				                     Name = commonChildTrait.Names.GetSuitableName(lang),
                                      Id = commonChildTrait.Id	
 					          }).ToList();	
-					curOption.Items=childDtoItems; 
+			 		curOption.Items=childDtoItems; 
+				  }
+				 
 				 }
 			      
 			 }
