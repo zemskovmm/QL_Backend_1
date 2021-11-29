@@ -488,3 +488,5 @@ sketch
 config.local.json
 
 QuartierLatin.Backend/sitemaps/
+
+QuartierLatin.CityMapper/dump.json
