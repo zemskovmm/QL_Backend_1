@@ -16,5 +16,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.
             Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize);
         Task<(int totalItems, List<(Housing housing, HousingLanguage housingLanguage)> housingAndLanguage)> GetCatalogHousingPageByFilterAsync(string lang,
             Dictionary<string, List<int>> commonTraits, int pageNumber, int pageSize);
+		Task<List<CommonTrait>> GetChildCommonTraitsByParentId(int parentId);
+	
     }
 }

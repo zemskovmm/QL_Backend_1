@@ -34,6 +34,15 @@ namespace QuartierLatin.Backend.Services.Catalog
             _courseCatalogRepository = courseCatalogRepository;
             _housingRepository = housingRepository;
         }
+		
+		
+		public async Task<List<CommonTrait>> GetChildCommonTraitsByParentId(int parentId){
+            var traits =
+                await _commonTraitRepository.GetCommonTraitListByParentId(parentId);
+              //  .GroupBy(x => x.CommonTraitTypeId).ToDictionary(x => x.Key, x => x.ToList());	
+             return traits;   			  
+			
+		}
 
         public async Task<List<(CommonTraitType commonTraitType, List<CommonTrait> commonTraits)>> GetNamedCommonTraitsAndTraitTypeByEntityType(EntityType entityType)
         {

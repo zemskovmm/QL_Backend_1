@@ -15,6 +15,14 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         {
             _db = db;
         }
+		
+		
+		
+		 public async Task<List<CommonTrait>> GetCommonTraitListByParentId(int parentId){
+            return await _db.ExecAsync(db =>
+                db.CommonTraits.Where(trait => trait.ParentId == parentId).ToListAsync());			 
+			 
+		 }
 
         public async Task<int> CreateCommonTraitAsync(int commonTraitTypeId, Dictionary<string, string> names, int? iconBlobId, int order, int? parentId)
         {
@@ -72,9 +80,21 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
             return await _db.ExecAsync(db =>
                 db.CommonTraits.Where(trait => trait.CommonTraitTypeId == typeId).ToListAsync());
         }
+		
+        public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdWithoutParent(int typeId)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraits.Where(trait => trait.CommonTraitTypeId == typeId && trait.ParentId == null).ToListAsync());
+        }	
+
+        public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdByParentId(int typeId,int parentId)
+        {
+            return await _db.ExecAsync(db =>
+                db.CommonTraits.Where(trait => trait.CommonTraitTypeId == typeId && trait.ParentId==parentId).ToListAsync());
+        }			
 
         public Task<List<CommonTrait>> GetCommonTraitListByTypeIds(int[] typeIds) => _db.ExecAsync(db =>
-            db.CommonTraits.Where(trait => typeIds.Contains(trait.CommonTraitTypeId)).ToListAsync());
+            db.CommonTraits.Where(trait => typeIds.Contains(trait.CommonTraitTypeId) && trait.ParentId == null).ToListAsync());
 
         public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdAndUniversityId(int typeId, int universityId)
         {

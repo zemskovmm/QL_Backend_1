@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using QuartierLatin.Backend.Config;
 using QuartierLatin.Backend.Dto.CatalogDto;
+using QuartierLatin.Backend.Dto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
 using QuartierLatin.Backend.Dto.CommonTraitDto;
@@ -401,6 +402,7 @@ namespace QuartierLatin.Backend.Controllers
                             [lang] = FormatHousingPrice(g, lang)
                         }
                     }).ToList()));
+	
             var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
                 .Select(trait => new CatalogFilterDto
                 {
@@ -410,8 +412,27 @@ namespace QuartierLatin.Backend.Controllers
                     {
                         Name = commonTrait.Names.GetSuitableName(lang),
                         Id = commonTrait.Id
+
+						
+						
+						
                     }).ToList()
                 }).ToList();
+				
+			 foreach (var curFilter in filters)
+             {	
+			     foreach (var curOption in curFilter.Options){
+					 var items=await _catalogAppService.GetChildCommonTraitsByParentId(curOption.Id);
+			         var childDtoItems=items.Select(commonChildTrait =>  new CatalogOptionsChildDto
+                              {
+						
+				                     Name = commonChildTrait.Names.GetSuitableName(lang),
+                                     Id = commonChildTrait.Id	
+					          }).ToList();	
+					curOption.Items=childDtoItems; 
+				 }
+			      
+			 }
 
             var response = new CatalogFilterResponseDto
             {
