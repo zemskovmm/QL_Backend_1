@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using QuartierLatin.Backend.Dto.HousingCatalogDto;
@@ -24,6 +25,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
             var noFields = new IExtraRemoteUiField[0];
             _definition = new RemoteUiBuilder(typeof(AdminHousingAccommodationTypeDto), noFields, null, new CamelCaseNamingStrategy())
                 .Register(typeof(HousingAccommodationTypeDto), noFields)
+                .Register(typeof(Dictionary<string, string>), noFields)
                 .Build(null);
 
             _housingAccommodationTypeAppService = housingAccommodationTypeAppService;
@@ -51,7 +53,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
         public IActionResult GetDefinition() => Ok(_definition);
 
         [HttpPost]
-        public async Task<IActionResult> CreateHousingAccommodationType([FromBody] HousingAccommodationTypeDto housingDto)
+        public async Task<IActionResult> CreateHousingAccommodationType([FromBody] AdminHousingAccommodationTypeDto housingDto)
         {
             var housingId = await _housingAccommodationTypeAppService.CreateHousingAccommodationTypeAsync(housingDto.Names, housingDto.HousingId, 
                 housingDto.Price, housingDto.Residents, housingDto.Square);
@@ -78,7 +80,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateHousingAccommodationTypeById([FromBody] HousingAccommodationTypeDto housingDto, int id)
+        public async Task<IActionResult> UpdateHousingAccommodationTypeById([FromBody] AdminHousingAccommodationTypeDto housingDto, int id)
         {
             await _housingAccommodationTypeAppService.UpdateHousingAccommodationTypeByIdAsync(id, housingDto.Names, housingDto.HousingId,
                 housingDto.Price, housingDto.Residents, housingDto.Square);

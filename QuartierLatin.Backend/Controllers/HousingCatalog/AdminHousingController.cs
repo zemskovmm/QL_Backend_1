@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.HousingServices;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.HousingModels;
+using QuartierLatin.Backend.Dto.HousingCatalogDto.HousingAccommodationTypeCatalogDto;
 
 namespace QuartierLatin.Backend.Controllers.HousingCatalog
 {
@@ -19,9 +20,10 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
     {
         private readonly ILanguageRepository _languageRepository;
         private readonly IHousingAppService _housingAppService;
+        private readonly IHousingAccommodationTypeAppService _housingAccommodationTypeAppService;
         private readonly JObject _definition;
 
-        public AdminHousingController(IHousingAppService housingAppService, ILanguageRepository languageRepository)
+        public AdminHousingController(IHousingAppService housingAppService, ILanguageRepository languageRepository, IHousingAccommodationTypeAppService housingAccommodationTypeAppService)
         {
             var noFields = new IExtraRemoteUiField[0];
             _definition = new RemoteUiBuilder(typeof(HousingAdminDto), noFields, null, new CamelCaseNamingStrategy())
@@ -32,6 +34,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
 
             _housingAppService = housingAppService;
             _languageRepository = languageRepository;
+            _housingAccommodationTypeAppService = housingAccommodationTypeAppService;
         }
 
         [HttpGet]
@@ -103,6 +106,25 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
             };
 
             return Ok(new AdminDtoResponse<HousingAdminDto> { Definition = _definition, Value = response });
+        }
+        
+        [HttpGet("{id}/accommodations")]
+        public async Task<IActionResult> GetAccommodationsByHousingId(int id)
+        {
+            var accommodations =
+                await _housingAccommodationTypeAppService.GetHousingAccommodationTypeListByHousingIdAsync(id);
+            
+            var response = accommodations.Select(housing => new AdminHousingAccommodationTypeDto
+            {
+                Id = housing.Id,
+                Price = housing.Price,
+                Square = housing.Square,
+                Residents = housing.Residents,
+                Names = housing.Names,
+                HousingId = housing.HousingId
+            }).ToList();
+
+            return Ok(response);
         }
 
         [HttpPut("{id}")]
