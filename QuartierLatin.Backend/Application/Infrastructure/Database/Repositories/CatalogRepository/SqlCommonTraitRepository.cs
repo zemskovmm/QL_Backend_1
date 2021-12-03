@@ -25,10 +25,32 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 			 
 		 }
 		 
-		 public async Task<IEnumerable<int>> getHousingTraitIds(){
-            var traits_for_housong_array = await _db.ExecAsync(db =>
+		 public async Task<int[]> getHousingTraitIds(){
+			            var traits_for_housong_array = await _db.ExecAsync(db =>
                 db.CommonTraitToHousing.Where(x => x.CommonTraitId != null).ToListAsync());		
-            return traits_for_housong_array.Select(x => x.CommonTraitId);				
+				
+			var traits_array = await _db.ExecAsync(db =>
+                db.CommonTraits.Where(x => (traits_for_housong_array.Select(x => x.CommonTraitId)).Contains(x.Id)).ToListAsync());
+            int?[] parent_trait_ids=traits_array.Select(x => x.ParentId).ToArray();	
+			int[] traits_ids_array=traits_array.Select(x =>x.Id).ToArray();
+
+			
+			
+			List<int> termsList = new List<int>();
+			foreach (var curParentId in parent_trait_ids){
+				termsList.Add(curParentId.GetValueOrDefault());
+			}
+			foreach (var curTraitId in traits_ids_array){
+				termsList.Add(curTraitId);
+			}			
+
+
+				return termsList.ToArray();
+				
+
+ 
+			 
+		
 			 
 		 }
 

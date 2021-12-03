@@ -61,7 +61,6 @@ namespace QuartierLatin.Backend.Services.Catalog
                 await _commonTraitRepository.getHousingTraitIds();
 			if(entityType==EntityType.Housing){
               var response =
-           //     traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id).Where(t => housing_trait_ids.Any(z => z == t.Id) ))).Where(x => x.commonTraits != null)
                 traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id).Where(ct => housing_trait_ids.Contains(ct.Id) ).OrderBy(ct => ct.Identifier).ToList())).Where(x => x.commonTraits != null)
                     .ToList();
 			    return response;		
