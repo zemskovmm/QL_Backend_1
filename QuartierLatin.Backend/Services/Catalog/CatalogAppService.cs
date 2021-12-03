@@ -57,12 +57,24 @@ namespace QuartierLatin.Backend.Services.Catalog
                 (await _commonTraitRepository.GetCommonTraitListByTypeIds(traitTypes.Select(x => x.Id).ToArray()))
                 .GroupBy(x => x.CommonTraitTypeId).ToDictionary(x => x.Key, x => x.ToList());
 
-
+            var housing_trait_ids =
+                await _commonTraitRepository.getHousingTraitIds();
+			if(entityType==EntityType.Housing){
+              var response =
+           //     traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id).Where(t => housing_trait_ids.Any(z => z == t.Id) ))).Where(x => x.commonTraits != null)
+                traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id).Where(ct => housing_trait_ids.Contains(ct.Id) ).OrderBy(ct => ct.Identifier).ToList())).Where(x => x.commonTraits != null)
+                    .ToList();
+			    return response;		
+			}
+            else{
             var response =
                 traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id))).Where(x => x.commonTraits != null)
                     .ToList();
+				return response;
+       
+			}				
 
-            return response;
+
         }
 
         public async Task<(int totalItems, List<(University, UniversityLanguage, int costGroup)>)> GetCatalogPageByFilter(

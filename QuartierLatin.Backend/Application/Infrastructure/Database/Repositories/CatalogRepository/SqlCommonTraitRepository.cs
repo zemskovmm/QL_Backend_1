@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LinqToDB;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.CatalogModels;
+using QuartierLatin.Backend.Application.ApplicationCore.Models.HousingModels;
 
 namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories.CatalogRepository
 {
@@ -21,6 +22,13 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 		 public async Task<List<CommonTrait>> GetCommonTraitListByParentId(int parentId){
             return await _db.ExecAsync(db =>
                 db.CommonTraits.Where(trait => trait.ParentId == parentId).ToListAsync());			 
+			 
+		 }
+		 
+		 public async Task<IEnumerable<int>> getHousingTraitIds(){
+            var traits_for_housong_array = await _db.ExecAsync(db =>
+                db.CommonTraitToHousing.Where(x => x.CommonTraitId != null).ToListAsync());		
+            return traits_for_housong_array.Select(x => x.CommonTraitId);				
 			 
 		 }
 
