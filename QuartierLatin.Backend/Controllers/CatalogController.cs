@@ -416,12 +416,13 @@ namespace QuartierLatin.Backend.Controllers
 						
 						
 						
-                    }).ToList()
+                    }).OrderBy(o=>o.Name).ToList()
                 }).ToList();
 				
 			 foreach (var curFilter in filters)
              {	
 			     if(curFilter.Identifier=="city"){ 
+				   curFilter.Options=curFilter.Options;
 			       foreach (var curOption in curFilter.Options){
 					 var items=await _catalogAppService.GetChildCommonTraitsByParentId(curOption.Id);
 			         var childDtoItems=items.Select(commonChildTrait =>  new CatalogOptionsChildDto
