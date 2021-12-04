@@ -5,7 +5,7 @@ namespace QuartierLatin.Backend.Dto.HousingCatalogDto.HousingAccommodationTypeCa
 {
     public class AdminHousingAccommodationTypeDto : BaseDto
     {
-        [RemoteUiField("names")]
+        [RemoteUiField("names", "", RemoteUiFieldType.Custom, CustomType = "PlainDictionary")]
         public Dictionary<string, string> Names { get; set; }
         [RemoteUiField("square")]
         public string Square { get; set; }
