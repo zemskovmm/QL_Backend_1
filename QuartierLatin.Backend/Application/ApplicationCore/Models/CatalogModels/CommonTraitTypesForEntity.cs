@@ -7,6 +7,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Models.CatalogModels
     public class CommonTraitTypesForEntity
     {
         [Column] [PrimaryKey] public int CommonTraitId { get; set; }
-        [Column] public EntityType EntityType { get; set; }
+        [Column] [PrimaryKey] public EntityType EntityType { get; set; }
     }
 }

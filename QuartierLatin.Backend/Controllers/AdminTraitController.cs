@@ -39,6 +39,7 @@ namespace QuartierLatin.Backend.Controllers
             _traitTypeDefinition =
                 new RemoteUiBuilder(typeof(TraitTypeDto), noFields, null, new CamelCaseNamingStrategy())
                     .Register(typeof(TraitTypeDto), noFields)
+                    .Register(typeof(EntityTypeDto), noFields)
                     .Register(typeof(Dictionary<string, string>), noFields)
                     .Build(null);
         }
@@ -77,11 +78,21 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> GetTraitTypeById(int id)
         {
             var traitType = await _commonTraitTypeAppService.GetTraitTypeByIdAsync(id);
-
+            var traitTypeEntityTypes = await _commonTraitTypeAppService.GetEntityTypesTraitTypeByIdAsync(id);
+			var entityTypeDtoItems=traitTypeEntityTypes.Select(entityTypeTraitType =>  new EntityTypeDto
+            {
+						
+				EntityTypeName = entityTypeTraitType.EntityType.ToString(),
+                EntityTypeId = (int)entityTypeTraitType.EntityType	
+				
+				
+				
+			}).ToList();	
             var response = new TraitTypeDto
             {
                 Identifier = traitType.Identifier,
-                Names = traitType.Names
+                Names = traitType.Names,
+				EntityTypes = entityTypeDtoItems
             };
 
             return Ok(response);

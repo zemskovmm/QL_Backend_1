@@ -41,6 +41,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 Order = order
             }));
         }
+		
 
         public async Task CreateOrUpdateCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType)
         {
@@ -50,6 +51,14 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 EntityType = entityType
             }));
         }
+		
+		
+		public async Task<List<CommonTraitTypesForEntity>> GetEntityTypesTraitTypeByIdAsync(int id){
+            return await _db.ExecAsync(db =>
+                db.CommonTraitTypesForEntities.Where(trait => trait.CommonTraitId == id).ToListAsync());			
+			
+		}
+
 
         public async Task DeleteCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType)
         {

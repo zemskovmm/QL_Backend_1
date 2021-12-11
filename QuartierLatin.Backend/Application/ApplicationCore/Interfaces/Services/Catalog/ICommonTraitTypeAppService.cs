@@ -36,5 +36,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.
         Task<List<int>> GetEntityTraitToHousingAccommodationTypeIdListAsync(int housingAccommodationTypeId);
         Task CreateEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId);
         Task DeleteEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId);
+		Task<List<CommonTraitTypesForEntity>> GetEntityTypesTraitTypeByIdAsync(int id);
     }
 }
