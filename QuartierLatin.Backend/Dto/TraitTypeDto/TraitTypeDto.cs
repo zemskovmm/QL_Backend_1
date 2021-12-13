@@ -19,7 +19,6 @@ namespace QuartierLatin.Backend.Dto.TraitTypeDto
 		
 		
 		[JsonProperty("entityTypes")]
-        [RemoteUiField("entityTypes")]
 		public List<EntityTypeDto> EntityTypes { get; set; } 
     }
 }
