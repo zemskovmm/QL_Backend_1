@@ -20,6 +20,13 @@ namespace QuartierLatin.Backend.Services.Catalog
         {
             return await _commonTraitTypeRepository.GetCommonTraitTypeListAsync();
         }
+		
+		
+		public async Task<List<CommonTraitTypesForEntity>> GetEntityTypesTraitTypeByIdAsync(int id)
+		{
+			
+            return await _commonTraitTypeRepository.GetEntityTypesTraitTypeByIdAsync(id);			
+		}
 
         public async Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names, int order)
         {
