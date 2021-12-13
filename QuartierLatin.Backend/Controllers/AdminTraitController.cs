@@ -36,7 +36,7 @@ namespace QuartierLatin.Backend.Controllers
                 .Register(typeof(Dictionary<string, string>), noFields)
                 .Build(null);
 
-        /*    _traitTypeDefinition =
+           _traitTypeDefinition =
                 new RemoteUiBuilder(typeof(TraitTypeDto), noFields, null, new CamelCaseNamingStrategy())
 				
 				
@@ -46,17 +46,11 @@ namespace QuartierLatin.Backend.Controllers
                     .Build(null);
 					
 					
-			_traitTypeDefinition =
-                new RemoteUiBuilder(typeof(TraitTypeDto), noFields, null, new CamelCaseNamingStrategy())
-				
-				
-                    .Register(typeof(TraitTypeDto), noFields)
-                    .Register(typeof(Dictionary<string, string>), noFields)
-                    .Build(null);	*/	
+			
         }
 
         [HttpGet("trait-type/definition")]
-        public async Task<IActionResult> GetTraitTypeDefinition() => Ok();
+        public async Task<IActionResult> GetTraitTypeDefinition() => Ok(_traitTypeDefinition);
         
         [HttpGet("trait/definition")]
         public async Task<IActionResult> GetDefinition() => Ok(_definition);
