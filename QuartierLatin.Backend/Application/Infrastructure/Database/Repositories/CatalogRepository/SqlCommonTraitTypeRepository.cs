@@ -59,6 +59,15 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 			
 		}
 
+        public async Task DeleteAllEntityTypesForTrait(int commonTraitId)
+        {
+            await _db.ExecAsync(db =>
+                db.CommonTraitTypesForEntities
+                    .Where(trait => trait.CommonTraitId == commonTraitId)
+                    .DeleteAsync());
+        }
+
+
 
         public async Task DeleteCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType)
         {

@@ -11,6 +11,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
         Task UpdateCommonTraitTypeAsync(int id, Dictionary<string, string> names, string? identifier, int order);
         Task CreateOrUpdateCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType);
         Task DeleteCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType);
+        Task DeleteAllEntityTypesForTrait(int commonTraitId);
         Task<CommonTraitType> GetCommonTraitTypeAsync(int id);
         Task<List<CommonTraitType>> GetCommonTraitTypeListAsync();
         Task<IEnumerable<int>> GetTraitTypeForEntitiesByEntityTypeIdListAsync(EntityType entityType);

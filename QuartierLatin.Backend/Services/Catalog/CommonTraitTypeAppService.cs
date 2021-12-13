@@ -4,6 +4,8 @@ using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.CatalogModels;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
+using QuartierLatin.Backend.Dto.TraitTypeDto;
+using System;
 
 namespace QuartierLatin.Backend.Services.Catalog
 {
@@ -28,9 +30,26 @@ namespace QuartierLatin.Backend.Services.Catalog
             return await _commonTraitTypeRepository.GetEntityTypesTraitTypeByIdAsync(id);			
 		}
 
-        public async Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names, int order)
+        public async Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names, int order, List<EntityTypeDto> entityTypes)
         {
-            return await _commonTraitTypeRepository.CreateCommonTraitTypeAsync(names, identifier, order);
+            var trait_type_id=await _commonTraitTypeRepository.CreateCommonTraitTypeAsync(names, identifier, order);
+			foreach (var curEntity in entityTypes)
+            {	
+			   var entityType =   (EntityType) Enum.Parse(typeof(EntityType), curEntity.EntityTypeName, true);;
+			  /* var entityType = EntityType.Housing;
+			   switch(curEntity.EntityTypeName){
+				   case "Housing": entityType = EntityType.Housing; break;
+				   case "University": entityType = EntityType.University; break;
+				   case "School": entityType = EntityType.School; break;
+				   case "Page": entityType = EntityType.Page; break;
+				   case "Course": entityType = EntityType.Course; break;
+			   } */
+			   await _commonTraitTypeRepository.CreateOrUpdateCommonTraitTypesForEntityAsync(trait_type_id, entityType);
+
+			}
+			
+			return trait_type_id;
+			
         }
 
         public async Task<CommonTraitType> GetTraitTypeByIdAsync(int id)
@@ -38,9 +57,27 @@ namespace QuartierLatin.Backend.Services.Catalog
             return await _commonTraitTypeRepository.GetCommonTraitTypeAsync(id);
         }
 
-        public async Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names, int order)
+        public async Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names, int order, List<EntityTypeDto> entityTypes)
         {
             await _commonTraitTypeRepository.UpdateCommonTraitTypeAsync(id, names, identifier, order);
+   		    await _commonTraitTypeRepository.DeleteAllEntityTypesForTrait(id);
+			
+			foreach (var curEntity in entityTypes)
+            {	
+			 	var entityType =   (EntityType) Enum.Parse(typeof(EntityType), curEntity.EntityTypeName, true);;
+
+	/*		   var entityType = EntityType.Housing;
+			   switch(curEntity.EntityTypeName){
+				   case 'Housing': entityType = EntityType.Housing; break;
+				   case 'University': entityType = EntityType.University; break;
+				   case 'School': entityType = EntityType.School; break;
+				   case 'Page': entityType = EntityType.Page; break;
+				   case 'Course': entityType = EntityType.Course; break;
+			   } */
+			   await _commonTraitTypeRepository.CreateOrUpdateCommonTraitTypesForEntityAsync(id, entityType);
+
+			}
+
         }
 
         public async Task<IEnumerable<int>> GetTraitTypeForEntitiesByEntityTypeAsync(EntityType entityType)
