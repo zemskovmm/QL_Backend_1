@@ -2,15 +2,16 @@
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.CatalogModels;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
+using QuartierLatin.Backend.Dto.TraitTypeDto;
 
 namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.Catalog
 {
     public interface ICommonTraitTypeAppService
     {
         Task<List<CommonTraitType>> GetTraitTypesAsync();
-        Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names, int order);
+        Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names, int order, List<EntityTypeDto> entityTypes);
         Task<CommonTraitType> GetTraitTypeByIdAsync(int id);
-        Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names, int order);
+        Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names, int order, List<EntityTypeDto> entityTypes);
         Task<IEnumerable<int>> GetTraitTypeForEntitiesByEntityTypeAsync(EntityType entityType);
         Task CreateTraitTypeForEntityByEntityTypeAsync(EntityType entityType, int traitTypeId);
         Task DeleteTraitTypeForEntityByEntityTypeAsync(EntityType entityType, int traitTypeId);
@@ -36,5 +37,6 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Services.
         Task<List<int>> GetEntityTraitToHousingAccommodationTypeIdListAsync(int housingAccommodationTypeId);
         Task CreateEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId);
         Task DeleteEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId);
+		Task<List<CommonTraitTypesForEntity>> GetEntityTypesTraitTypeByIdAsync(int id);
     }
 }

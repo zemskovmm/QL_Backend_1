@@ -36,11 +36,17 @@ namespace QuartierLatin.Backend.Controllers
                 .Register(typeof(Dictionary<string, string>), noFields)
                 .Build(null);
 
-            _traitTypeDefinition =
+           _traitTypeDefinition =
                 new RemoteUiBuilder(typeof(TraitTypeDto), noFields, null, new CamelCaseNamingStrategy())
+				
+				
                     .Register(typeof(TraitTypeDto), noFields)
+                    .Register(typeof(EntityTypeDto), noFields)
                     .Register(typeof(Dictionary<string, string>), noFields)
                     .Build(null);
+					
+					
+			
         }
 
         [HttpGet("trait-type/definition")]
@@ -68,7 +74,7 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> CreateTraitTypes([FromBody] TraitTypeDto traitTypeDto)
         {
             var response =
-                await _commonTraitTypeAppService.CreateTraitTypeAsync(traitTypeDto.Identifier, traitTypeDto.Names, traitTypeDto.Order);
+                await _commonTraitTypeAppService.CreateTraitTypeAsync(traitTypeDto.Identifier, traitTypeDto.Names, traitTypeDto.Order, traitTypeDto.EntityTypes);
 
             return Ok(new {id = response});
         }
@@ -77,11 +83,21 @@ namespace QuartierLatin.Backend.Controllers
         public async Task<IActionResult> GetTraitTypeById(int id)
         {
             var traitType = await _commonTraitTypeAppService.GetTraitTypeByIdAsync(id);
-
+            var traitTypeEntityTypes = await _commonTraitTypeAppService.GetEntityTypesTraitTypeByIdAsync(id);
+			var entityTypeDtoItems=traitTypeEntityTypes.Select(entityTypeTraitType =>  new EntityTypeDto
+            {
+						
+				EntityTypeName = entityTypeTraitType.EntityType.ToString(),
+                EntityTypeId = (int)entityTypeTraitType.EntityType	
+				
+				
+				
+			}).ToList();	
             var response = new TraitTypeDto
             {
                 Identifier = traitType.Identifier,
-                Names = traitType.Names
+                Names = traitType.Names,
+				EntityTypes = entityTypeDtoItems
             };
 
             return Ok(response);
@@ -90,7 +106,7 @@ namespace QuartierLatin.Backend.Controllers
         [HttpPut("trait-types/{id}")]
         public async Task<IActionResult> UpdateTraitTypeById([FromBody] TraitTypeDto traitTypeDto, int id)
         {
-            await _commonTraitTypeAppService.UpdateTraitTypeByIdAsync(id, traitTypeDto.Identifier, traitTypeDto.Names, traitTypeDto.Order);
+            await _commonTraitTypeAppService.UpdateTraitTypeByIdAsync(id, traitTypeDto.Identifier, traitTypeDto.Names, traitTypeDto.Order, traitTypeDto.EntityTypes);
 
             return Ok(new object());
         }

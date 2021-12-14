@@ -16,5 +16,9 @@ namespace QuartierLatin.Backend.Dto.TraitTypeDto
         [JsonProperty("order")]
         [RemoteUiField("Order")]
         public int Order { get; set; }
+		
+		
+		[JsonProperty("entityTypes")]
+		public List<EntityTypeDto> EntityTypes { get; set; } 
     }
 }

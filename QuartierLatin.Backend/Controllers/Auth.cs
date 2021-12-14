@@ -131,10 +131,8 @@ namespace QuartierLatin.Backend.Controllers
         public Task Pulse() => Task.CompletedTask;
 
         [HttpGet("roles")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RoleList()
-        {
-            return Ok(Roles.ValidRolesList);
-        }
+        [Authorize(Roles = Roles.Admin + "," + Roles.Manager)]
+        public async Task<IActionResult> RoleList() => 
+            Ok(User.Claims.Where(x => x.Type is ClaimTypes.Role).Select(x => x.Value).ToList());
     }
 }

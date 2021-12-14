@@ -11,6 +11,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
         Task UpdateCommonTraitTypeAsync(int id, Dictionary<string, string> names, string? identifier, int order);
         Task CreateOrUpdateCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType);
         Task DeleteCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType);
+        Task DeleteAllEntityTypesForTrait(int commonTraitId);
         Task<CommonTraitType> GetCommonTraitTypeAsync(int id);
         Task<List<CommonTraitType>> GetCommonTraitTypeListAsync();
         Task<IEnumerable<int>> GetTraitTypeForEntitiesByEntityTypeIdListAsync(EntityType entityType);
@@ -37,6 +38,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
         Task<List<int>> GetEntityTraitToHousingAccommodationTypeIdListAsync(int housingAccommodationTypeId);
         Task CreateEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId);
         Task DeleteEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId);
+		Task<List<CommonTraitTypesForEntity>> GetEntityTypesTraitTypeByIdAsync(int id);
 
     }
 }
