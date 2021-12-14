@@ -36,14 +36,7 @@ namespace QuartierLatin.Backend.Services.Catalog
 			foreach (var curEntity in entityTypes)
             {	
 			   var entityType =   (EntityType) Enum.Parse(typeof(EntityType), curEntity.EntityTypeName, true);;
-			  /* var entityType = EntityType.Housing;
-			   switch(curEntity.EntityTypeName){
-				   case "Housing": entityType = EntityType.Housing; break;
-				   case "University": entityType = EntityType.University; break;
-				   case "School": entityType = EntityType.School; break;
-				   case "Page": entityType = EntityType.Page; break;
-				   case "Course": entityType = EntityType.Course; break;
-			   } */
+
 			   await _commonTraitTypeRepository.CreateOrUpdateCommonTraitTypesForEntityAsync(trait_type_id, entityType);
 
 			}
@@ -64,16 +57,8 @@ namespace QuartierLatin.Backend.Services.Catalog
 			
 			foreach (var curEntity in entityTypes)
             {	
-			 	var entityType =   (EntityType) Enum.Parse(typeof(EntityType), curEntity.EntityTypeName, true);;
+			 	var entityType =   (EntityType) Enum.Parse(typeof(EntityType), curEntity.EntityTypeName, true);
 
-	/*		   var entityType = EntityType.Housing;
-			   switch(curEntity.EntityTypeName){
-				   case 'Housing': entityType = EntityType.Housing; break;
-				   case 'University': entityType = EntityType.University; break;
-				   case 'School': entityType = EntityType.School; break;
-				   case 'Page': entityType = EntityType.Page; break;
-				   case 'Course': entityType = EntityType.Course; break;
-			   } */
 			   await _commonTraitTypeRepository.CreateOrUpdateCommonTraitTypesForEntityAsync(id, entityType);
 
 			}
