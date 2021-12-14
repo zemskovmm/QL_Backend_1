@@ -45,7 +45,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 
         public async Task CreateOrUpdateCommonTraitTypesForEntityAsync(int commonTraitId, EntityType entityType)
         {
-            await _db.ExecAsync(db => db.InsertOrReplaceAsync(new CommonTraitTypesForEntity
+            await _db.ExecAsync(db => db.InsertAsync(new CommonTraitTypesForEntity
             {
                 CommonTraitId = commonTraitId,
                 EntityType = entityType
