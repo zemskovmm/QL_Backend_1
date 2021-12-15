@@ -393,14 +393,15 @@ namespace QuartierLatin.Backend.Controllers
                 Names = priceLangs,
                 Order = _baseFilterConfig.Value.PriceOrder
             },
-                CostHousingGroup.CostHousingGroups.Select(g =>
+                CostHousingGroup.CostHousingGroups.Select((g, index) =>
                     new CommonTrait
                     {
                         Id = g,
                         Names = new Dictionary<string, string>
                         {
                             [lang] = FormatHousingPrice(g, lang)
-                        }
+                        },
+						Order = index
                     }).ToList()));
 	
             var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
@@ -411,12 +412,12 @@ namespace QuartierLatin.Backend.Controllers
                     Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
                     {
                         Name = commonTrait.Names.GetSuitableName(lang),
-                        Id = commonTrait.Id
-
+                        Id = commonTrait.Id,
+                        Order = commonTrait.Order 
 						
 						
 						
-                    }).OrderBy(o=>o.Name).ToList()
+                    }).OrderBy(o=>o.Name).OrderBy(o=>o.Order).ToList()
                 }).ToList();
 				
 			 foreach (var curFilter in filters)

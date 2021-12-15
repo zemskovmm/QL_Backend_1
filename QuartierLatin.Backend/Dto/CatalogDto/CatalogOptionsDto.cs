@@ -9,6 +9,8 @@ namespace QuartierLatin.Backend.Dto.CatalogDto
         public int Id { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
+        [JsonProperty("order")]
+        public int Order { get; set; }
 		[JsonProperty("items")]
         public List<CatalogOptionsChildDto> Items { get; set; } 
     }
