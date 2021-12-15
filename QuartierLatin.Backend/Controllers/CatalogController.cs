@@ -393,14 +393,15 @@ namespace QuartierLatin.Backend.Controllers
                 Names = priceLangs,
                 Order = _baseFilterConfig.Value.PriceOrder
             },
-                CostHousingGroup.CostHousingGroups.Select(g =>
+                CostHousingGroup.CostHousingGroups.Select((g, index) =>
                     new CommonTrait
                     {
                         Id = g,
                         Names = new Dictionary<string, string>
                         {
                             [lang] = FormatHousingPrice(g, lang)
-                        }
+                        },
+						Order = index
                     }).ToList()));
 	
             var filters = commonTraits.OrderBy(trait => trait.commonTraitType.Order)
