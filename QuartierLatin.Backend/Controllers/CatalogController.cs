@@ -416,7 +416,7 @@ namespace QuartierLatin.Backend.Controllers
 						
 						
 						
-                    }).OrderBy(o=>o.Order).OrderBy(o=>o.Name).ToList()
+                    }).OrderBy(o=>o.Name).OrderBy(o=>o.Order).ToList()
                 }).ToList();
 				
 			 foreach (var curFilter in filters)
