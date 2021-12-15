@@ -411,12 +411,12 @@ namespace QuartierLatin.Backend.Controllers
                     Options = trait.Item2.Select(commonTrait => new CatalogOptionsDto
                     {
                         Name = commonTrait.Names.GetSuitableName(lang),
-                        Id = commonTrait.Id
-
+                        Id = commonTrait.Id,
+                        Order = commonTrait.Order 
 						
 						
 						
-                    }).OrderBy(o=>o.Name).ToList()
+                    }).OrderBy(o=>o.Order).OrderBy(o=>o.Name).ToList()
                 }).ToList();
 				
 			 foreach (var curFilter in filters)
