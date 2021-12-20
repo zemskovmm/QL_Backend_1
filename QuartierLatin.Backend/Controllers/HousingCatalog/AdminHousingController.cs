@@ -15,6 +15,7 @@ using QuartierLatin.Backend.Dto.HousingCatalogDto.HousingAccommodationTypeCatalo
 
 namespace QuartierLatin.Backend.Controllers.HousingCatalog
 {
+    [Authorize(Roles = "Admin")]	
     [Route("/api/admin/housings")]
     public class AdminHousingController : Controller
     {
