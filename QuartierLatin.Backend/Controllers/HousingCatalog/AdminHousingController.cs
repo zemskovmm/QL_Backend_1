@@ -5,6 +5,7 @@ using QuartierLatin.Backend.Dto.HousingCatalogDto;
 using RemoteUi;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
@@ -14,7 +15,7 @@ using QuartierLatin.Backend.Dto.HousingCatalogDto.HousingAccommodationTypeCatalo
 
 namespace QuartierLatin.Backend.Controllers.HousingCatalog
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]	
     [Route("/api/admin/housings")]
     public class AdminHousingController : Controller
     {
@@ -30,6 +31,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                 .Register(typeof(HousingAdminDto), noFields)
                 .Register(typeof(Dictionary<string, HousingLanguageAdminDto>), noFields)
                 .Register(typeof(HousingLanguageAdminDto), noFields)
+                .Register(typeof(HousingLanguageLocationAdminDto), noFields)
                 .Build(null);
 
             _housingAppService = housingAppService;
@@ -54,7 +56,13 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                         HtmlDescription = housing.Value.Description,
                         Url = housing.Value.Url,
                         Metadata = housing.Value.Metadata is null ? null : JObject.Parse(housing.Value.Metadata),
-                        Location = housing.Value.Location is null ? null : JObject.Parse(housing.Value.Location)
+                        Location = housing.Value.Location is null ? null : new HousingLanguageLocationAdminDto() {
+							Lat=JObject.Parse(housing.Value.Location).SelectToken("lat").ToString(),
+
+							Lng=JObject.Parse(housing.Value.Location).SelectToken("lng").ToString(),
+							Address=JObject.Parse(housing.Value.Location).SelectToken("address").ToString()
+							
+						}
                     })
             }).ToList();
 
@@ -67,8 +75,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
         [HttpPost]
         public async Task<IActionResult> CreateHousing([FromBody] HousingAdminDto housingDto)
         {
-            var language = await _languageRepository.GetLanguageIdWithShortNameAsync();
-
+            var language = await _languageRepository.GetLanguageIdWithShortNameAsync();   
             var housingLanguage = housingDto.Languages.Select(housing => new HousingLanguage
             {
                 Description = housing.Value.HtmlDescription,
@@ -76,7 +83,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                 Url = housing.Value.Url,
                 LanguageId = language.FirstOrDefault(language => language.Value == housing.Key).Key,
                 Metadata = housing.Value.Metadata is null ? null : housing.Value.Metadata.ToString(),
-                Location = housing.Value.Location is null ? null : housing.Value.Location.ToString()
+                Location =  housing.Value.Location is null ? null : housing.Value.Location.ToString(),
             }).ToList();
 
             var housingId = await _housingAppService.CreateHousingAsync(housingDto.Price, housingDto.ImageId, housingLanguage);
@@ -101,7 +108,12 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                         HtmlDescription = housing.Value.Description,
                         Url = housing.Value.Url,
                         Metadata = housing.Value.Metadata is null ? null : JObject.Parse(housing.Value.Metadata),
-                        Location = housing.Value.Location is null ? null : JObject.Parse(housing.Value.Location)
+                        Location = housing.Value.Location is null ? null : new HousingLanguageLocationAdminDto() {
+							Lat=JObject.Parse(housing.Value.Location)?.SelectToken("lat")?.ToString(),
+							Lng=JObject.Parse(housing.Value.Location)?.SelectToken("lng")?.ToString(),
+							Address=JObject.Parse(housing.Value.Location)?.SelectToken("address")?.ToString()
+							
+						}
                     })
             };
 
@@ -140,7 +152,13 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                     housingLanguage.Value.HtmlDescription,
                     languageId,
                     housingLanguage.Value.Name,
-                    housingLanguage.Value.Url, housingLanguage.Value.Metadata, housingLanguage.Value.Location);
+                    housingLanguage.Value.Url, housingLanguage.Value.Metadata, new JObject
+                       {
+                             ["lat"] = housingLanguage.Value.Location.Lat,
+                             ["lng"] = housingLanguage.Value.Location.Lng,
+                             ["address"] = housingLanguage.Value.Location.Address
+					   }
+				);
             }
 
             return Ok(new object());

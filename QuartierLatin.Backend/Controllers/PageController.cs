@@ -34,7 +34,7 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [HttpPost("search/{lang}")]
-        public async Task<IActionResult> SearchInPages(string lang, [FromBody] PageSearchDto pageSearchDto)
+        public async Task<IActionResult> SearchInPages(string lang, [FromBody] PageSearchDto pageSearchDto, string date = null)
         {
             lang = lang.ToLower();
 
@@ -56,7 +56,7 @@ namespace QuartierLatin.Backend.Controllers
 
             var pageDtos = new List<PageDto>();
 
-            foreach (var page in catalogPage.Item2)
+            foreach (var page in catalogPage.Item2.OrderByDescending(x => x.page.Date))
             {
                 var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
 
@@ -83,7 +83,7 @@ namespace QuartierLatin.Backend.Controllers
                     page.page.Metadata is null ? null : JObject.Parse(page.page.Metadata)));
             };
 
-
+            
             var response = new CatalogSearchResponseDtoList<PageDto>
             {
                 Items = pageDtos,
