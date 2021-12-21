@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 using QuartierLatin.Backend.Dto.CatalogDto;
 using QuartierLatin.Backend.Dto.CatalogDto.CatalogSearchDto.CatalogSearchResponseDto;
 using QuartierLatin.Backend.Dto.PageModuleDto;
@@ -77,16 +78,31 @@ namespace QuartierLatin.Backend.Controllers
 
                     traits.Add(traitType.Identifier, pageTraitList);
                 }
+                var block_items=JObject.Parse(page.page.PageData).SelectToken("rows[0].blocks[0].data.date");
+				
+				var rows_items=JObject.Parse(page.page.PageData).SelectToken("rows");
+				DateTime? blockDate=null;
+				foreach(var cur_item in rows_items){
+					var blocks_array=cur_item.SelectToken("blocks");
+					foreach(var cur_block in blocks_array){
+						  if(cur_block.SelectToken("type").ToString()=="firstArticleBlock"){
+								   blockDate=DateTime.ParseExact(cur_block.SelectToken("data.date").ToString(), "dd.MM.yyyy", null);
+                                   break;								   
+						  }							  
+						  
+					}
+				}
 
                 pageDtos.Add(new PageDto(page.page.Title, JObject.Parse(page.page.PageData), page.page.Date,
                     page.pageRoot.PageType, page.page.PreviewImageId, page.page.SmallPreviewImageId, page.page.WidePreviewImageId, traits, page.page.Url,
-                    page.page.Metadata is null ? null : JObject.Parse(page.page.Metadata)));
+                    page.page.Metadata is null ? null : JObject.Parse(page.page.Metadata),blockDate));
             };
-
+           
+		    
             
             var response = new CatalogSearchResponseDtoList<PageDto>
             {
-                Items = pageDtos,
+                Items = pageDtos.OrderByDescending(x => x.BlockDate).ToList<PageDto>(),
                 TotalItems = catalogPage.totalItems,
                 TotalPages = FilterHelper.PageCount(catalogPage.totalItems, pageSize)
             };

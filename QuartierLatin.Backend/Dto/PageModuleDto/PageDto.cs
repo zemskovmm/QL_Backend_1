@@ -26,6 +26,8 @@ namespace QuartierLatin.Backend.Dto.PageModuleDto
         public int? WidePreviewImageId { get; set; }
 
         public DateTime? Date { get; set; }
+      
+    	public DateTime? BlockDate { get; set; }
 
         public PageType PageType { get; set; }
 
@@ -38,11 +40,12 @@ namespace QuartierLatin.Backend.Dto.PageModuleDto
             DateTime? date, PageType pageType, int? previewImageId, 
             int? smallPreviewImageId, int? widePreviewImageId, 
             Dictionary<string, List<CommonTraitLanguageDto>>? namedTraits, string? url,
-            JObject? metadata)
+            JObject? metadata, DateTime? blockDate = null)
         {
             Title = title;
             PageBlockDto = pageBlockDto;
             Date = date;
+            BlockDate = blockDate;
             PageType = pageType;
             PreviewImageId = previewImageId;
             SmallPreviewImageId = smallPreviewImageId;
