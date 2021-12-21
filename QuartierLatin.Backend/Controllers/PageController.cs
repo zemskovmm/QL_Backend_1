@@ -48,7 +48,7 @@ namespace QuartierLatin.Backend.Controllers
                 await _pageAppService.GetPagesByFilter(lang, entityType, commonTraits,
                     pageSearchDto.PageNumber, pageSize);
 
-            var pageIds = catalogPage.Item2.OrderByDescending(x => x.page.Date).Select(x => x.Item1.Id).ToList();
+            var pageIds = catalogPage.Item2.Select(x => x.Item1.Id).ToList();
 
             var commonTraitsPages = await _pageAppService.GetCommonTraitListByPageIds(pageIds);
 
@@ -56,7 +56,7 @@ namespace QuartierLatin.Backend.Controllers
 
             var pageDtos = new List<PageDto>();
 
-            foreach (var page in catalogPage.Item2)
+            foreach (var page in catalogPage.Item2.OrderByDescending(x => x.page.Date))
             {
                 var traits = new Dictionary<string, List<CommonTraitLanguageDto>>();
 
