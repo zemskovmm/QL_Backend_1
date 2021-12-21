@@ -31,6 +31,7 @@ namespace QuartierLatin.Backend.Controllers.HousingCatalog
                 .Register(typeof(HousingAdminDto), noFields)
                 .Register(typeof(Dictionary<string, HousingLanguageAdminDto>), noFields)
                 .Register(typeof(HousingLanguageAdminDto), noFields)
+                .Register(typeof(HousingLanguageLocationAdminDto), noFields)
                 .Build(null);
 
             _housingAppService = housingAppService;
