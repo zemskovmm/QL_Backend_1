@@ -34,7 +34,7 @@ namespace QuartierLatin.Backend.Controllers
         }
 
         [HttpPost("search/{lang}")]
-        public async Task<IActionResult> SearchInPages(string lang, [FromBody] PageSearchDto pageSearchDto)
+        public async Task<IActionResult> SearchInPages(string lang, [FromBody] PageSearchDto pageSearchDto, string date = null)
         {
             lang = lang.ToLower();
 
@@ -48,7 +48,7 @@ namespace QuartierLatin.Backend.Controllers
                 await _pageAppService.GetPagesByFilter(lang, entityType, commonTraits,
                     pageSearchDto.PageNumber, pageSize);
 
-            var pageIds = catalogPage.Item2.Select(x => x.Item1.Id).ToList();
+            var pageIds = catalogPage.Item2.OrderByDescending(x => x.page.Date).Select(x => x.Item1.Id).ToList();
 
             var commonTraitsPages = await _pageAppService.GetCommonTraitListByPageIds(pageIds);
 
@@ -83,7 +83,7 @@ namespace QuartierLatin.Backend.Controllers
                     page.page.Metadata is null ? null : JObject.Parse(page.page.Metadata)));
             };
 
-
+            
             var response = new CatalogSearchResponseDtoList<PageDto>
             {
                 Items = pageDtos,
