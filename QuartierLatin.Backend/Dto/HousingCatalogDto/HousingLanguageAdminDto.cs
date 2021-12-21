@@ -14,6 +14,8 @@ namespace QuartierLatin.Backend.Dto.HousingCatalogDto
 
 		
         public JObject? Metadata { get; set; }
+		
+		[RemoteUiField("Location")]
         public HousingLanguageLocationAdminDto Location { get; set; }
     }
 }
