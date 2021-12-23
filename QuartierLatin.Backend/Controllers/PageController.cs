@@ -78,7 +78,6 @@ namespace QuartierLatin.Backend.Controllers
 
                     traits.Add(traitType.Identifier, pageTraitList);
                 }
-                var block_items=JObject.Parse(page.page.PageData).SelectToken("rows[0].blocks[0].data.date");
 				
 				var rows_items=JObject.Parse(page.page.PageData).SelectToken("rows");
 				DateTime? blockDate=null;
