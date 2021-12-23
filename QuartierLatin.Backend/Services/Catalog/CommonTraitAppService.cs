@@ -74,6 +74,12 @@ namespace QuartierLatin.Backend.Services.Catalog
         {
             return await _commonTraitRepository.GetTraitOfTypesByIdentifierAsync(traitIdentifier);
         }
+		
+		
+		public async Task<List<CommonTrait>> GetTraitOfTypesByIdentifierWithContentsAsync(string traitIdentifier)
+        {
+            return await _commonTraitRepository.GetTraitOfTypesByIdentifierWithContetnsAsync(traitIdentifier);
+        }
 
         public async Task<List<CommonTrait>> GetTraitOfTypesByTypeIdAndHousingIdAsync(int traitTypeId, int housingId)
         {

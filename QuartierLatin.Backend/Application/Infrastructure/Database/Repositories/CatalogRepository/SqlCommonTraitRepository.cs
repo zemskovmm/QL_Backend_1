@@ -5,6 +5,7 @@ using LinqToDB;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CatalogRepositoies;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.CatalogModels;
 using QuartierLatin.Backend.Application.ApplicationCore.Models.HousingModels;
+using QuartierLatin.Backend.Application.ApplicationCore.Models;
 
 namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories.CatalogRepository
 {
@@ -111,6 +112,21 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                 db.CommonTraits.Where(trait => trait.CommonTraitTypeId == typeId).ToListAsync());
         }
 		
+        public async Task<List<CommonTrait>> GetCommonTraitListWithContentsByTypeId(int typeId)
+        {
+			 
+
+            return await _db.ExecAsync(async db =>
+		    	{
+
+		    	  var traitInPages= db.CommonTraitsToPages.Select(x => x.CommonTraitId).AsEnumerable();
+                  return await db.CommonTraits.Where(trait => trait.CommonTraitTypeId == typeId && traitInPages.Contains(trait.Id)).ToListAsync();
+				
+			    }	
+			);
+         
+        }		
+		
         public async Task<List<CommonTrait>> GetCommonTraitListByTypeIdWithoutParent(int typeId)
         {
             return await _db.ExecAsync(db =>
@@ -183,6 +199,19 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
                return await GetCommonTraitListByTypeId(traitTypeId);
             });
         }
+		
+		public async Task<List<CommonTrait>> GetTraitOfTypesByIdentifierWithContetnsAsync(string traitIdentifier)
+		{
+            return await _db.ExecAsync(async db =>
+            {
+               var traitTypes = db.CommonTraitTypes.AsEnumerable();
+
+               var traitTypeId = traitTypes.FirstOrDefault(traitType => traitType.Identifier == traitIdentifier).Id;
+
+               return await GetCommonTraitListWithContentsByTypeId(traitTypeId);
+            });			
+			
+		}
 
         public Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByCourseIdsAsync(IEnumerable<int> courseIds) =>
             _db.ExecAsync(async db =>

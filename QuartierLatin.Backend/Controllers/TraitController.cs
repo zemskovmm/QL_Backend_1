@@ -36,5 +36,23 @@ namespace QuartierLatin.Backend.Controllers
 
             return Ok(response);
         }
+		
+        [HttpGet("by-type/with-contents/{traitIdentifier}")]
+        public async Task<IActionResult> GetTraitOfTypeByTypeNameWithContents(string traitIdentifier)
+        {
+            var traitList = await _commonTraitAppService.GetTraitOfTypesByIdentifierWithContentsAsync(traitIdentifier);
+
+            var response = traitList.Select(trait => new CommonTraitListDto
+            {
+                Id = trait.Id,
+                CommonTraitTypeId = trait.CommonTraitTypeId,
+                IconBlobId = trait.IconBlobId,
+                Names = JObject.Parse(trait.NamesJson),
+                Order = trait.Order,
+                ParentId = trait.ParentId
+            });
+
+            return Ok(response);
+        }		
     }
 }
