@@ -6,7 +6,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Models
     {
         public static (int from, int? to) GetCostHousingGroup(int group) => group switch
         {
-            1 => (300, 400),
+            1 => (0, 400),
             2 => (400, 500),
             3 => (500, 600),
             4 => (600, 700),
