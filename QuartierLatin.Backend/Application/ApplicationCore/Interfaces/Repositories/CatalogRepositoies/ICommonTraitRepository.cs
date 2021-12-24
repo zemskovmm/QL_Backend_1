@@ -26,6 +26,7 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
         Task<Dictionary<int, List<CommonTrait>>> GetCommonTraitListByHousingAccommodationTypeIdsAsync(IEnumerable<int> housingAccommodationIds);
         Task<List<CommonTrait>> GetCommonTraitListByTypeIdWithoutParent(int typeId);
         Task<List<CommonTrait>> GetCommonTraitListByParentId(int parentId);
+		Task<List<CommonTrait>> GetTraitOfTypesByIdentifierWithContetnsAsync(string traitIdentifier);
         Task<int[]> getHousingTraitIds();
 		
     }
