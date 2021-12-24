@@ -62,7 +62,21 @@ namespace QuartierLatin.Backend.Controllers
         
         private string FormatPriceValue(int from, int? to, string lang)
         {
-            return lang == "ru"
+			if(from==0){
+               return lang == "ru"
+                ?  $"до {to} евро"
+                : lang == "fr"
+                    ? $"à {to} euros"
+                    : lang == "esp"
+                        ? $"a {to} euros"
+                        : lang == "cn"
+                            ? $"到 {to} euros"
+                            : $"to {to} euros";				
+				
+			}
+			else{
+			
+              return lang == "ru"
                 ? to is null ? $"От {from} евро" : $"От {from} до {to} евро"
                 : lang == "fr"
                     ? to is null ? $"De {from} euros" : $"De {from} à {to} euros"
@@ -71,6 +85,7 @@ namespace QuartierLatin.Backend.Controllers
                         : lang == "cn"
                             ? to is null ? $"从 {from} euros" : $"从 {from} 到 {to} euros"
                             : to is null ? $"From {from} euros" : $"From {from} to {to} euros";
+			}				
         }
 
         private string FormatPrice(int group, string lang)
