@@ -64,14 +64,14 @@ namespace QuartierLatin.Backend.Controllers
         {
 			if(from==0){
                return lang == "ru"
-                ?  $"до {to} евро"
+                ?  $"До {to} евро"
                 : lang == "fr"
                     ? $"à {to} euros"
                     : lang == "esp"
                         ? $"a {to} euros"
                         : lang == "cn"
                             ? $"到 {to} euros"
-                            : $"to {to} euros";				
+                            : $"To {to} euros";				
 				
 			}
 			else{
