@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 using System.Threading.Tasks;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories;
 using QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositories.CatalogRepositoies;
@@ -56,19 +57,46 @@ namespace QuartierLatin.Backend.Services.Catalog
                 (await _commonTraitRepository.GetCommonTraitListByTypeIds(traitTypes.Select(x => x.Id).ToArray()))
                 .GroupBy(x => x.CommonTraitTypeId).ToDictionary(x => x.Key, x => x.ToList());
 
-            var housing_trait_ids =
-                await _commonTraitRepository.getHousingTraitIds();
+
 			if(entityType==EntityType.Housing){
+             var housing_trait_ids =
+                 await _commonTraitRepository.getHousingTraitIds();
               var response =
                 traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id).Where(ct => housing_trait_ids.Contains(ct.Id) ).ToList())).Where(x => x.commonTraits != null)
                     .ToList();
 			    return response;		
 			}
             else{
-            var response =
-                traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id))).Where(x => x.commonTraits != null)
-                    .ToList();
-				return response;
+				if(entityType==EntityType.School || entityType==EntityType.Course){
+				             var school_trait_ids =
+                                    await _commonTraitRepository.getSchoolTraitIds();	 
+				             var course_trait_ids =
+                                    await _commonTraitRepository.getCourseTraitIds();	
+							 var trait_ids=school_trait_ids.Concat(course_trait_ids);	
+						 
+                             var response =
+                                   traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id).Where(ct => trait_ids.Contains(ct.Id) ).ToList())).Where(x => x.commonTraits != null)
+                                    .ToList();
+			                 return response;										
+			    }
+                else{
+                    if(entityType==EntityType.University){
+				             var trait_ids =
+                                    await _commonTraitRepository.getUniversityTraitIds();	 
+	
+						 
+                             var response =
+                                   traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id).Where(ct => trait_ids.Contains(ct.Id) ).ToList())).Where(x => x.commonTraits != null)
+                                    .ToList();
+			                 return response;						
+                    }
+                    else{					
+                       var response =
+                         traitTypes.Select(trait => (commonTraitType: trait, commonTraits: traits.GetValueOrDefault(trait.Id))).Where(x => x.commonTraits != null)
+                         .ToList();
+				      return response;
+					}  
+				}	 
        
 			}				
 
