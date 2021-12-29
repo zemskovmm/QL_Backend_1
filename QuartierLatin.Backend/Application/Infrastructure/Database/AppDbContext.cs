@@ -29,7 +29,7 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database
         public AppDbContext(string connectionString, IDataProvider provider) : base(provider, connectionString)
         {
         }
-
+		
         public ITable<Admin> Admins => GetTable<Admin>();
         public ITable<AdminRole> AdminRoles => GetTable<AdminRole>();
         public ITable<Blob> Blobs => GetTable<Blob>();

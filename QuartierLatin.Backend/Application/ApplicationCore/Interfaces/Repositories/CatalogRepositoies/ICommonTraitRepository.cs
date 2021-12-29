@@ -28,6 +28,9 @@ namespace QuartierLatin.Backend.Application.ApplicationCore.Interfaces.Repositor
         Task<List<CommonTrait>> GetCommonTraitListByParentId(int parentId);
 		Task<List<CommonTrait>> GetTraitOfTypesByIdentifierWithContetnsAsync(string traitIdentifier);
         Task<int[]> getHousingTraitIds();
+        Task<int[]> getSchoolTraitIds();
+        Task<int[]> getCourseTraitIds();
+        Task<int[]> getUniversityTraitIds();
 		
     }
 }

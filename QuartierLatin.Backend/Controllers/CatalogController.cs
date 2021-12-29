@@ -242,6 +242,9 @@ namespace QuartierLatin.Backend.Controllers
             {
                 if (!traitDic.TryGetValue(id, out var traits))
                     return new List<CommonTrait>();
+				
+
+				
                 return traits.FirstOrDefault(x => x.Key.Identifier == identifier).Value ?? new List<CommonTrait>();
             }
 

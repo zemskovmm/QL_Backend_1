@@ -7,190 +7,154 @@ using QuartierLatin.Backend.Application.ApplicationCore.Models.Enums;
 using QuartierLatin.Backend.Dto.TraitTypeDto;
 using System;
 
-namespace QuartierLatin.Backend.Services.Catalog
-{
-    public class CommonTraitTypeAppService : ICommonTraitTypeAppService
-    {
+namespace QuartierLatin.Backend.Services.Catalog {
+    public class CommonTraitTypeAppService: ICommonTraitTypeAppService {
         private readonly ICommonTraitTypeRepository _commonTraitTypeRepository;
 
-        public CommonTraitTypeAppService(ICommonTraitTypeRepository commonTraitTypeRepository)
-        {
+        public CommonTraitTypeAppService(ICommonTraitTypeRepository commonTraitTypeRepository) {
             _commonTraitTypeRepository = commonTraitTypeRepository;
         }
 
-        public async Task<List<CommonTraitType>> GetTraitTypesAsync()
-        {
+        public async Task < List < CommonTraitType >> GetTraitTypesAsync() {
             return await _commonTraitTypeRepository.GetCommonTraitTypeListAsync();
         }
-		
-		
-		public async Task<List<CommonTraitTypesForEntity>> GetEntityTypesTraitTypeByIdAsync(int id)
-		{
-			
-            return await _commonTraitTypeRepository.GetEntityTypesTraitTypeByIdAsync(id);			
-		}
 
-        public async Task<int> CreateTraitTypeAsync(string? identifier, Dictionary<string, string> names, int order, List<EntityTypeDto> entityTypes)
-        {
-            var trait_type_id=await _commonTraitTypeRepository.CreateCommonTraitTypeAsync(names, identifier, order);
-			foreach (var curEntity in entityTypes)
-            {	
-			   var entityType =   (EntityType) Enum.Parse(typeof(EntityType), curEntity.EntityTypeName, true);;
+        public async Task < List < CommonTraitTypesForEntity >> GetEntityTypesTraitTypeByIdAsync(int id) {
 
-			   await _commonTraitTypeRepository.CreateOrUpdateCommonTraitTypesForEntityAsync(trait_type_id, entityType);
-
-			}
-			
-			return trait_type_id;
-			
+            return await _commonTraitTypeRepository.GetEntityTypesTraitTypeByIdAsync(id);
         }
 
-        public async Task<CommonTraitType> GetTraitTypeByIdAsync(int id)
-        {
+        public async Task < int > CreateTraitTypeAsync(string ? identifier, Dictionary < string, string > names, int order, List < EntityTypeDto > entityTypes) {
+            var traitTypeId = await _commonTraitTypeRepository.CreateCommonTraitTypeAsync(names, identifier, order);
+            foreach(var curEntity in entityTypes) {
+                var entityType = (EntityType)Enum.Parse(typeof(EntityType), curEntity.EntityTypeName, true); ;
+
+                await _commonTraitTypeRepository.CreateOrUpdateCommonTraitTypesForEntityAsync(traitTypeId, entityType);
+
+            }
+
+            return traitTypeId;
+
+        }
+
+        public async Task < CommonTraitType > GetTraitTypeByIdAsync(int id) {
             return await _commonTraitTypeRepository.GetCommonTraitTypeAsync(id);
         }
 
-        public async Task UpdateTraitTypeByIdAsync(int id, string? identifier, Dictionary<string, string> names, int order, List<EntityTypeDto> entityTypes)
-        {
+        public async Task UpdateTraitTypeByIdAsync(int id, string ? identifier, Dictionary < string, string > names, int order, List < EntityTypeDto > entityTypes) {
             await _commonTraitTypeRepository.UpdateCommonTraitTypeAsync(id, names, identifier, order);
-   		    await _commonTraitTypeRepository.DeleteAllEntityTypesForTrait(id);
-			
-			foreach (var curEntity in entityTypes)
-            {	
-			 	var entityType =   (EntityType) Enum.Parse(typeof(EntityType), curEntity.EntityTypeName, true);
+            await _commonTraitTypeRepository.DeleteAllEntityTypesForTrait(id);
 
-			   await _commonTraitTypeRepository.CreateOrUpdateCommonTraitTypesForEntityAsync(id, entityType);
+            foreach(var curEntity in entityTypes) {
+                var entityType = (EntityType)Enum.Parse(typeof(EntityType), curEntity.EntityTypeName, true);
 
-			}
+                await _commonTraitTypeRepository.CreateOrUpdateCommonTraitTypesForEntityAsync(id, entityType);
+
+            }
 
         }
 
-        public async Task<IEnumerable<int>> GetTraitTypeForEntitiesByEntityTypeAsync(EntityType entityType)
-        {
+        public async Task < IEnumerable < int >> GetTraitTypeForEntitiesByEntityTypeAsync(EntityType entityType) {
             return await _commonTraitTypeRepository.GetTraitTypeForEntitiesByEntityTypeIdListAsync(entityType);
         }
 
-        public async Task CreateTraitTypeForEntityByEntityTypeAsync(EntityType entityType, int traitTypeId)
-        {
+        public async Task CreateTraitTypeForEntityByEntityTypeAsync(EntityType entityType, int traitTypeId) {
             await _commonTraitTypeRepository.CreateOrUpdateCommonTraitTypesForEntityAsync(traitTypeId, entityType);
         }
 
-        public async Task DeleteTraitTypeForEntityByEntityTypeAsync(EntityType entityType, int traitTypeId)
-        {
+        public async Task DeleteTraitTypeForEntityByEntityTypeAsync(EntityType entityType, int traitTypeId) {
             await _commonTraitTypeRepository.DeleteCommonTraitTypesForEntityAsync(traitTypeId, entityType);
         }
 
-        public async Task<List<int>> GetEntityTraitToUniversityIdListAsync(int universityId)
-        {
+        public async Task < List < int >> GetEntityTraitToUniversityIdListAsync(int universityId) {
             return await _commonTraitTypeRepository.GetEntityTraitToUniversityIdListAsync(universityId);
         }
 
-        public async Task CreateEntityTraitToUniversityAsync(int universityId, int commonTraitId)
-        {
+        public async Task CreateEntityTraitToUniversityAsync(int universityId, int commonTraitId) {
             await _commonTraitTypeRepository.CreateEntityTraitToUniversityAsync(universityId, commonTraitId);
         }
 
-        public async Task DeleteEntityTraitToUniversityAsync(int universityId, int commonTraitId)
-        {
+        public async Task DeleteEntityTraitToUniversityAsync(int universityId, int commonTraitId) {
             await _commonTraitTypeRepository.DeleteEntityTraitToUniversityAsync(universityId, commonTraitId);
         }
 
-        public async Task<List<CommonTraitType>> GetTraitTypesWithIndetifierAsync()
-        {
+        public async Task < List < CommonTraitType >> GetTraitTypesWithIndetifierAsync() {
             return await _commonTraitTypeRepository.GetTraitTypesWithIndetifierAsync();
         }
 
-        public async Task<List<int>> GetEntityTraitToSchoolIdListAsync(int schoolId)
-        {
+        public async Task < List < int >> GetEntityTraitToSchoolIdListAsync(int schoolId) {
             return await _commonTraitTypeRepository.GetEntityTraitToSchoolIdListAsync(schoolId);
         }
 
-        public async Task CreateEntityTraitToSchoolAsync(int schoolId, int commonTraitId)
-        {
+        public async Task CreateEntityTraitToSchoolAsync(int schoolId, int commonTraitId) {
             await _commonTraitTypeRepository.CreateEntityTraitToSchoolAsync(schoolId, commonTraitId);
         }
 
-        public async Task DeleteEntityTraitToSchoolAsync(int schoolId, int commonTraitId)
-        {
+        public async Task DeleteEntityTraitToSchoolAsync(int schoolId, int commonTraitId) {
             await _commonTraitTypeRepository.DeleteEntityTraitToSchoolAsync(schoolId, commonTraitId);
         }
 
-        public async Task<List<int>> GetEntityTraitToCourseIdListAsync(int courseId)
-        {
+        public async Task < List < int >> GetEntityTraitToCourseIdListAsync(int courseId) {
             return await _commonTraitTypeRepository.GetEntityTraitToCourseIdListAsync(courseId);
         }
 
-        public async Task CreateEntityTraitToCourseAsync(int courseId, int commonTraitId)
-        {
+        public async Task CreateEntityTraitToCourseAsync(int courseId, int commonTraitId) {
             await _commonTraitTypeRepository.CreateEntityTraitToCourseAsync(courseId, commonTraitId);
         }
 
-        public async Task DeleteEntityTraitToCourseAsync(int courseId, int commonTraitId)
-        {
+        public async Task DeleteEntityTraitToCourseAsync(int courseId, int commonTraitId) {
             await _commonTraitTypeRepository.DeleteEntityTraitToCourseAsync(courseId, commonTraitId);
         }
 
-        public async Task<List<int>> GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(int universityId, int commonTraitTypeId)
-        {
+        public async Task < List < int >> GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(int universityId, int commonTraitTypeId) {
             return await _commonTraitTypeRepository.GetEntityTraitToUniversityIdByCommonTraitTypeIdListAsync(universityId,
                 commonTraitTypeId);
         }
 
-        public async Task<List<int>> GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(int schoolId, int commonTraitTypeId)
-        {
+        public async Task < List < int >> GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(int schoolId, int commonTraitTypeId) {
             return await _commonTraitTypeRepository.GetEntityTraitToSchoolIdByCommonTraitTypeIdListAsync(schoolId,
                 commonTraitTypeId);
         }
 
-        public async Task<List<int>> GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(int courseId,
-            int commonTraitTypeId)
-        {
+        public async Task < List < int >> GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(int courseId,
+            int commonTraitTypeId) {
             return await _commonTraitTypeRepository.GetEntityTraitToCourseIdByCommonTraitTypeIdListAsync(courseId,
                 commonTraitTypeId);
         }
 
-        public async Task<List<int>> GetEntityTraitToPageIdListAsync(int pageId)
-        {
+        public async Task < List < int >> GetEntityTraitToPageIdListAsync(int pageId) {
             return await _commonTraitTypeRepository.GetEntityTraitToPageIdListAsync(pageId);
         }
 
-        public async Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId)
-        {
+        public async Task CreateEntityTraitToPageAsync(int pageId, int commonTraitId) {
             await _commonTraitTypeRepository.CreateEntityTraitToPageAsync(pageId, commonTraitId);
         }
 
-        public async Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId)
-        {
+        public async Task DeleteEntityTraitToPageAsync(int pageId, int commonTraitId) {
             await _commonTraitTypeRepository.DeleteEntityTraitToPageAsync(pageId, commonTraitId);
         }
 
-        public async Task<List<int>> GetEntityTraitToHousingIdListAsync(int housingId)
-        {
+        public async Task < List < int >> GetEntityTraitToHousingIdListAsync(int housingId) {
             return await _commonTraitTypeRepository.GetEntityTraitToHousingIdListAsync(housingId);
         }
 
-        public async Task CreateEntityTraitToHousingAsync(int housingId, int commonTraitId)
-        {
+        public async Task CreateEntityTraitToHousingAsync(int housingId, int commonTraitId) {
             await _commonTraitTypeRepository.CreateEntityTraitToHousingAsync(housingId, commonTraitId);
         }
 
-        public async Task DeleteEntityTraitToHousingAsync(int housingId, int commonTraitId)
-        {
+        public async Task DeleteEntityTraitToHousingAsync(int housingId, int commonTraitId) {
             await _commonTraitTypeRepository.DeleteEntityTraitToHousingAsync(housingId, commonTraitId);
         }
 
-        public async Task<List<int>> GetEntityTraitToHousingAccommodationTypeIdListAsync(int housingAccommodationTypeId)
-        {
+        public async Task < List < int >> GetEntityTraitToHousingAccommodationTypeIdListAsync(int housingAccommodationTypeId) {
             return await _commonTraitTypeRepository.GetEntityTraitToHousingAccommodationTypeIdListAsync(housingAccommodationTypeId);
         }
 
-        public async Task CreateEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId)
-        {
+        public async Task CreateEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId) {
             await _commonTraitTypeRepository.CreateEntityTraitToHousingAccommodationTypeAsync(housingAccommodationTypeId, commonTraitId);
         }
 
-        public async Task DeleteEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId)
-        {
+        public async Task DeleteEntityTraitToHousingAccommodationTypeAsync(int housingAccommodationTypeId, int commonTraitId) {
             await _commonTraitTypeRepository.DeleteEntityTraitToHousingAccommodationTypeAsync(housingAccommodationTypeId, commonTraitId);
         }
     }

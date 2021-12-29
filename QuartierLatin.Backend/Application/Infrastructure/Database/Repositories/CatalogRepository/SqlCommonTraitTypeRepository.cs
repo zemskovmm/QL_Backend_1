@@ -126,8 +126,9 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
         public Task<List<CommonTraitType>> GetTraitTypesWithIndetifierByEntityTypeAsync(EntityType entityType) =>
             _db.ExecAsync(db => (from traitType in db.CommonTraitTypes
                 join traitToEntity in db.CommonTraitTypesForEntities.Where(e => e.EntityType == entityType)
-                    on traitType.Id equals traitToEntity.CommonTraitId
-                select traitType).Distinct().ToListAsync());
+                    on traitType.Id equals traitToEntity.CommonTraitId 
+			//	join commonTrait in db.CommonTraits.Where(c => c.CommonTraitTypeId == traitType.Id) on  commonTrait.CommonTraitTypeId equals traitType.Id
+                select traitType  ).Distinct().ToListAsync());
 
         public async Task<List<int>> GetEntityTraitToSchoolIdListAsync(int schoolId)
         {
