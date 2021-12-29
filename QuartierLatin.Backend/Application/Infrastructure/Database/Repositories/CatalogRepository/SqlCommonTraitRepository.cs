@@ -27,21 +27,21 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 		 }
 		 
 		 public async Task<int[]> getHousingTraitIds(){
-			            var traits_for_housong_array = await _db.ExecAsync(db =>
+			            var traitsForHousingArray = await _db.ExecAsync(db =>
                 db.CommonTraitToHousing.Where(x => x.CommonTraitId != null).ToListAsync());		
 				
-			var traits_array = await _db.ExecAsync(db =>
-                db.CommonTraits.Where(x => (traits_for_housong_array.Select(x => x.CommonTraitId)).Contains(x.Id)).ToListAsync());
-            int?[] parent_trait_ids=traits_array.Select(x => x.ParentId).ToArray();	
-			int[] traits_ids_array=traits_array.Select(x =>x.Id).ToArray();
+			var traitsArray = await _db.ExecAsync(db =>
+                db.CommonTraits.Where(x => (traitsForHousingArray.Select(x => x.CommonTraitId)).Contains(x.Id)).ToListAsync());
+            int?[] parentTraitIds=traitsArray.Select(x => x.ParentId).ToArray();	
+			int[] traitsIdsArray=traitsArray.Select(x =>x.Id).ToArray();
 
 			
 			
 			List<int> termsList = new List<int>();
-			foreach (var curParentId in parent_trait_ids){
+			foreach (var curParentId in parentTraitIds){
 				termsList.Add(curParentId.GetValueOrDefault());
 			}
-			foreach (var curTraitId in traits_ids_array){
+			foreach (var curTraitId in traitsIdsArray){
 				termsList.Add(curTraitId);
 			}			
 
@@ -57,10 +57,10 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 		 
 		 
 		 public async Task<int[]> getSchoolTraitIds(){
-			    var traits_array=await _db.ExecAsync(db =>
+			    var traitsArray=await _db.ExecAsync(db =>
                    db.CommonTraitToSchools.Where(x => x.CommonTraitId != null).ToListAsync());		
 				List<int> termsList = new List<int>();
-				foreach (var curTrait in traits_array){
+				foreach (var curTrait in traitsArray){
 				   termsList.Add(curTrait.CommonTraitId);
 			    }	
 				
@@ -69,10 +69,10 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 		 }	
 
 		 public async Task<int[]> getCourseTraitIds(){
-			    var traits_array=await _db.ExecAsync(db =>
+			    var traitsArray=await _db.ExecAsync(db =>
                    db.CommonTraitToCourses.Where(x => x.CommonTraitId != null).ToListAsync());
 				List<int> termsList = new List<int>();
-				foreach (var curTrait in traits_array){
+				foreach (var curTrait in traitsArray){
 				   termsList.Add(curTrait.CommonTraitId);
 			    }	
 				
@@ -82,10 +82,10 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 
 
 		 public async Task<int[]> getUniversityTraitIds(){
-			    var traits_array=await _db.ExecAsync(db =>
+			    var traitsArray=await _db.ExecAsync(db =>
                    db.CommonTraitsToUniversities.Where(x => x.CommonTraitId != null).ToListAsync());
 				List<int> termsList = new List<int>();
-				foreach (var curTrait in traits_array){
+				foreach (var curTrait in traitsArray){
 				   termsList.Add(curTrait.CommonTraitId);
 			    }	
 				
