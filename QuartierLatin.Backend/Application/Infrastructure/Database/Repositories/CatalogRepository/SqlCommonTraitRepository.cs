@@ -54,6 +54,47 @@ namespace QuartierLatin.Backend.Application.Infrastructure.Database.Repositories
 		
 			 
 		 }
+		 
+		 
+		 public async Task<int[]> getSchoolTraitIds(){
+			    var traits_array=await _db.ExecAsync(db =>
+                   db.CommonTraitToSchools.Where(x => x.CommonTraitId != null).ToListAsync());		
+				List<int> termsList = new List<int>();
+				foreach (var curTrait in traits_array){
+				   termsList.Add(curTrait.CommonTraitId);
+			    }	
+				
+				return termsList.ToArray();
+	 
+		 }	
+
+		 public async Task<int[]> getCourseTraitIds(){
+			    var traits_array=await _db.ExecAsync(db =>
+                   db.CommonTraitToCourses.Where(x => x.CommonTraitId != null).ToListAsync());
+				List<int> termsList = new List<int>();
+				foreach (var curTrait in traits_array){
+				   termsList.Add(curTrait.CommonTraitId);
+			    }	
+				
+				return termsList.ToArray();				   
+	 
+		 }	
+
+
+		 public async Task<int[]> getUniversityTraitIds(){
+			    var traits_array=await _db.ExecAsync(db =>
+                   db.CommonTraitsToUniversities.Where(x => x.CommonTraitId != null).ToListAsync());
+				List<int> termsList = new List<int>();
+				foreach (var curTrait in traits_array){
+				   termsList.Add(curTrait.CommonTraitId);
+			    }	
+				
+				return termsList.ToArray();				   
+	 
+		 }			 
+
+
+		 
 
         public async Task<int> CreateCommonTraitAsync(int commonTraitTypeId, Dictionary<string, string> names, int? iconBlobId, int order, int? parentId)
         {
